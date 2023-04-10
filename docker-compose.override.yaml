@@ -1,0 +1,18 @@
+version: '3.4'
+
+x-support_metrics_service:
+  &support_metrics_service
+  build:
+    context: .
+    dockerfile: Dockerfile
+
+services:
+
+  support_metrics_worker:
+    <<: *support_metrics_service
+
+  support_metrics_dashboard:
+    <<: *support_metrics_service
+
+  support_metrics_server:
+    <<: *support_metrics_service
