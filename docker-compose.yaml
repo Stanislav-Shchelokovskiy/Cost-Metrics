@@ -9,42 +9,57 @@ x-support_metrics_service:
     - SQL_DATABASE
     - SQL_USER
     - SQL_PASSWORD
+    - WF_LOGIN_HEADER
+    - WF_LOGIN_PASSWORD
+    - WF_LOGIN
+    - WF_PASSWORD
+    - WF_ENDPOINT
     - SERVER_PORT
     - FLOWER_PORT
     - CORS_ORIGINS
     - QUERY_SERVICE
-    - REDIS_PORT
-    - CELERY_BROKER_URL=redis://${REDIS_SERVICE}:${REDIS_PORT}/0
-    - CELERY_RESULT_BACKEND=redis://${REDIS_SERVICE}:${REDIS_PORT}/0
     - REDIS_DB=support_metrics
-    - DB_HOME
+    - CELERY_BROKER_URL=redis://support_metrics_redis:6379/0
+    - CELERY_RESULT_BACKEND=redis://support_metrics_redis:6379/0
     - SQLITE_DATABASE=${DB_HOME}/db
     - LD_LIBRARY_PATH=/usr/lib #https://stackoverflow.com/questions/49920444/upgrading-sqlite3-version-used-in-python3-on-linux
     - PRODUCTION
+    - RECALCULATE_FROM_THE_BEGINNING
 
 services:
   support_metrics_dashboard:
     <<: *support_metrics_service
     hostname: support_metrics_dashboard
     container_name: support_metrics_dashboard
-    command: celery -A worker flower --port=${FLOWER_PORT}
+    command: celery --app=worker flower --port=${FLOWER_PORT}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${FLOWER_PORT}/healthcheck"]
+      test:
+        [
+          "CMD",
+          "curl",
+          "-f",
+          "http://localhost:${FLOWER_PORT}/healthcheck"
+        ]
       interval: 5s
       timeout: 5s
       retries: 3
       start_period: 5s
     ports:
       - "${FLOWER_PORT}:${FLOWER_PORT}"
+    depends_on:
+      support_metrics_redis:
+        condition: service_healthy
 
   support_metrics_worker:
     <<: *support_metrics_service
     hostname: support_metrics_worker
     container_name: support_metrics_worker
-    command: celery --app worker worker --beat --loglevel=INFO --concurrency 7 #--logfile=logs/celery.log
+    command: celery --app=worker worker --beat --loglevel=INFO --concurrency=7
     volumes:
       - support_metrics-volume:${DB_HOME}
     depends_on:
+      support_metrics_redis:
+        condition: service_healthy
       support_metrics_dashboard:
         condition: service_healthy
 
@@ -54,22 +69,25 @@ services:
     container_name: support_metrics_server
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
-    command: uvicorn server:app --host 0.0.0.0 --port $SERVER_PORT --reload
+    command: uvicorn server:app --host 0.0.0.0 --port ${SERVER_PORT} --log-level critical
     volumes:
       - support_metrics-volume:${DB_HOME}
 
   support_metrics_redis:
-    image: redis/redis-stack-server:latest
+    image: redis/redis-stack:latest
     hostname: support_metrics_redis
     container_name: support_metrics_redis
+    restart: always
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    volumes:
+      - support_metrics-volume:/data
     ports:
-      - "${REDIS_PORT}:6379"
-      - "${REDIS_DATABASE_PORT}:8001"
-
-networks:
-  default:
-    name: support_analytics
-    external: true
+      - "${REDIS_INSIGHT_PORT}:8001"
 
 volumes:
   support_metrics-volume:

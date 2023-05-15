@@ -42,3 +42,10 @@ RUN curl -sSL https://install.python-poetry.org | python3 - --git https://github
     /root/.local/bin/poetry install --only main
 
 # copy app
+COPY configs ./configs
+COPY repository ./repository
+COPY sql_queries ./sql_queries
+COPY tasks ./tasks
+COPY toolbox ./toolbox
+COPY server.py .
+COPY worker.py .
