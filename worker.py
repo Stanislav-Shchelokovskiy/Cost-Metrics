@@ -1,14 +1,13 @@
-import os
 from collections.abc import Callable
 
 from celery import Celery, chord
 from celery.schedules import crontab
 from celery.signals import worker_ready
-import tasks.wf_tasks  as wf_tasks
- 
+
+import tasks.wf_tasks as wf_tasks
 import configs.config as config
 
-print(os.environ['CELERY_BROKER_URL'])
+
 app = Celery(__name__)
 
 
@@ -35,7 +34,7 @@ def setup_periodic_tasks(sender, **kwargs):
             hour=1,
             day_of_week='1-5',
         ),
-       upsert_work_on_holidays.s(),
+        upsert_work_on_holidays.s(),
     )
 
 
