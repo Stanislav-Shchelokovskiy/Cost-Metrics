@@ -1,6 +1,5 @@
-from collections.abc import Iterable
 from toolbox.sql.repository_queries import RepositoryAlchemyQueries
-import sql_queries.index as index
+import sql_queries.remote_index as remote_index
 from sql_queries.meta import (
     WorkOnHolidaysMeta,
 )
@@ -9,7 +8,7 @@ from sql_queries.meta import (
 class WorkOnHolidaysQueries(RepositoryAlchemyQueries):
 
     def get_main_query_path(self, **kwargs) -> str:
-        return index.get_upsert_work_on_holidays()
+        return remote_index.get_upsert_work_on_holidays()
 
     def get_main_query_format_params(self, **kwargs) -> dict[str, str]:
         return {

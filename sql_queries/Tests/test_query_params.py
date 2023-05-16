@@ -2,19 +2,37 @@ import pytest
 from typing import Callable
 from os import getcwd
 import toolbox.sql.index as RootPath
-import sql_queries.index as paths_index
+import sql_queries.remote_index as remote_index
+import sql_queries.transform_load_index as transform_load_index
 from pathlib import Path
-from sql_queries.meta import (WorkOnHolidaysMeta)
+from sql_queries.meta import (
+    WorkOnHolidaysMeta,
+    CostmetricsMeta,
+)
 
 
 @pytest.mark.parametrize(
     'get_query_file_path, format_params',
     [
         (
-            paths_index.get_upsert_work_on_holidays,
+            remote_index.get_upsert_work_on_holidays,
             {
                 'values': '(qwe, 2, 3)',
                 **WorkOnHolidaysMeta.get_attrs(),
+            },
+        ),
+        (
+            remote_index.get_cost_metrics_path,
+            {
+                'start': 'start',
+                'end': 'end',
+                **CostmetricsMeta.get_attrs(),
+            },
+        ),
+        (
+            transform_load_index.get_cost_metrics_table_path,
+            {
+                **CostmetricsMeta.get_attrs(),
             },
         ),
     ],

@@ -5,7 +5,7 @@ from celery.schedules import crontab
 from celery.signals import worker_ready
 
 import tasks.wf_tasks as wf_tasks
-import configs.config as config
+import config as config
 
 
 app = Celery(__name__)
