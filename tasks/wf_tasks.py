@@ -37,7 +37,7 @@ def upsert_work_on_holidays(start: str, end: str):
                 (
                     item['resourceID'],
                     DateTimeToSqlString.convert_from_utcstring(item['date']),
-                    hours if (hours:= item['hours']) < 8 else 0,
+                    item['hours'],
                 )
             ) for item in json.loads(work_on_holydays_json)
             if item['isHoliday'] == 1
