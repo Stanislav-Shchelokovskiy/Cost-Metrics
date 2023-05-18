@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS {CostMetrics}(
+CREATE TABLE IF NOT EXISTS {CostMetricsTable}(
     {year_month}                                    TEXT, 
     {emp_tribe_name}                                TEXT,
     {emp_name}                                      TEXT,
@@ -63,5 +63,3 @@ CREATE TABLE IF NOT EXISTS {CostMetrics}(
     {chapter_hour_price_gross_withAOE}              REAL,
     {is_dev_team}                                   INTEGER
 );
-
-CREATE INDEX idx_{CostMetrics} ON {CostMetrics}({year_month}, {emp_tribe_name}, {position_name}, {emp_level_name}, {emp_name});

@@ -5,6 +5,7 @@ from celery.schedules import crontab
 from celery.signals import worker_ready
 
 import tasks.wf_tasks as wf_tasks
+import tasks.cost_metrics_tasks as cost_metrics_tasks
 import config as config
 
 
@@ -14,7 +15,7 @@ app = Celery(__name__)
 @worker_ready.connect
 def on_startup(sender, **kwargs):
     tasks = [
-        'upsert_work_on_holidays',
+        'update_cost_metrics',
     ]
 
     sender_app: Celery = sender.app
@@ -32,10 +33,17 @@ def setup_periodic_tasks(sender, **kwargs):
         crontab(
             minute=0,
             hour=1,
-            day_of_week='1-5',
+            day_of_week=1,
         ),
-        upsert_work_on_holidays.s(),
+        update_cost_metrics.s(),
     )
+
+
+@app.task(name='update_cost_metrics')
+def update_cost_metrics(**kwargs):
+    chord([
+        upsert_work_on_holidays.si(),
+    ])(upsert_cost_metrics.si())
 
 
 @app.task(name='upsert_work_on_holidays', bind=True)
@@ -44,6 +52,15 @@ def upsert_work_on_holidays(self, **kwargs):
         self,
         wf_tasks.upsert_work_on_holidays,
         **config.get_work_on_holidays_period(),
+    )
+
+
+@app.task(name='upsert_cost_metrics', bind=True)
+def upsert_cost_metrics(self, **kwargs):
+    return run_retriable_task(
+        self,
+        cost_metrics_tasks.update_cost_metrics,
+        kwargs=config.get_cost_metrics_period(),
     )
 
 

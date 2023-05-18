@@ -2,8 +2,8 @@ import pytest
 from typing import Callable
 from os import getcwd
 import toolbox.sql.index as RootPath
-import sql_queries.remote_index as remote_index
-import sql_queries.transform_load_index as transform_load_index
+from sql_queries.index import remote_paths_index
+from sql_queries.index import transform_load_paths_index
 from pathlib import Path
 from sql_queries.meta import (
     WorkOnHolidaysMeta,
@@ -15,23 +15,27 @@ from sql_queries.meta import (
     'get_query_file_path, format_params',
     [
         (
-            remote_index.get_upsert_work_on_holidays,
+            remote_paths_index.get_upsert_work_on_holidays,
             {
                 'values': '(qwe, 2, 3)',
                 **WorkOnHolidaysMeta.get_attrs(),
             },
         ),
         (
-            remote_index.get_cost_metrics_path,
+            remote_paths_index.get_cost_metrics_prep_path,
             {
                 'start': 'start',
                 'end': 'end',
-                **CostmetricsMeta.get_attrs(),
             },
         ),
         (
-            transform_load_index.get_cost_metrics_table_path,
+            remote_paths_index.get_cost_metrics_totals_path,
+            CostmetricsMeta.get_attrs(),
+        ),
+        (
+            transform_load_paths_index.get_cost_metrics_table_path,
             {
+                'CostMetricsTable': 'qwe',
                 **CostmetricsMeta.get_attrs(),
             },
         ),

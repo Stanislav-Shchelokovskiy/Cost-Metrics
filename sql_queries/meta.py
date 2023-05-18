@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from toolbox.sql.meta_data import MetaData
 
 
@@ -71,3 +72,19 @@ class CostmetricsMeta(MetaData):
     chapter_hour_price_gross = 'chapter_hour_price_gross'
     chapter_hour_price_gross_withAOE = 'chapter_hour_price_gross_withAOE'
     is_dev_team = 'is_dev_team'
+
+    @staticmethod
+    def get_key_fields() -> Sequence[str]:
+        return (
+            CostmetricsMeta.year_month,
+            CostmetricsMeta.emp_tribe_name,
+            CostmetricsMeta.position_name,
+            CostmetricsMeta.emp_level_name,
+            CostmetricsMeta.emp_name,
+        )
+
+    @staticmethod
+    def get_conflicting_fields() -> Sequence[str]:
+        index_fields = set(CostmetricsMeta.get_key_fields())
+        all_fields = set(CostmetricsMeta.get_values())
+        return all_fields - index_fields
