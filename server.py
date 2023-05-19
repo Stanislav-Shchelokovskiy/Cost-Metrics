@@ -1,9 +1,10 @@
 import os
-import repository.server_repository as server_repository
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from toolbox.utils.converters import JSON_to_object
+from collections.abc import Coroutine
+from repository import LocalRepository
 
 
 app = FastAPI()
@@ -26,9 +27,10 @@ def get_response(json_data: str) -> Response:
     )
 
 
+async def get_repsonse_async(task: Coroutine):
+    return get_response(json_data=await task)
+
+
 @app.get('/get_cost_metrics')
-def get_cost_metrics():
-    # yapf: disable
-    #df_json = server_repository.customers_activity_get_tickets_with_iterations_period()
-    # yapf: enable
-    return get_response(json_data='{"cost": "metrics"}')
+async def get_cost_metrics():
+    return await get_repsonse_async(LocalRepository.cost_metrics.get_data())
