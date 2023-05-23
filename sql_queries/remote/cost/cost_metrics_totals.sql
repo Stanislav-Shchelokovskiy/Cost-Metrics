@@ -370,20 +370,6 @@ support_totals_ex AS (
 	FROM	support_totals
 ),
 
-dev_tickets_per_hour AS (
-	SELECT	tribe_id,
-			s_totals.tribe_iterations_per_hour		/ dev_factor	AS tribe_iterations_per_hour,
-			s_totals.chapter_iterations_per_hour	/ dev_factor	AS chapter_iterations_per_hour,
-			s_totals.tribe_tickets_per_hour			/ dev_factor	AS tribe_tickets_per_hour,
-			s_totals.chapter_tickets_per_hour		/ dev_factor	AS chapter_tickets_per_hour
-	FROM	#DevPerformanceFactors AS dpf
-			CROSS APPLY (
-				SELECT	TOP 1 tribe_tickets_per_hour, chapter_tickets_per_hour, tribe_iterations_per_hour, chapter_iterations_per_hour
-				FROM	support_totals
-				WHERE	tribe_name = dpf.tribe_name
-			) AS s_totals
-),
-
 dev_support_activity AS (
 	SELECT	emp_activity.year_month									AS year_month,
 			emp_activity.emp_tribe_name								AS emp_tribe_name,
@@ -399,29 +385,37 @@ dev_support_activity AS (
 			iterations												AS iterations,
 			unique_tickets											AS unique_tickets,
 			emp_tribe_id											AS emp_tribe_id,
-			NULLIF(dtph.tribe_iterations_per_hour, 0)				AS tribe_iterations_per_hour,
-			NULLIF(dtph.chapter_iterations_per_hour, 0)				AS chapter_iterations_per_hour,
-			NULLIF(dtph.tribe_tickets_per_hour, 0)					AS tribe_tickets_per_hour,
-			NULLIF(dtph.chapter_tickets_per_hour, 0)				AS chapter_tickets_per_hour,
-			iterations / NULLIF(dtph.tribe_iterations_per_hour, 0)	AS probable_sc_hours
+			emp_activity.paid_hours * ISNULL(eds.perc_of_worktime_spent_on_support, 
+				SUM(eds.perc_of_worktime_spent_on_support) OVER (PARTITION BY emp_tribe_name) * 1.0
+				/ SUM(CASE WHEN eds.perc_of_worktime_spent_on_support IS NULL THEN 0 ELSE 1 END) OVER (PARTITION BY emp_tribe_name)) AS sc_hours
 	FROM	emp_activity
-			INNER JOIN dev_tickets_per_hour AS dtph ON dtph.tribe_id = emp_activity.emp_tribe_id
+			LEFT JOIN DXStatisticsV2.dbo.EmployeesDevSupport AS eds ON eds.crmid = emp_activity.emp_crmid
 	WHERE	(position_id IN (@developer, @pm, @principal_pm, @technical_writer)
 		OR (position_id IN (@chapter_leader, @tribe_leader, @squad_leader) AND has_support_processing_role = 0))
 		AND iterations > 0
 ),
 
-dev_sc_activity_hours AS (
-	SELECT	*,
-			ROUND(IIF(probable_sc_hours > paid_hours, paid_hours,  probable_sc_hours), 1) AS sc_hours,
-			probable_sc_hours + paid_vacation_hours * (IIF(probable_sc_hours > paid_hours, paid_hours,  probable_sc_hours) * 1.0 / paid_hours) AS probable_sc_paidvacs_hours	
-	FROM	dev_support_activity
-),
-
 dev_sc_activity_total_hours AS (
 	SELECT	*,
-			ROUND(IIF(probable_sc_paidvacs_hours > paid_hours, paid_hours,  probable_sc_paidvacs_hours), 1) AS sc_paidvacs_hours	
-	FROM	dev_sc_activity_hours
+			-----------------------------------------------------------------------------------------------------------
+			IIF(SUM(sc_hours)	OVER (PARTITION BY emp_tribe_name, year_month) = 0, 0,
+			SUM(iterations)		OVER (PARTITION BY emp_tribe_name, year_month) * 1.0 
+			/ SUM(sc_hours)		OVER (PARTITION BY emp_tribe_name, year_month))			AS tribe_iterations_per_hour,
+			-----------------------------------------------------------------------------------------------------------
+			IIF(SUM(sc_hours)	OVER (PARTITION BY year_month) = 0, 0,
+			SUM(iterations)		OVER (PARTITION BY year_month) * 1.0 
+			/ SUM(sc_hours)		OVER (PARTITION BY year_month))							AS chapter_iterations_per_hour,
+			-----------------------------------------------------------------------------------------------------------
+			IIF(SUM(sc_hours)	OVER (PARTITION BY emp_tribe_name, year_month) = 0, 0,
+			SUM(unique_tickets)	OVER (PARTITION BY emp_tribe_name, year_month) * 1.0 
+			/ SUM(sc_hours)		OVER (PARTITION BY emp_tribe_name, year_month))			AS tribe_tickets_per_hour,
+			-----------------------------------------------------------------------------------------------------------
+			IIF(SUM(sc_hours)	OVER (PARTITION BY year_month) = 0, 0,
+			SUM(unique_tickets)	OVER (PARTITION BY year_month) * 1.0 
+			/ SUM(sc_hours)		OVER (PARTITION BY year_month))							AS chapter_tickets_per_hour,
+			-----------------------------------------------------------------------------------------------------------
+			sc_hours + paid_vacation_hours * (IIF(sc_hours > paid_hours, paid_hours, sc_hours) * 1.0 / paid_hours) AS sc_paidvacs_hours	
+	FROM	dev_support_activity
 ),
 
 dev_sc_activity_total_hours_normalized AS (
