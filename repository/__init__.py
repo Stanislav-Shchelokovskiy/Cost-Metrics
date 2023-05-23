@@ -10,7 +10,7 @@ from toolbox.sql_async import (
 )
 from repository.wf.work_on_holidays import WorkOnHolidaysQueries
 from repository.metrics.remote.cost_metrics import CostMetricsQueries
-from repository.metrics.local.cost_metrics import CostMetricsQueryDescriptor
+from repository.metrics.local.cost_metrics.repository import CostMetricsRepository
 
 
 class WfRepository:
@@ -34,4 +34,4 @@ class LocalRepository:
             query_executor=AsyncSQLiteQueryExecutor()
         )
 
-    cost_metrics = __create_async_repository(CostMetricsQueryDescriptor())
+    cost_metrics = CostMetricsRepository(__create_async_repository)

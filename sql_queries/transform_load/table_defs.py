@@ -12,7 +12,7 @@ def get_create_table_statements() -> dict[str, str]:
 
 # yapf: disable
 __create_table_statements = {
-    local_names_index.get_cost_metrics_table_name():
+    local_names_index.get_cost_metrics_name():
         SqlQuery(
             query_file_path=transform_load_paths_index.get_cost_metrics_table_path(),
             format_params={

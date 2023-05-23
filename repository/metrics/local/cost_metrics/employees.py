@@ -1,21 +1,23 @@
 from collections.abc import Mapping
 from toolbox.sql_async import AsyncQueryDescriptor
 from toolbox.sql import MetaData
-from sql_queries.meta import CostmetricsMeta
 from sql_queries.index import local_names_index
 from sql_queries.index import local_paths_index
+from sql_queries.meta import CostmetricsEmployeesMeta
 
 
 # yapf: disable
-class CostMetricsQueryDescriptor(AsyncQueryDescriptor):
+class EmployeesQueryDescriptor(AsyncQueryDescriptor):
 
     def get_path(self, kwargs: Mapping) -> str:
-        return local_paths_index.get_cost_metrics_table_path()
+        return local_paths_index.get_general_select_path()
 
     def get_fields_meta(self, kwargs: Mapping) -> MetaData:
-        return CostmetricsMeta
+        return CostmetricsEmployeesMeta
 
     def get_format_params(self, kwargs: Mapping) -> Mapping[str, str]:
         return {
-            'CostMetricsTable': local_names_index.get_cost_metrics_table_name(),
+            'columns': ','.join(self.get_fields(kwargs)),
+            'table_name': local_names_index.get_cost_metrics_employees_name(),
+            'filter_group_limit_clause': '',
         }

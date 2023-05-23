@@ -47,6 +47,14 @@ from sql_queries.meta import (
                 **CostmetricsMeta.get_attrs(),
             },
         ),
+        (
+            local_paths_index.get_general_select_path,
+            {
+                'columns': 'qwe',
+                'table_name': 'qwe',
+                'filter_group_limit_clause': 'qwe',
+            },
+        ),
     ],
 )
 def test_query_params(

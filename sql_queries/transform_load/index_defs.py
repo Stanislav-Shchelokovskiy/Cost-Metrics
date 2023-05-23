@@ -1,6 +1,6 @@
 from typing import Iterable
 from sql_queries.index import local_names_index
-from sql_queries.meta import CostmetricsMeta
+from sql_queries.meta import CostmetricsMeta, CostmetricsEmployeesMeta
 
 
 def _create_index_statement(
@@ -14,11 +14,19 @@ def _create_index_statement(
 
 def get_create_index_statements() -> dict[str, tuple[str]]:
     return {
-        local_names_index.get_cost_metrics_table_name():
+        local_names_index.get_cost_metrics_name():
             (
                 _create_index_statement(
-                    tbl=local_names_index.get_cost_metrics_table_name(),
+                    tbl=local_names_index.get_cost_metrics_name(),
                     cols=CostmetricsMeta.get_key_fields(),
+                    unique=True,
+                ),
+            ),
+        local_names_index.get_cost_metrics_employees_name():
+            (
+                _create_index_statement(
+                    tbl=local_names_index.get_cost_metrics_employees_name(),
+                    cols=CostmetricsEmployeesMeta.get_key_fields(),
                     unique=True,
                 ),
             )

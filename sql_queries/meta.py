@@ -1,11 +1,26 @@
 from collections.abc import Sequence
-from toolbox.sql.meta_data import MetaData
+from toolbox.sql.meta_data import MetaData, KnotMeta
 
 
 class WorkOnHolidaysMeta(MetaData):
     crmid = 'crmid'
     date = 'date'
     hours = 'hours'
+
+
+class NameKnotMeta(MetaData):
+    name = KnotMeta.name
+
+
+class CostmetricsEmployeesMeta(MetaData):
+    name = 'name'
+    tribe = 'tribe'
+
+    def get_key_fields() -> Sequence[str]:
+        return (
+            CostmetricsEmployeesMeta.tribe,
+            CostmetricsEmployeesMeta.name,
+        )
 
 
 class CostmetricsMeta(MetaData):
