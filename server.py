@@ -31,28 +31,28 @@ async def get_repsonse_async(task: Coroutine):
     return get_response(json_data=await task)
 
 
-@app.get('/cost_metrics')
+@app.get('/CostMetrics')
 async def get_cost_metrics():
     return await get_repsonse_async(
         LocalRepository.cost_metrics.cost_metrics.get_data()
     )
 
 
-@app.get('/cost_metrics/tribes')
+@app.get('/CostMetrics/Tribes')
 async def get_cost_metrics_tribes():
     return await get_repsonse_async(
         LocalRepository.cost_metrics.tribes.get_data()
     )
 
 
-@app.get('/cost_metrics/positions')
+@app.get('/CostMetrics/Positions')
 async def get_cost_metrics_positions():
     return await get_repsonse_async(
         LocalRepository.cost_metrics.positions.get_data()
     )
 
 
-@app.get('/cost_metrics/employees')
+@app.get('/CostMetrics/Employees')
 async def get_cost_metrics_employees():
     return await get_repsonse_async(
         LocalRepository.cost_metrics.employees.get_data()
