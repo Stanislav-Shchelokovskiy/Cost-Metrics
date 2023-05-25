@@ -5,6 +5,7 @@ from fastapi.responses import Response
 from toolbox.utils.converters import JSON_to_object
 from collections.abc import Coroutine
 from repository import LocalRepository
+from config import get_cost_metrics_period_json
 
 
 app = FastAPI()
@@ -56,4 +57,31 @@ async def get_cost_metrics_positions():
 async def get_cost_metrics_employees():
     return await get_repsonse_async(
         LocalRepository.cost_metrics.employees.get_data()
+    )
+
+
+@app.get('/CostMetrics/Period')
+async def customers_activity_get_tickets_with_iterations_period():
+    return await get_repsonse_async(get_cost_metrics_period_json())
+
+
+@app.get('/GroupByPeriods')
+async def get_group_by_periods():
+    return await get_repsonse_async(
+        LocalRepository.periods.get_group_by_periods_json()
+    )
+
+
+@app.get('/PeriodsArray')
+async def get_periods_array(
+    start: str,
+    end: str,
+    format: str,
+):
+    return await get_repsonse_async(
+        LocalRepository.periods.generate_periods(
+            start=start,
+            end=end,
+            format=format,
+        )
     )

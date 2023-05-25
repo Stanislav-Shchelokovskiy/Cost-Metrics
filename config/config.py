@@ -1,7 +1,12 @@
 import os
+import json
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from toolbox.utils.converters import DateTimeToSqlString
+
+
+async def get_cost_metrics_period_json():
+    return json.dumps(get_cost_metrics_period())
 
 
 def get_cost_metrics_period() -> dict[str, str]:
