@@ -3,9 +3,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from toolbox.utils.converters import JSON_to_object
+from toolbox.server_models import ViewState
 from collections.abc import Coroutine
 from repository import LocalRepository
 from config import get_cost_metrics_period_json
+import toolbox.cache.view_state_cache as view_state_cache
 
 
 app = FastAPI()
@@ -85,3 +87,15 @@ async def get_periods_array(
             format=format,
         )
     )
+
+
+@app.post('/PushState')
+def push_state(params: ViewState):
+    state_id = view_state_cache.push_state(params.state)
+    return get_response(json_data=state_id)
+
+
+@app.get('/PullState')
+def pull_state(state_id: str):
+    state = view_state_cache.pull_state(state_id)
+    return get_response(json_data=state)
