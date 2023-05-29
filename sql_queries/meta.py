@@ -89,6 +89,53 @@ class CostmetricsMeta(MetaData):
     is_dev_team = 'is_dev_team'
 
     @staticmethod
+    def get_metrics() -> Sequence[str]:
+        return (
+            {'name':CostmetricsMeta.emp_total_work_hours},
+            {'name':CostmetricsMeta.tribe_total_work_hours},
+            {'name':CostmetricsMeta.chapter_total_work_hours},
+            {'name':CostmetricsMeta.emp_sc_work_cost_gross},
+            {'name':CostmetricsMeta.tribe_sc_work_cost_gross},
+            {'name':CostmetricsMeta.chapter_sc_work_cost_gross},
+            {'name':CostmetricsMeta.emp_sc_work_cost_gross_withAOE},
+            {'name':CostmetricsMeta.tribe_sc_work_cost_gross_with_AOE},
+            {'name':CostmetricsMeta.chapter_sc_work_cost_gross_withAOE},
+            {'name':CostmetricsMeta.emp_proactive_work_cost_gross},
+            {'name':CostmetricsMeta.tribe_proactive_work_cost_gross},
+            {'name':CostmetricsMeta.chapter_proactive_work_cost_gross},
+            {'name':CostmetricsMeta.emp_proactive_work_cost_gross_withAOE},
+            {'name':CostmetricsMeta.tribe_proactive_work_cost_gross_withAOE},
+            {'name':CostmetricsMeta.chapter_proactive_work_cost_gross_withAOE},
+            {'name':CostmetricsMeta.emp_ticket_cost_gross},
+            {'name':CostmetricsMeta.tribe_ticket_cost_gross},
+            {'name':CostmetricsMeta.chapter_ticket_cost_gross},
+            {'name':CostmetricsMeta.emp_ticket_cost_gross_withAOE},
+            {'name':CostmetricsMeta.tribe_ticket_cost_gross_withAOE},
+            {'name':CostmetricsMeta.chapter_ticket_cost_gross_withAOE},
+            {'name':CostmetricsMeta.emp_iteration_cost_gross},
+            {'name':CostmetricsMeta.tribe_iteration_cost_gross},
+            {'name':CostmetricsMeta.chapter_iteration_cost_gross},
+            {'name':CostmetricsMeta.emp_iteration_cost_gross_withAOE},
+            {'name':CostmetricsMeta.tribe_iteration_cost_gross_withAOE},
+            {'name':CostmetricsMeta.chapter_iteration_cost_gross_withAOE},
+            {'name':CostmetricsMeta.emp_iterations_per_hour},
+            {'name':CostmetricsMeta.tribe_iterations_per_hour},
+            {'name':CostmetricsMeta.chapter_iterations_per_hour},
+            {'name':CostmetricsMeta.emp_hours_per_ticket},
+            {'name':CostmetricsMeta.emp_tickets_per_hour},
+            {'name':CostmetricsMeta.tribe_tickets_per_hour},
+            {'name':CostmetricsMeta.chapter_tickets_per_hour},
+            {'name':CostmetricsMeta.tribe_fot_gross},
+            {'name':CostmetricsMeta.tribe_fot_gross_withAOE},
+            {'name':CostmetricsMeta.chapter_fot_gross},
+            {'name':CostmetricsMeta.chapter_fot_gross_withAOE},
+            {'name':CostmetricsMeta.tribe_hour_price_gross},
+            {'name':CostmetricsMeta.tribe_hour_price_gross_withAOE},
+            {'name':CostmetricsMeta.chapter_hour_price_gross},
+            {'name':CostmetricsMeta.chapter_hour_price_gross_withAOE},
+        )
+
+    @staticmethod
     def get_key_fields() -> Sequence[str]:
         return (
             CostmetricsMeta.year_month,

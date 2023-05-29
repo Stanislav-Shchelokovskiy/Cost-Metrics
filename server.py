@@ -88,6 +88,11 @@ async def get_periods_array(
         )
     )
 
+@app.get('/CostMetrics/Metrics')
+async def get_metrics():
+    return await get_repsonse_async(
+        LocalRepository.cost_metrics.get_metrics()
+    )
 
 @app.post('/PushState')
 def push_state(params: ViewState):
