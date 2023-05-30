@@ -133,6 +133,7 @@ class CostmetricsMeta(MetaData):
     def get_key_fields() -> Sequence[str]:
         return (
             CostmetricsMeta.year_month,
+            CostmetricsMeta.team,
             CostmetricsMeta.emp_tribe_name,
             CostmetricsMeta.position_name,
             CostmetricsMeta.emp_level_name,
