@@ -10,13 +10,14 @@ class CostMetricsQueries(RepositoryAlchemyQueries):
     def get_prep_queries(self, **kwargs) -> Iterable[SqlAlchemyQuery]:
         return (
             SqlAlchemyQuery(
-                query_file_path=remote_paths_index.get_cost_metrics_prep_path(),
+                query_file_path=remote_paths_index.CostMetrics.
+                cost_metrics_prep,
                 format_params=kwargs,
             ),
         )
 
     def get_main_query_path(self, **kwargs) -> str:
-        return remote_paths_index.get_cost_metrics_path()
+        return remote_paths_index.CostMetrics.cost_metrics
 
     def get_main_query_format_params(self, **kwargs) -> dict[str, str]:
         return CostmetricsMeta.get_attrs()

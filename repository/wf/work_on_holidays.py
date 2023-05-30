@@ -8,7 +8,7 @@ from sql_queries.meta import (
 class WorkOnHolidaysQueries(RepositoryAlchemyQueries):
 
     def get_main_query_path(self, **kwargs) -> str:
-        return remote_paths_index.get_upsert_work_on_holidays()
+        return remote_paths_index.WF.upsert_work_on_holidays
 
     def get_main_query_format_params(self, **kwargs) -> dict[str, str]:
         return {

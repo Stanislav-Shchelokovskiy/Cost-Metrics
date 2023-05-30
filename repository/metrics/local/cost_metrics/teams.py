@@ -1,23 +1,22 @@
 from collections.abc import Mapping
 from toolbox.sql_async import AsyncQueryDescriptor
 from toolbox.sql import MetaData
-from sql_queries.meta import NameKnotMeta
+from sql_queries.meta import KnotMeta
 from sql_queries.index import local_names_index
 from sql_queries.index import local_paths_index
 
 
-# yapf: disable
-class TribesQueryDescriptor(AsyncQueryDescriptor):
+class TeamsQueryDescriptor(AsyncQueryDescriptor):
 
     def get_path(self, kwargs: Mapping) -> str:
         return local_paths_index.General.general_select
 
     def get_fields_meta(self, kwargs: Mapping) -> MetaData:
-        return NameKnotMeta
+        return KnotMeta
 
     def get_format_params(self, kwargs: Mapping) -> Mapping[str, str]:
         return {
-            'columns': NameKnotMeta.name,
-            'table_name': local_names_index.CostMetrics.tribes,
+            'columns': ','.join(KnotMeta.get_values()),
+            'table_name': local_names_index.CostMetrics.teams,
             'filter_group_limit_clause': '',
         }

@@ -41,6 +41,13 @@ async def get_cost_metrics():
     )
 
 
+@app.get('/CostMetrics/Teams')
+async def get_cost_metrics_teams():
+    return await get_repsonse_async(
+        LocalRepository.cost_metrics.teams.get_data()
+    )
+
+
 @app.get('/CostMetrics/Tribes')
 async def get_cost_metrics_tribes():
     return await get_repsonse_async(
@@ -88,11 +95,11 @@ async def get_periods_array(
         )
     )
 
+
 @app.get('/CostMetrics/Metrics')
 async def get_metrics():
-    return await get_repsonse_async(
-        LocalRepository.cost_metrics.get_metrics()
-    )
+    return await get_repsonse_async(LocalRepository.cost_metrics.get_metrics())
+
 
 @app.post('/PushState')
 def push_state(params: ViewState):

@@ -10,12 +10,12 @@ from sql_queries.index import local_paths_index
 class CostMetricsQueryDescriptor(AsyncQueryDescriptor):
 
     def get_path(self, kwargs: Mapping) -> str:
-        return local_paths_index.get_cost_metrics_table_path()
+        return local_paths_index.CostMetrics.cost_metrics_table
 
     def get_fields_meta(self, kwargs: Mapping) -> MetaData:
         return CostmetricsMeta
 
     def get_format_params(self, kwargs: Mapping) -> Mapping[str, str]:
         return {
-            'CostMetricsTable': local_names_index.get_cost_metrics_name(),
+            'CostMetricsTable': local_names_index.CostMetrics.cost_metrics,
         }

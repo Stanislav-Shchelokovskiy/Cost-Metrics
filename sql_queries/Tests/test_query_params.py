@@ -1,5 +1,4 @@
 import pytest
-from typing import Callable
 from os import getcwd
 import toolbox.sql.index as RootPath
 from sql_queries.index import remote_paths_index
@@ -16,39 +15,39 @@ from sql_queries.meta import (
     'get_query_file_path, format_params',
     [
         (
-            remote_paths_index.get_upsert_work_on_holidays,
+            remote_paths_index.WF.upsert_work_on_holidays,
             {
                 'values': '(qwe, 2, 3)',
                 **WorkOnHolidaysMeta.get_attrs(),
             },
         ),
         (
-            remote_paths_index.get_cost_metrics_prep_path,
+            remote_paths_index.CostMetrics.cost_metrics_prep,
             {
                 'start': 'start',
                 'end': 'end',
             },
         ),
         (
-            remote_paths_index.get_cost_metrics_path,
+            remote_paths_index.CostMetrics.cost_metrics,
             CostmetricsMeta.get_attrs(),
         ),
         (
-            transform_load_paths_index.get_cost_metrics_table_path,
+            transform_load_paths_index.CostMetrics.cost_metrics_table,
             {
                 'CostMetricsTable': 'qwe',
                 **CostmetricsMeta.get_attrs(),
             },
         ),
         (
-            local_paths_index.get_cost_metrics_table_path,
+            local_paths_index.CostMetrics.cost_metrics_table,
             {
                 'CostMetricsTable': 'qwe',
                 **CostmetricsMeta.get_attrs(),
             },
         ),
         (
-            local_paths_index.get_general_select_path,
+            local_paths_index.General.general_select,
             {
                 'columns': 'qwe',
                 'table_name': 'qwe',
@@ -58,12 +57,12 @@ from sql_queries.meta import (
     ],
 )
 def test_query_params(
-    get_query_file_path: Callable[[], str],
+    get_query_file_path: str,
     format_params: dict,
 ):
     with pytest.MonkeyPatch.context() as monkeypatch:
         prepare_env(monkeypatch)
-        query = Path(get_query_file_path()).read_text(encoding='utf-8')
+        query = Path(get_query_file_path).read_text(encoding='utf-8')
         for key in format_params:
             assert f'{{{key}}}' in query
 

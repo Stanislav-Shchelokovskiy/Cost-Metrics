@@ -14,18 +14,18 @@ def _create_index_statement(
 
 def get_create_index_statements() -> dict[str, tuple[str]]:
     return {
-        local_names_index.get_cost_metrics_name():
+        local_names_index.CostMetrics.cost_metrics:
             (
                 _create_index_statement(
-                    tbl=local_names_index.get_cost_metrics_name(),
+                    tbl=local_names_index.CostMetrics.cost_metrics,
                     cols=CostmetricsMeta.get_key_fields(),
                     unique=True,
                 ),
             ),
-        local_names_index.get_cost_metrics_employees_name():
+        local_names_index.CostMetrics.employees:
             (
                 _create_index_statement(
-                    tbl=local_names_index.get_cost_metrics_employees_name(),
+                    tbl=local_names_index.CostMetrics.employees,
                     cols=CostmetricsEmployeesMeta.get_key_fields(),
                     unique=True,
                 ),

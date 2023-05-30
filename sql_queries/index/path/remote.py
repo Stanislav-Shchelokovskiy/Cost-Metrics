@@ -1,25 +1,22 @@
 import toolbox.sql.index as RootPath
 
 
-def __get_root_path() -> str:
+def _get_root_path() -> str:
     return RootPath.get_cwd() + '/remote'
 
 
-def __get_cost_path() -> str:
-    return __get_root_path() + '/cost'
+def _get_cost_path() -> str:
+    return _get_root_path() + '/cost'
 
 
-def __get_wf_path() -> str:
-    return __get_root_path() + '/wf'
+def _get_wf_path() -> str:
+    return _get_root_path() + '/wf'
 
 
-def get_cost_metrics_prep_path() -> str:
-    return __get_cost_path() + '/cost_metrics_prep.sql'
+class CostMetrics:
+    cost_metrics_prep = _get_cost_path() + '/cost_metrics_prep.sql'
+    cost_metrics = _get_cost_path() + '/cost_metrics.sql'
 
 
-def get_cost_metrics_path() -> str:
-    return __get_cost_path() + '/cost_metrics.sql'
-
-
-def get_upsert_work_on_holidays() -> str:
-    return __get_wf_path() + '/upsert_work_on_holidays.sql'
+class WF:
+    upsert_work_on_holidays = _get_wf_path() + '/upsert_work_on_holidays.sql'

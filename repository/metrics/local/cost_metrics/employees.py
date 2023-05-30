@@ -10,7 +10,7 @@ from sql_queries.meta import CostmetricsEmployeesMeta
 class EmployeesQueryDescriptor(AsyncQueryDescriptor):
 
     def get_path(self, kwargs: Mapping) -> str:
-        return local_paths_index.get_general_select_path()
+        return local_paths_index.General.general_select
 
     def get_fields_meta(self, kwargs: Mapping) -> MetaData:
         return CostmetricsEmployeesMeta
@@ -18,6 +18,6 @@ class EmployeesQueryDescriptor(AsyncQueryDescriptor):
     def get_format_params(self, kwargs: Mapping) -> Mapping[str, str]:
         return {
             'columns': ','.join(self.get_fields(kwargs)),
-            'table_name': local_names_index.get_cost_metrics_employees_name(),
+            'table_name': local_names_index.CostMetrics.employees,
             'filter_group_limit_clause': '',
         }
