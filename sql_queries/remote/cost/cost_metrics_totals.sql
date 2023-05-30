@@ -385,14 +385,18 @@ dev_support_activity AS (
 			iterations												AS iterations,
 			unique_tickets											AS unique_tickets,
 			emp_tribe_id											AS emp_tribe_id,
-			emp_activity.paid_hours * ISNULL(eds.perc_of_worktime_spent_on_support, 
-				SUM(eds.perc_of_worktime_spent_on_support) OVER (PARTITION BY emp_tribe_name) * 1.0
-				/ SUM(CASE WHEN eds.perc_of_worktime_spent_on_support IS NULL THEN 0 ELSE 1 END) OVER (PARTITION BY emp_tribe_name)) AS sc_hours
+			emp_activity.paid_hours * ISNULL(eds.perc_of_worktime_spent_on_support,
+				IIF(emp_activity.emp_tribe_name = 'IDETeam', 0.5,
+					IIF(SUM(eds.perc_of_worktime_spent_on_support) OVER (PARTITION BY emp_tribe_name) = 0, 0,
+						SUM(eds.perc_of_worktime_spent_on_support) OVER (PARTITION BY emp_tribe_name) * 1.0
+						/ SUM(CASE WHEN eds.perc_of_worktime_spent_on_support IS NULL OR eds.perc_of_worktime_spent_on_support = 0 
+									THEN 0 ELSE 1 END) OVER (PARTITION BY emp_tribe_name)))) AS sc_hours
 	FROM	emp_activity
 			LEFT JOIN DXStatisticsV2.dbo.EmployeesDevSupport AS eds ON eds.crmid = emp_activity.emp_crmid
 	WHERE	(position_id IN (@developer, @pm, @principal_pm, @technical_writer)
 		OR (position_id IN (@chapter_leader, @tribe_leader, @squad_leader) AND has_support_processing_role = 0))
-		AND iterations > 0
+		AND	emp_tribe_name != 'Internal'
+		--AND iterations > 0
 ),
 
 dev_sc_activity_total_hours AS (
@@ -459,7 +463,7 @@ dev_tribe_totals AS (
 			--------------------------------------------------------------------------------------------------------------------------
 			SUM(emp_sc_work_cost_gross_withAOE)	OVER (PARTITION BY emp_tribe_id, year_month)	AS tribe_sc_work_cost_gross_with_AOE,
 			--------------------------------------------------------------------------------------------------------------------------
-			SUM(emp_sc_work_cost_gross_withAOE)	OVER (PARTITION BY emp_tribe_id, year_month)	AS chapter_sc_work_cost_gross_withAOE,
+			SUM(emp_sc_work_cost_gross_withAOE)	OVER (PARTITION BY year_month)					AS chapter_sc_work_cost_gross_withAOE,
 			--------------------------------------------------------------------------------------------------------------------------
 			IIF(SUM(iterations)					OVER (PARTITION BY emp_tribe_id, year_month) = 0, 0,
 			SUM(emp_sc_work_cost_gross_withAOE)	OVER (PARTITION BY emp_tribe_id, year_month)
