@@ -42,97 +42,91 @@ class CostmetricsMeta(MetaData):
     proactive_paidvacs_hours = 'proactive_paidvacs_hours'
     unique_tickets = 'unique_tickets'
     iterations = 'iterations'
-    emp_sc_work_cost_gross_incl_overtime = 'emp_sc_work_cost_gross_incl_overtime'
-    emp_sc_work_cost_gross_withAOE_incl_overtime = 'emp_sc_work_cost_gross_withAOE_incl_overtime'
     emp_total_work_hours = 'emp_total_work_hours'
-    tribe_total_work_hours = 'tribe_total_work_hours'
-    chapter_total_work_hours = 'chapter_total_work_hours'
     emp_sc_work_cost_gross = 'emp_sc_work_cost_gross'
-    tribe_sc_work_cost_gross = 'tribe_sc_work_cost_gross'
-    chapter_sc_work_cost_gross = 'chapter_sc_work_cost_gross'
+    emp_sc_work_cost_gross_incl_overtime = 'emp_sc_work_cost_gross_incl_overtime'
     emp_sc_work_cost_gross_withAOE = 'emp_sc_work_cost_gross_withAOE'
-    tribe_sc_work_cost_gross_with_AOE = 'tribe_sc_work_cost_gross_with_AOE'
-    chapter_sc_work_cost_gross_withAOE = 'chapter_sc_work_cost_gross_withAOE'
     emp_proactive_work_cost_gross = 'emp_proactive_work_cost_gross'
-    tribe_proactive_work_cost_gross = 'tribe_proactive_work_cost_gross'
-    chapter_proactive_work_cost_gross = 'chapter_proactive_work_cost_gross'
     emp_proactive_work_cost_gross_withAOE = 'emp_proactive_work_cost_gross_withAOE'
-    tribe_proactive_work_cost_gross_withAOE = 'tribe_proactive_work_cost_gross_withAOE'
-    chapter_proactive_work_cost_gross_withAOE = 'chapter_proactive_work_cost_gross_withAOE'
+    emp_sc_work_cost_gross_withAOE_incl_overtime = 'emp_sc_work_cost_gross_withAOE_incl_overtime'
     emp_ticket_cost_gross = 'emp_ticket_cost_gross'
-    tribe_ticket_cost_gross = 'tribe_ticket_cost_gross'
-    chapter_ticket_cost_gross = 'chapter_ticket_cost_gross'
     emp_ticket_cost_gross_withAOE = 'emp_ticket_cost_gross_withAOE'
-    tribe_ticket_cost_gross_withAOE = 'tribe_ticket_cost_gross_withAOE'
-    chapter_ticket_cost_gross_withAOE = 'chapter_ticket_cost_gross_withAOE'
     emp_iteration_cost_gross = 'emp_iteration_cost_gross'
-    tribe_iteration_cost_gross = 'tribe_iteration_cost_gross'
-    chapter_iteration_cost_gross = 'chapter_iteration_cost_gross'
     emp_iteration_cost_gross_withAOE = 'emp_iteration_cost_gross_withAOE'
-    tribe_iteration_cost_gross_withAOE = 'tribe_iteration_cost_gross_withAOE'
-    chapter_iteration_cost_gross_withAOE = 'chapter_iteration_cost_gross_withAOE'
     emp_iterations_per_hour = 'emp_iterations_per_hour'
-    tribe_iterations_per_hour = 'tribe_iterations_per_hour'
-    chapter_iterations_per_hour = 'chapter_iterations_per_hour'
     emp_hours_per_ticket = 'emp_hours_per_ticket'
     emp_tickets_per_hour = 'emp_tickets_per_hour'
-    tribe_tickets_per_hour = 'tribe_tickets_per_hour'
-    chapter_tickets_per_hour = 'chapter_tickets_per_hour'
-    tribe_fot_gross = 'tribe_fot_gross'
-    tribe_fot_gross_withAOE = 'tribe_fot_gross_withAOE'
-    chapter_fot_gross = 'chapter_fot_gross'
-    chapter_fot_gross_withAOE = 'chapter_fot_gross_withAOE'
-    tribe_hour_price_gross = 'tribe_hour_price_gross'
-    tribe_hour_price_gross_withAOE = 'tribe_hour_price_gross_withAOE'
-    chapter_hour_price_gross = 'chapter_hour_price_gross'
-    chapter_hour_price_gross_withAOE = 'chapter_hour_price_gross_withAOE'
-    is_dev_team = 'is_dev_team'
+    team = 'team'
 
     @staticmethod
     def get_metrics() -> Sequence[str]:
         return (
-            {'name':CostmetricsMeta.emp_total_work_hours},
-            {'name':CostmetricsMeta.tribe_total_work_hours},
-            {'name':CostmetricsMeta.chapter_total_work_hours},
-            {'name':CostmetricsMeta.emp_sc_work_cost_gross},
-            {'name':CostmetricsMeta.tribe_sc_work_cost_gross},
-            {'name':CostmetricsMeta.chapter_sc_work_cost_gross},
-            {'name':CostmetricsMeta.emp_sc_work_cost_gross_withAOE},
-            {'name':CostmetricsMeta.tribe_sc_work_cost_gross_with_AOE},
-            {'name':CostmetricsMeta.chapter_sc_work_cost_gross_withAOE},
-            {'name':CostmetricsMeta.emp_proactive_work_cost_gross},
-            {'name':CostmetricsMeta.tribe_proactive_work_cost_gross},
-            {'name':CostmetricsMeta.chapter_proactive_work_cost_gross},
-            {'name':CostmetricsMeta.emp_proactive_work_cost_gross_withAOE},
-            {'name':CostmetricsMeta.tribe_proactive_work_cost_gross_withAOE},
-            {'name':CostmetricsMeta.chapter_proactive_work_cost_gross_withAOE},
-            {'name':CostmetricsMeta.emp_ticket_cost_gross},
-            {'name':CostmetricsMeta.tribe_ticket_cost_gross},
-            {'name':CostmetricsMeta.chapter_ticket_cost_gross},
-            {'name':CostmetricsMeta.emp_ticket_cost_gross_withAOE},
-            {'name':CostmetricsMeta.tribe_ticket_cost_gross_withAOE},
-            {'name':CostmetricsMeta.chapter_ticket_cost_gross_withAOE},
-            {'name':CostmetricsMeta.emp_iteration_cost_gross},
-            {'name':CostmetricsMeta.tribe_iteration_cost_gross},
-            {'name':CostmetricsMeta.chapter_iteration_cost_gross},
-            {'name':CostmetricsMeta.emp_iteration_cost_gross_withAOE},
-            {'name':CostmetricsMeta.tribe_iteration_cost_gross_withAOE},
-            {'name':CostmetricsMeta.chapter_iteration_cost_gross_withAOE},
-            {'name':CostmetricsMeta.emp_iterations_per_hour},
-            {'name':CostmetricsMeta.tribe_iterations_per_hour},
-            {'name':CostmetricsMeta.chapter_iterations_per_hour},
-            {'name':CostmetricsMeta.emp_hours_per_ticket},
-            {'name':CostmetricsMeta.emp_tickets_per_hour},
-            {'name':CostmetricsMeta.tribe_tickets_per_hour},
-            {'name':CostmetricsMeta.chapter_tickets_per_hour},
-            {'name':CostmetricsMeta.tribe_fot_gross},
-            {'name':CostmetricsMeta.tribe_fot_gross_withAOE},
-            {'name':CostmetricsMeta.chapter_fot_gross},
-            {'name':CostmetricsMeta.chapter_fot_gross_withAOE},
-            {'name':CostmetricsMeta.tribe_hour_price_gross},
-            {'name':CostmetricsMeta.tribe_hour_price_gross_withAOE},
-            {'name':CostmetricsMeta.chapter_hour_price_gross},
-            {'name':CostmetricsMeta.chapter_hour_price_gross_withAOE},
+            {
+                'name': CostmetricsMeta.emp_total_work_hours
+            },
+            # {'name':CostmetricsMeta.tribe_total_work_hours},
+            # {'name':CostmetricsMeta.chapter_total_work_hours},
+            {
+                'name': CostmetricsMeta.emp_sc_work_cost_gross
+            },
+            # {'name':CostmetricsMeta.tribe_sc_work_cost_gross},
+            # {'name':CostmetricsMeta.chapter_sc_work_cost_gross},
+            {
+                'name': CostmetricsMeta.emp_sc_work_cost_gross_withAOE
+            },
+            # {'name':CostmetricsMeta.tribe_sc_work_cost_gross_with_AOE},
+            # {'name':CostmetricsMeta.chapter_sc_work_cost_gross_withAOE},
+            {
+                'name': CostmetricsMeta.emp_proactive_work_cost_gross
+            },
+            # {'name':CostmetricsMeta.tribe_proactive_work_cost_gross},
+            # {'name':CostmetricsMeta.chapter_proactive_work_cost_gross},
+            {
+                'name': CostmetricsMeta.emp_proactive_work_cost_gross_withAOE
+            },
+            # {'name':CostmetricsMeta.tribe_proactive_work_cost_gross_withAOE},
+            # {'name':CostmetricsMeta.chapter_proactive_work_cost_gross_withAOE},
+            {
+                'name': CostmetricsMeta.emp_ticket_cost_gross
+            },
+            # {'name':CostmetricsMeta.tribe_ticket_cost_gross},
+            # {'name':CostmetricsMeta.chapter_ticket_cost_gross},
+            {
+                'name': CostmetricsMeta.emp_ticket_cost_gross_withAOE
+            },
+            # {'name':CostmetricsMeta.tribe_ticket_cost_gross_withAOE},
+            # {'name':CostmetricsMeta.chapter_ticket_cost_gross_withAOE},
+            {
+                'name': CostmetricsMeta.emp_iteration_cost_gross
+            },
+            # {'name':CostmetricsMeta.tribe_iteration_cost_gross},
+            # {'name':CostmetricsMeta.chapter_iteration_cost_gross},
+            {
+                'name': CostmetricsMeta.emp_iteration_cost_gross_withAOE
+            },
+            # {'name':CostmetricsMeta.tribe_iteration_cost_gross_withAOE},
+            # {'name':CostmetricsMeta.chapter_iteration_cost_gross_withAOE},
+            {
+                'name': CostmetricsMeta.emp_iterations_per_hour
+            },
+            # {'name':CostmetricsMeta.tribe_iterations_per_hour},
+            # {'name':CostmetricsMeta.chapter_iterations_per_hour},
+            {
+                'name': CostmetricsMeta.emp_hours_per_ticket
+            },
+            {
+                'name': CostmetricsMeta.emp_tickets_per_hour
+            },
+            # {'name':CostmetricsMeta.tribe_tickets_per_hour},
+            # {'name':CostmetricsMeta.chapter_tickets_per_hour},
+            # {'name':CostmetricsMeta.tribe_fot_gross},
+            # {'name':CostmetricsMeta.tribe_fot_gross_withAOE},
+            # {'name':CostmetricsMeta.chapter_fot_gross},
+            # {'name':CostmetricsMeta.chapter_fot_gross_withAOE},
+            # {'name':CostmetricsMeta.tribe_hour_price_gross},
+            # {'name':CostmetricsMeta.tribe_hour_price_gross_withAOE},
+            # {'name':CostmetricsMeta.chapter_hour_price_gross},
+            # {'name':CostmetricsMeta.chapter_hour_price_gross_withAOE},
         )
 
     @staticmethod

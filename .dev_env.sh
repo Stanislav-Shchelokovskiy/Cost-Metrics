@@ -6,3 +6,4 @@ export DB_HOME=/home/shchelokovskiy/code/support_metrics/data
 export SQLITE_DATABASE=/home/shchelokovskiy/code/support_metrics/data/db
 export REDIS_DB=SUPPORT_METRICS
 export QUERY_SERVICE=localhost:11005
+export RECALCULATE_FROM_THE_BEGINNING=1

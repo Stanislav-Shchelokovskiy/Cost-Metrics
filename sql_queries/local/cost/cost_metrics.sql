@@ -61,5 +61,5 @@ SELECT
 		{tribe_hour_price_gross_withAOE},
 		{chapter_hour_price_gross},
 		{chapter_hour_price_gross_withAOE},
-        {is_dev_team}
+        {team}
 FROM {CostMetricsTable}

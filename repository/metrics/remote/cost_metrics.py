@@ -16,7 +16,7 @@ class CostMetricsQueries(RepositoryAlchemyQueries):
         )
 
     def get_main_query_path(self, **kwargs) -> str:
-        return remote_paths_index.get_cost_metrics_totals_path()
+        return remote_paths_index.get_cost_metrics_path()
 
     def get_main_query_format_params(self, **kwargs) -> dict[str, str]:
         return CostmetricsMeta.get_attrs()

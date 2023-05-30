@@ -17,8 +17,8 @@ def get_cost_metrics_prep_path() -> str:
     return __get_cost_path() + '/cost_metrics_prep.sql'
 
 
-def get_cost_metrics_totals_path() -> str:
-    return __get_cost_path() + '/cost_metrics_totals.sql'
+def get_cost_metrics_path() -> str:
+    return __get_cost_path() + '/cost_metrics.sql'
 
 
 def get_upsert_work_on_holidays() -> str:

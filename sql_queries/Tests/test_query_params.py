@@ -30,7 +30,7 @@ from sql_queries.meta import (
             },
         ),
         (
-            remote_paths_index.get_cost_metrics_totals_path,
+            remote_paths_index.get_cost_metrics_path,
             CostmetricsMeta.get_attrs(),
         ),
         (
