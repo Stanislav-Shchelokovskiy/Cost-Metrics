@@ -2,7 +2,7 @@ from collections.abc import Mapping
 from toolbox.sql_async import GeneralSelectAsyncQueryDescriptor
 from toolbox.sql import MetaData
 from sql_queries.index import local_names_index
-from sql_queries.meta import CostmetricsEmployeesMeta
+from sql_queries.meta.cost_metrics import CostmetricsEmployeesMeta
 
 
 # yapf: disable

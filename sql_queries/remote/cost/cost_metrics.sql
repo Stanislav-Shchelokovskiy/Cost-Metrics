@@ -274,11 +274,8 @@ emp_activity AS (
 			hourly_pay_gross_withAOE * proactive_paidvacs_hours												AS emp_proactive_work_cost_gross_withAOE,
 			------------------------------------------------------------------------------------------------------------------------------------------------
 			sc_paidvacs_hours_incl_overtime * hourly_pay_gross_withAOE
-			+ ISNULL(work_on_holidays.hours, 0) * hourly_pay_gross											AS emp_sc_work_cost_gross_withAOE_incl_overtime,
+			+ ISNULL(work_on_holidays.hours, 0) * hourly_pay_gross											AS emp_sc_work_cost_gross_withAOE_incl_overtime
 			------------------------------------------------------------------------------------------------------------------------------------------------
-			position_id,
-			chapter_id,
-			has_support_processing_role
 	FROM	emp_activity_with_total_hours
 			OUTER APPLY (
 				SELECT	SUM(hours) AS hours

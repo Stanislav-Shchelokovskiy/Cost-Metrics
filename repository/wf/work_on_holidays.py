@@ -1,6 +1,6 @@
 from toolbox.sql.repository_queries import RepositoryAlchemyQueries
 from sql_queries.index import remote_paths_index
-from sql_queries.meta import (
+from sql_queries.meta.cost_metrics import (
     WorkOnHolidaysMeta,
 )
 

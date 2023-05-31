@@ -10,7 +10,7 @@ from sql_queries.transform_load.table_defs import get_create_table_statements
 from sql_queries.transform_load.index_defs import get_create_index_statements
 from repository import RemoteRepository
 from sql_queries.index import local_names_index
-from sql_queries.meta import CostmetricsMeta, NameKnotMeta, CostmetricsEmployeesMeta
+from sql_queries.meta.cost_metrics import CostmetricsMeta, NameKnotMeta, CostmetricsEmployeesMeta
 from toolbox.sql.db_operations import SaveTableOperation
 
 

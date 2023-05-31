@@ -1,6 +1,6 @@
 from typing import Iterable
 from sql_queries.index import local_names_index
-from sql_queries.meta import CostmetricsMeta, CostmetricsEmployeesMeta
+from sql_queries.meta.cost_metrics import CostmetricsMeta, CostmetricsEmployeesMeta
 
 
 def _create_index_statement(

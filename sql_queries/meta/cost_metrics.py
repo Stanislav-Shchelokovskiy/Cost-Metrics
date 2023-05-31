@@ -22,12 +22,14 @@ class CostmetricsEmployeesMeta(MetaData):
             CostmetricsEmployeesMeta.name,
         )
 
-
-class CostmetricsMeta(MetaData):
+class CostmetricsAggMeta(MetaData):
     year_month = 'year_month'
+
+class CostmetricsMeta(CostmetricsAggMeta):
+    team = 'team'
     emp_tribe_name = 'emp_tribe_name'
-    emp_name = 'emp_name'
     position_name = 'position_name'
+    emp_name = 'emp_name'
     emp_level_name = 'emp_level_name'
     hourly_pay_net = 'hourly_pay_net'
     hourly_pay_gross = 'hourly_pay_gross'
@@ -56,7 +58,7 @@ class CostmetricsMeta(MetaData):
     emp_iterations_per_hour = 'emp_iterations_per_hour'
     emp_hours_per_ticket = 'emp_hours_per_ticket'
     emp_tickets_per_hour = 'emp_tickets_per_hour'
-    team = 'team'
+    
 
     @staticmethod
     def get_metrics() -> Sequence[str]:

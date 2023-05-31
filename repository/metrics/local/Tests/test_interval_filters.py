@@ -1,6 +1,6 @@
 import pytest
 import repository.metrics.local.generators.common as common
-from sql_queries.meta import CostmetricsMeta
+from sql_queries.meta.cost_metrics import CostmetricsMeta
 
 
 @pytest.mark.parametrize(

@@ -1,6 +1,6 @@
 import pytest
 import repository.metrics.local.generators.employees as employees
-from sql_queries.meta import CostmetricsMeta
+from sql_queries.meta.cost_metrics import CostmetricsMeta
 
 
 # yapf: disable

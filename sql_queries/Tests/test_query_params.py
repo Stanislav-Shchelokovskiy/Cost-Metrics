@@ -5,7 +5,7 @@ from sql_queries.index import remote_paths_index
 from sql_queries.index import transform_load_paths_index
 from sql_queries.index import local_paths_index
 from pathlib import Path
-from sql_queries.meta import (
+from sql_queries.meta.cost_metrics import (
     WorkOnHolidaysMeta,
     CostmetricsMeta,
 )

@@ -1,7 +1,7 @@
 from toolbox.sql.sql_query import SqlQuery
 from sql_queries.index import transform_load_paths_index
 from sql_queries.index import local_names_index
-from sql_queries.meta import (
+from sql_queries.meta.cost_metrics import (
     CostmetricsMeta,
 )
 

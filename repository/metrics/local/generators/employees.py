@@ -1,4 +1,4 @@
-from sql_queries.meta import CostmetricsMeta
+from sql_queries.meta.cost_metrics import CostmetricsMeta
 from toolbox.sql.generators.filter_clause_generator_factory import (
     FilterParametersNode,
     SqlFilterClauseFromFilterParametersGeneratorFactory,
