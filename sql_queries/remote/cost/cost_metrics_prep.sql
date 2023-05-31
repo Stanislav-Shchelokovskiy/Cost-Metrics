@@ -432,15 +432,15 @@ FROM (	SELECT	psts.Created, psts.Owner, psts.Ticket_Id, psts.Id
 			AND	t.Created BETWEEN @period_start AND @period_end
 	) AS tickets
 	OUTER APPLY (
-		SELECT	id, name
-		FROM	DXStatisticsV2.dbo.get_ticket_tribes(tickets.Id, DEFAULT, DEFAULT)
-	) AS tribes
-	OUTER APPLY (
 		SELECT	e.*
 		FROM	#Employees AS e
 		WHERE	e.scid = posts.Owner 
 			AND posts.Created BETWEEN e.year_month AND e.next_year_month
 	) AS employees
+	OUTER APPLY (
+		SELECT	id, name
+		FROM	DXStatisticsV2.dbo.get_ticket_tribes(tickets.Id, DEFAULT, employees.tribe_id)
+	) AS tribes
 	/*	Post owner is not service user	*/
 	WHERE serivce_users.Id IS NULL
 
