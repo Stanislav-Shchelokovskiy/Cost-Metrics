@@ -136,7 +136,6 @@ class CostmetricsMeta(MetaData):
             CostmetricsMeta.team,
             CostmetricsMeta.emp_tribe_name,
             CostmetricsMeta.position_name,
-            CostmetricsMeta.emp_level_name,
             CostmetricsMeta.emp_name,
         )
 

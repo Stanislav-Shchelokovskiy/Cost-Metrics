@@ -1,13 +1,14 @@
 import os
+import toolbox.cache.view_state_cache as view_state_cache
+from collections.abc import Coroutine
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from toolbox.utils.converters import JSON_to_object
 from toolbox.server_models import ViewState
-from collections.abc import Coroutine
 from repository import LocalRepository
 from config import get_cost_metrics_period_json
-import toolbox.cache.view_state_cache as view_state_cache
+from server_models import CostMetricsParams
 
 
 app = FastAPI()
@@ -35,9 +36,19 @@ async def get_repsonse_async(task: Coroutine):
 
 
 @app.get('/CostMetrics')
-async def get_cost_metrics():
+async def get_cost_metrics(
+    group_by_period: str,
+    range_start: str,
+    range_end: str,
+    body: CostMetricsParams,
+):
     return await get_repsonse_async(
-        LocalRepository.cost_metrics.cost_metrics.get_data()
+        LocalRepository.cost_metrics.cost_metrics.get_data(
+            group_by_period=group_by_period,
+            range_start=range_start,
+            range_end=range_end,
+            **body.get_field_values(),
+        )
     )
 
 
