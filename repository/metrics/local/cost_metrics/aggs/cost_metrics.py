@@ -15,14 +15,14 @@ class CostMetricsAggsQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
         return CostmetricsAggMeta
 
     def get_format_params(self, kwargs: Mapping) -> Mapping[str, str]:
-        period_field, agg_field, *_ = self.get_fields(kwargs)
+        period_field, agg_field, agg_name, *_ = self.get_fields(kwargs)
         groupby = generate_groupby(
             groupby_format=kwargs['group_by_period'],
             agg_by=kwargs['agg_by']
         )
         metric = get_metric(kwargs['metric'])
         return {
-            'select': f'{groupby.expression} AS {period_field}, {metric} AS {agg_field}',
+            'select': f'{groupby.expression} AS {period_field}, {metric} AS {agg_field}, {groupby.aggName} AS {agg_name}',
             'from':  local_names_index.CostMetrics.cost_metrics,
             'where_group_limit': build_multiline_string_ignore_empties(
                 (

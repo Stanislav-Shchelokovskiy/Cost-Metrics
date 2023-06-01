@@ -24,9 +24,18 @@ class AggBy(MetaData):
 
 
 group_bys = {
-    AggBy.employee: get_employee_group_by,
-    AggBy.tribe: get_tribe_groupby,
-    AggBy.chapter: get_chapter_groupby,
+    AggBy.employee: (
+        get_employee_group_by,
+        CostmetricsMeta.name,
+    ),
+    AggBy.tribe: (
+        get_tribe_groupby,
+        CostmetricsMeta.tribe_name,
+    ),
+    AggBy.chapter: (
+        get_chapter_groupby,
+        '""',
+    ),
 }
 
 
@@ -37,6 +46,7 @@ def get_groupbys() -> Iterable[str]:
 class GroupBy(NamedTuple):
     expression: str
     statement: str
+    aggName: str
 
 
 def generate_groupby(groupby_format: str, agg_by: str) -> GroupBy:
@@ -44,8 +54,9 @@ def generate_groupby(groupby_format: str, agg_by: str) -> GroupBy:
         format=groupby_format,
         field=CostmetricsMeta.year_month,
     )
-    group_by = group_bys[agg_by]
+    group_by, aggName = group_bys[agg_by]
     return GroupBy(
         groupby_period_expression,
         group_by(groupby_period_expression),
+        aggName,
     )

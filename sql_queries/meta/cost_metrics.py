@@ -71,3 +71,4 @@ class CostmetricsMeta(MetaData):
 class CostmetricsAggMeta(MetaData):
     year_month = CostmetricsMeta.year_month
     agg = 'agg'
+    name = 'name'
