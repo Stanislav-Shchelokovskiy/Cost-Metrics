@@ -73,7 +73,7 @@ def upsert_cost_metrics(self, **kwargs):
 def cost_metrics_process_staged_data(self, **kwargs):
     return run_retriable_task(
         self,
-        cost_metrics_tasks.process_staged_data(),
+        cost_metrics_tasks.process_staged_data,
     )
 
 
