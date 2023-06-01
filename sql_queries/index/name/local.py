@@ -4,3 +4,4 @@ class CostMetrics:
     positions = 'CostMetricsPositions'
     employees = 'CostMetricsEmployees'
     teams = 'CostMetricsTeams'
+    agg_by = 'CostMetricsAggBy'

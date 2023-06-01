@@ -45,7 +45,7 @@ def process_staged_data():
             source_table_or_subquery=local_names_index.CostMetrics.cost_metrics,
             target_table_name=local_names_index.CostMetrics.tribes,
             unique_key_field=QueryField(
-                source_name=CostmetricsMeta.emp_tribe_name,
+                source_name=CostmetricsMeta.tribe_name,
                 target_name=NameKnotMeta.name,
                 type='TEXT',
             )
@@ -65,12 +65,12 @@ def process_staged_data():
             unique_key_field=None,
             values_fields=(
                 QueryField(
-                    source_name=CostmetricsMeta.emp_name,
+                    source_name=CostmetricsMeta.name,
                     target_name=CostmetricsEmployeesMeta.name,
                     type='TEXT',
                 ),
                 QueryField(
-                    source_name=CostmetricsMeta.emp_tribe_name,
+                    source_name=CostmetricsMeta.tribe_name,
                     target_name=CostmetricsEmployeesMeta.tribe,
                     type='TEXT',
                 ),

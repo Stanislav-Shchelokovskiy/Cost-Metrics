@@ -257,6 +257,7 @@ emp_activity AS (
 			sc_paidvacs_hours,
 			sc_paidvacs_hours_incl_overtime,
 			proactive_paidvacs_hours,
+			IIF(sc_hours < sc_paidvacs_hours, 0, sc_hours - sc_paidvacs_hours) 								AS overtime_sc_hours,
 			------------------------------------------------------------------------------------------------------------------------------------------------
 			sc_paidvacs_hours_incl_overtime + proactive_paidvacs_hours										AS emp_total_work_hours,
 			------------------------------------------------------------------------------------------------------------------------------------------------
@@ -283,26 +284,14 @@ emp_activity AS (
 				WHERE	woh.crmid = emp_crmid
 					AND	woh.date >= year_month AND woh.date < DATEADD(MONTH, 1, year_month)
 			) AS work_on_holidays
-),
-
-emp_activity_ex AS (
-	SELECT 	*,
-			IIF(sc_hours < sc_paidvacs_hours, 0, sc_hours - sc_paidvacs_hours) 							AS overtime_sc_hours,
-			IIF(unique_tickets = 0, 0, emp_sc_work_cost_gross_incl_overtime / unique_tickets)			AS emp_ticket_cost_gross,
-			IIF(unique_tickets = 0, 0, emp_sc_work_cost_gross_withAOE_incl_overtime / unique_tickets)	AS emp_ticket_cost_gross_withAOE,
-			IIF(iterations = 0, 0, emp_sc_work_cost_gross_incl_overtime / iterations)					AS emp_iteration_cost_gross,
-			IIF(iterations = 0, 0, emp_sc_work_cost_gross_withAOE_incl_overtime / iterations)			AS emp_iteration_cost_gross_withAOE,
-			IIF(sc_hours = 0, 0, iterations * 1.0 / sc_hours) 											AS emp_iterations_per_hour,
-			IIF(unique_tickets = 0, 0, sc_hours * 1.0 / unique_tickets)									AS emp_hours_per_ticket,
-			IIF(sc_hours = 0, 0, unique_tickets * 1.0 / sc_hours) 										AS emp_tickets_per_hour
-	FROM 	emp_activity
 )
 
 SELECT 	year_month										AS {year_month},
-		emp_tribe_name									AS {emp_tribe_name},
-		emp_name										AS {emp_name},
+		team											AS {team},
+		emp_tribe_name									AS {tribe_name},
+		emp_name										AS {name},
 		position_name									AS {position_name},
-		emp_level_name									AS {emp_level_name},
+		emp_level_name									AS {level_name},
 		hourly_pay_net									AS {hourly_pay_net},
 		hourly_pay_gross								AS {hourly_pay_gross},
 		hourly_pay_gross_withAOE						AS {hourly_pay_gross_withAOE},
@@ -316,19 +305,11 @@ SELECT 	year_month										AS {year_month},
 		proactive_paidvacs_hours						AS {proactive_paidvacs_hours},
 		unique_tickets									AS {unique_tickets},
 		iterations										AS {iterations},
-		emp_total_work_hours							AS {emp_total_work_hours},
-		emp_sc_work_cost_gross							AS {emp_sc_work_cost_gross},
-		emp_sc_work_cost_gross_incl_overtime			AS {emp_sc_work_cost_gross_incl_overtime},
-		emp_sc_work_cost_gross_withAOE					AS {emp_sc_work_cost_gross_withAOE},
-		emp_proactive_work_cost_gross					AS {emp_proactive_work_cost_gross},
-		emp_proactive_work_cost_gross_withAOE			AS {emp_proactive_work_cost_gross_withAOE},
-		emp_sc_work_cost_gross_withAOE_incl_overtime	AS {emp_sc_work_cost_gross_withAOE_incl_overtime},
-		emp_ticket_cost_gross							AS {emp_ticket_cost_gross},
-		emp_ticket_cost_gross_withAOE					AS {emp_ticket_cost_gross_withAOE},
-		emp_iteration_cost_gross						AS {emp_iteration_cost_gross},
-		emp_iteration_cost_gross_withAOE				AS {emp_iteration_cost_gross_withAOE},
-		emp_iterations_per_hour							AS {emp_iterations_per_hour},
-		emp_hours_per_ticket							AS {emp_hours_per_ticket},
-		emp_tickets_per_hour							AS {emp_tickets_per_hour},
-		team											AS {team}
-FROM 	emp_activity_ex
+		emp_total_work_hours							AS {total_work_hours},
+		emp_sc_work_cost_gross							AS {sc_work_cost_gross},
+		emp_sc_work_cost_gross_incl_overtime			AS {sc_work_cost_gross_incl_overtime},
+		emp_sc_work_cost_gross_withAOE					AS {sc_work_cost_gross_withAOE},
+		emp_proactive_work_cost_gross					AS {proactive_work_cost_gross},
+		emp_proactive_work_cost_gross_withAOE			AS {proactive_work_cost_gross_withAOE},
+		emp_sc_work_cost_gross_withAOE_incl_overtime	AS {sc_work_cost_gross_withAOE_incl_overtime}
+FROM 	emp_activity

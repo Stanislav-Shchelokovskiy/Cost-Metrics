@@ -35,23 +35,6 @@ async def get_repsonse_async(task: Coroutine):
     return get_response(json_data=await task)
 
 
-@app.get('/CostMetrics')
-async def get_cost_metrics(
-    group_by_period: str,
-    range_start: str,
-    range_end: str,
-    body: CostMetricsParams,
-):
-    return await get_repsonse_async(
-        LocalRepository.cost_metrics.cost_metrics.get_data(
-            group_by_period=group_by_period,
-            range_start=range_start,
-            range_end=range_end,
-            **body.get_field_values(),
-        )
-    )
-
-
 @app.get('/CostMetrics/Teams')
 async def get_cost_metrics_teams():
     return await get_repsonse_async(
@@ -92,6 +75,16 @@ async def get_group_by_periods():
     )
 
 
+@app.get('/CostMetrics/Metrics')
+async def get_metrics():
+    return await get_repsonse_async(LocalRepository.cost_metrics.get_metrics())
+
+
+@app.get('/CostMetrics/AggBy')
+async def get_agg_by():
+    return await get_repsonse_async(LocalRepository.cost_metrics.get_agg_bys())
+
+
 @app.get('/PeriodsArray')
 async def get_periods_array(
     start: str,
@@ -107,9 +100,25 @@ async def get_periods_array(
     )
 
 
-@app.get('/CostMetrics/Metrics')
-async def get_metrics():
-    return await get_repsonse_async(LocalRepository.cost_metrics.get_metrics())
+@app.post('/CostMetrics/Aggregates')
+async def get_cost_metrics_aggregates(
+    group_by_period: str,
+    range_start: str,
+    range_end: str,
+    metric: str,
+    agg_by: str,
+    body: CostMetricsParams,
+):
+    return await get_repsonse_async(
+        LocalRepository.cost_metrics.aggregates.get_data(
+            group_by_period=group_by_period,
+            range_start=range_start,
+            range_end=range_end,
+            metric=metric,
+            agg_by=agg_by,
+            **body.get_field_values(),
+        )
+    )
 
 
 @app.post('/PushState')

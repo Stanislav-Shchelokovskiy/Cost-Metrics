@@ -3,7 +3,6 @@ from os import getcwd
 import toolbox.sql.index as RootPath
 from sql_queries.index import remote_paths_index
 from sql_queries.index import transform_load_paths_index
-from sql_queries.index import local_paths_index
 from pathlib import Path
 from sql_queries.meta.cost_metrics import (
     WorkOnHolidaysMeta,
@@ -34,13 +33,6 @@ from sql_queries.meta.cost_metrics import (
         ),
         (
             transform_load_paths_index.CostMetrics.cost_metrics_table,
-            {
-                'CostMetricsTable': 'qwe',
-                **CostmetricsMeta.get_attrs(),
-            },
-        ),
-        (
-            local_paths_index.CostMetrics.cost_metrics_table,
             {
                 'CostMetricsTable': 'qwe',
                 **CostmetricsMeta.get_attrs(),

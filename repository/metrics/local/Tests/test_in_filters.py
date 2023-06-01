@@ -14,7 +14,7 @@ from sql_queries.meta.cost_metrics import CostmetricsMeta
         ),
         (
             employees.generate_tribes_filter,
-            CostmetricsMeta.emp_tribe_name,
+            CostmetricsMeta.tribe_name,
             'tribes',
             None,
         ),
@@ -26,7 +26,7 @@ from sql_queries.meta.cost_metrics import CostmetricsMeta
         ),
         (
             employees.generate_employees_filter,
-            CostmetricsMeta.emp_name,
+            CostmetricsMeta.name,
             'employees',
             None,
         ),
