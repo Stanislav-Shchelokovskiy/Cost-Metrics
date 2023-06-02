@@ -12,7 +12,7 @@ def test_add():
     assert Metric('', 'expr1') + Metric('', 'expr2') == Metric('', 'expr1 + expr2')
 
 def test_mul():
-    assert Metric('', 'expr1') * 1.0 == Metric('', 'expr1 * 1.0')
+    assert Metric('', 'expr1') * 1.0 == Metric('', '(expr1) * 1.0')
 
 def test_div():
-    assert Metric('', 'expr1') / Metric('', 'expr2') == Metric('', 'expr1 / expr2')
+    assert Metric('', 'expr1') / Metric('', 'expr2') == Metric('', '(expr1) / expr2')
