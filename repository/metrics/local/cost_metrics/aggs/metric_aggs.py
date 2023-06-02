@@ -14,13 +14,17 @@ class Metric(NamedTuple):
         return Metric('', f'{self.expression} + {other.expression}')
 
     def __mul__(self, other: float):
-        return Metric('', self.expression + f' * {other}')
+        return Metric('', f'({self.expression}) * {other}')
 
     def __truediv__(self, other: 'Metric'):
-        return Metric('', self.expression + f' / {other.expression}')
+        return Metric('', f'({self.expression}) / {other.expression}')
 
     def __eq__(self, other: 'Metric') -> bool:
         return self.expression == other.expression
+
+    @classmethod
+    def from_metric(cls, name: str, metric: 'Metric'):
+        return cls(name, metric.expression)
 
 
 sc_work_cost_gross_incl_overtime = Metric(
@@ -77,11 +81,11 @@ tickets_per_hour = Metric(
 )
 
 # yapf: disable
-fot_gross = Metric('FOT (gross)', sc_work_cost_gross + proactive_work_cost_gross)
-fot_gross_withAOE = Metric('FOT (gross with AOE)', sc_work_cost_gross_withAOE + proactive_work_cost_gross_withAOE)
+fot_gross = Metric.from_metric('FOT (gross)', sc_work_cost_gross + proactive_work_cost_gross)
+fot_gross_withAOE = Metric.from_metric('FOT (gross with AOE)', sc_work_cost_gross_withAOE + proactive_work_cost_gross_withAOE)
 
-hour_price_gross = Metric('Hour price (gross)', (sc_work_cost_gross+proactive_work_cost_gross) * 1.0 / total_work_hours)
-hour_price_gross_withAOE = Metric('Hour price (gross with AOE)',(sc_work_cost_gross_withAOE + proactive_work_cost_gross_withAOE) * 1.0 / total_work_hours)
+hour_price_gross = Metric.from_metric('Hour price (gross)', (sc_work_cost_gross+proactive_work_cost_gross) * 1.0 / total_work_hours)
+hour_price_gross_withAOE = Metric.from_metric('Hour price (gross with AOE)', (sc_work_cost_gross_withAOE + proactive_work_cost_gross_withAOE) * 1.0 / total_work_hours)
 
 
 metrics = {
