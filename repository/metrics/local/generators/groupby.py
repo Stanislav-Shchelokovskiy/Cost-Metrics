@@ -1,8 +1,9 @@
 from collections.abc import Iterable
 from typing import NamedTuple
-from toolbox.sql import MetaData
+from toolbox.sql import MetaData, KnotMeta
 from sql_queries.meta.cost_metrics import CostmetricsMeta
 import toolbox.sql.generators.sqlite_periods_generator as periods_generator
+from sql_queries.index import local_names_index
 
 
 # yapf: disable
@@ -34,7 +35,7 @@ group_bys = {
     ),
     AggBy.chapter: (
         get_chapter_groupby,
-        '""',
+        f'(SELECT {KnotMeta.name} FROM {local_names_index.CostMetrics.teams} WHERE {KnotMeta.id} = {CostmetricsMeta.team} LIMIT 1)',
     ),
 }
 
