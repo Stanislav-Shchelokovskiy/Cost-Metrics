@@ -1,6 +1,6 @@
 from collections.abc import Callable
 
-from celery import Celery, chord
+from celery import Celery, chord, chain
 from celery.schedules import crontab
 from celery.signals import worker_ready
 
@@ -41,9 +41,14 @@ def setup_periodic_tasks(sender, **kwargs):
 
 @app.task(name='update_cost_metrics')
 def update_cost_metrics(**kwargs):
-    chord([
-        upsert_work_on_holidays.si(),
-    ])(upsert_cost_metrics.si())
+    chord(
+        [
+            chain(
+                upsert_work_on_holidays.si(),
+                upsert_cost_metrics.si(),
+            ),
+        ]
+    )(cost_metrics_process_staged_data.si())
 
 
 @app.task(name='upsert_work_on_holidays', bind=True)
@@ -61,6 +66,14 @@ def upsert_cost_metrics(self, **kwargs):
         self,
         cost_metrics_tasks.update_cost_metrics,
         kwargs=config.get_cost_metrics_period(),
+    )
+
+
+@app.task(name='cost_metrics_process_staged_data', bind=True)
+def cost_metrics_process_staged_data(self, **kwargs):
+    return run_retriable_task(
+        self,
+        cost_metrics_tasks.process_staged_data,
     )
 
 

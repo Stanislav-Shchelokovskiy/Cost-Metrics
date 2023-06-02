@@ -66,9 +66,3 @@ class CostmetricsMeta(MetaData):
         index_fields = set(CostmetricsMeta.get_key_fields())
         all_fields = set(CostmetricsMeta.get_values())
         return all_fields - index_fields
-
-
-class CostmetricsAggMeta(MetaData):
-    year_month = CostmetricsMeta.year_month
-    agg = 'agg'
-    name = 'name'

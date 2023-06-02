@@ -7,7 +7,6 @@ from fastapi.responses import Response
 from toolbox.utils.converters import JSON_to_object
 from toolbox.server_models import ViewState
 from repository import LocalRepository
-from config import get_cost_metrics_period_json
 from server_models import CostMetricsParams
 
 
@@ -65,7 +64,9 @@ async def get_cost_metrics_employees():
 
 @app.get('/CostMetrics/Period')
 async def customers_activity_get_tickets_with_iterations_period():
-    return await get_repsonse_async(get_cost_metrics_period_json())
+    return await get_repsonse_async(
+        LocalRepository.cost_metrics.period.get_data()
+    )
 
 
 @app.get('/GroupByPeriods')
