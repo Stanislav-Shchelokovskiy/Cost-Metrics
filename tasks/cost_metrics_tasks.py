@@ -77,7 +77,7 @@ def process_staged_data():
             )
         ),
         SqliteCreateTableFromTableQuery(
-            source_table_or_subquery='''(VALUES (0, 'Support'), (1, 'Team'))''',
+            source_table_or_subquery='''(VALUES (0, 'Support'), (1, 'DevTeam'))''',
             target_table_name=local_names_index.CostMetrics.teams,
             unique_key_field=QueryField(
                     source_name='column1',
