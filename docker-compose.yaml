@@ -19,8 +19,8 @@ x-support_metrics_service:
     - CORS_ORIGINS
     - QUERY_SERVICE
     - REDIS_SERVICE=support_metrics_redis
-    - REDIS_PORT=6379
-    - REDIS_DB=SUPPORT_METRICS
+    - REDIS_PORT
+    - REDIS_DB
     - CELERY_BROKER_URL=redis://support_metrics_redis:6379/0
     - CELERY_RESULT_BACKEND=redis://support_metrics_redis:6379/0
     - SQLITE_DATABASE=${DB_HOME}/db
