@@ -6,7 +6,7 @@ from toolbox.server_models import (
 
 
 class CostMetricsParams(ServerModel):
-    teams: FilterParametersNode | None = Field(alias='Teams')
-    tribes: FilterParametersNode | None = Field(alias='Tribes')
-    positions: FilterParametersNode | None = Field(alias='Positions')
-    employees: FilterParametersNode | None = Field(alias='Employees')
+    teams: FilterParametersNode[int] | None = Field(alias='Teams')
+    tribes: FilterParametersNode[str] | None = Field(alias='Tribes')
+    positions: FilterParametersNode[str] | None = Field(alias='Positions')
+    employees: FilterParametersNode[str] | None = Field(alias='Employees')
