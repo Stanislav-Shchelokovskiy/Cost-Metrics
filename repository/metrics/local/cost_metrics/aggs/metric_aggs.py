@@ -1,5 +1,7 @@
+import os
 from typing import NamedTuple
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
+from collections import ChainMap
 from sql_queries.meta.cost_metrics import CostmetricsMeta
 
 
@@ -102,17 +104,32 @@ metrics = {
     iteration_cost_gross_withAOE.name: iteration_cost_gross_withAOE,
     iterations_per_hour.name: iterations_per_hour,
     tickets_per_hour.name: tickets_per_hour,
-    fot_gross.name: fot_gross,
-    fot_gross_withAOE.name: fot_gross_withAOE,
     hour_price_gross.name: hour_price_gross,
     hour_price_gross_withAOE.name: hour_price_gross_withAOE,
 }
+
+
+advanced_metrics = {
+    fot_gross.name: fot_gross,
+    fot_gross_withAOE.name: fot_gross_withAOE,
+}
+
+
+none_metric = Metric('Fake', 'SUM(0)')
+def get_metric(kwargs: dict) -> Metric:
+    metrics = get_metrics(kwargs['mode'])
+    return metrics.get(kwargs['metric'], none_metric)
+
+
+def get_metrics_descs(mode: str | None) -> Iterable[Mapping[str, Metric]]:
+    res = get_metrics(mode)
+    return [{'name': x} for x in res.keys()]
+
+
+def get_metrics(mode: str | None)-> Mapping[str, Metric]:
+    return ChainMap(advanced_metrics, metrics) if advanced_mode_enabled(mode) else metrics
+
+
+def advanced_mode_enabled(mode: str | None) -> bool:
+    return mode == os.environ['ADVANCED_MODE_NAME']
 # yapf: enable
-
-
-def get_metric(name: str) -> Metric:
-    return metrics[name]
-
-
-def get_metrics() -> Iterable[dict[str, Metric]]:
-    return [{'name': x} for x in metrics.keys()]

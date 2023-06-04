@@ -21,6 +21,8 @@ x-support_metrics_service:
     - REDIS_SERVICE=support_metrics_redis
     - REDIS_PORT
     - REDIS_DB
+    - ADVANCED_MODE_CODE
+    - ADVANCED_MODE_NAME
     - CELERY_BROKER_URL=redis://support_metrics_redis:6379/0
     - CELERY_RESULT_BACKEND=redis://support_metrics_redis:6379/0
     - SQLITE_DATABASE=${DB_HOME}/db

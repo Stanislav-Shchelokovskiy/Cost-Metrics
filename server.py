@@ -1,12 +1,12 @@
 import os
 import toolbox.cache.view_state_cache as view_state_cache
-from fastapi import FastAPI
+from fastapi import FastAPI, Cookie
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from toolbox.utils.converters import JSON_to_object
 from toolbox.server_models import ViewState
 from repository import LocalRepository
-from server_models import CostMetricsParams
+from server_models import CostMetricsParams, AdvancedModeParams
 
 
 class CustomJSONResponse(Response):
@@ -57,8 +57,8 @@ async def get_group_by_periods():
 
 
 @app.get('/CostMetrics/Metrics')
-async def get_metrics():
-    return await LocalRepository.cost_metrics.get_metrics()
+async def get_metrics(mode: str | None = Cookie(None)):
+    return await LocalRepository.cost_metrics.get_metrics(mode=os.environ['ADVANCED_MODE_NAME'])#mode)
 
 
 @app.get('/CostMetrics/AggBy')
@@ -87,6 +87,7 @@ async def get_cost_metrics_aggregates(
     metric: str,
     agg_by: str,
     body: CostMetricsParams,
+    mode: str | None = Cookie(None),
 ):
     return await LocalRepository.cost_metrics.aggregates.get_data(
         group_by_period=group_by_period,
@@ -94,8 +95,21 @@ async def get_cost_metrics_aggregates(
         range_end=range_end,
         metric=metric,
         agg_by=agg_by,
+        mode=os.environ['ADVANCED_MODE_NAME'],#mode,
         **body.get_field_values(),
     )
+
+
+@app.post('/EnableAdvancedMode')
+async def enable_advanced_mode(body: AdvancedModeParams, response: Response):
+    if body.code == os.environ['ADVANCED_MODE_CODE']:
+        response.set_cookie(
+            key='mode',
+            value=os.environ['ADVANCED_MODE_NAME'],
+            max_age=2628288,
+        )
+        return 'advanced mode enabled'
+    return 'incorrect code. ignore.'
 
 
 @app.post('/PushState')
