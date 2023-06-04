@@ -1,6 +1,6 @@
 import os
 import toolbox.cache.view_state_cache as view_state_cache
-from fastapi import FastAPI, Cookie
+from fastapi import FastAPI, Cookie, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from toolbox.utils.converters import JSON_to_object
@@ -100,7 +100,7 @@ async def get_cost_metrics_aggregates(
     )
 
 
-@app.post('/EnableAdvancedMode')
+@app.post('/EnableAdvancedMode', status_code=status.HTTP_201_CREATED)
 async def enable_advanced_mode(body: AdvancedModeParams, response: Response):
     if body.code == os.environ['ADVANCED_MODE_CODE']:
         response.set_cookie(
@@ -108,8 +108,8 @@ async def enable_advanced_mode(body: AdvancedModeParams, response: Response):
             value=os.environ['ADVANCED_MODE_NAME'],
             max_age=2628288,
         )
-        return 'advanced mode enabled'
-    return 'incorrect code. ignore.'
+    else:
+        response.status_code = status.HTTP_200_OK
 
 
 @app.post('/PushState')
