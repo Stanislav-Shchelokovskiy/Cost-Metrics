@@ -107,29 +107,27 @@ metrics = {
     hour_price_gross.name: hour_price_gross,
     hour_price_gross_withAOE.name: hour_price_gross_withAOE,
 }
-
+# yapf: enable
 
 advanced_metrics = {
     fot_gross.name: fot_gross,
     fot_gross_withAOE.name: fot_gross_withAOE,
 }
 
+all_metrics = ChainMap(advanced_metrics, metrics)
 
 none_metric = Metric('Fake', 'SUM(0)')
-def get_metric(kwargs: dict) -> Metric:
-    metrics = get_metrics(kwargs['mode'])
-    return metrics.get(kwargs['metric'], none_metric)
 
 
-def get_metrics_descs(mode: str | None) -> Iterable[Mapping[str, Metric]]:
-    res = get_metrics(mode)
-    return [{'name': x} for x in res.keys()]
+def get_metric(metric: str, mode: str | None) -> Metric:
+    if advanced_mode_enabled(mode):
+        return all_metrics[metric]
+    return metrics.get(metric, none_metric)
 
 
-def get_metrics(mode: str | None)-> Mapping[str, Metric]:
-    return ChainMap(advanced_metrics, metrics) if advanced_mode_enabled(mode) else metrics
+def get_metrics_descs() -> Iterable[Mapping[str, Metric]]:
+    return [{'name': x} for x in all_metrics.keys()]
 
 
 def advanced_mode_enabled(mode: str | None) -> bool:
     return mode == os.environ['ADVANCED_MODE_NAME']
-# yapf: enable

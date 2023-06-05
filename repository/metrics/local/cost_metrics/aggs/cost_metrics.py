@@ -26,7 +26,7 @@ class CostMetricsAggsQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
             groupby_format=kwargs['group_by_period'],
             agg_by=kwargs['agg_by']
         )
-        metric = get_metric(kwargs)
+        metric = get_metric(metric=kwargs['metric'], mode=kwargs['mode'])
         return {
             'select': f'{groupby.expression} AS {period_field}, {metric} AS {agg_field}, {groupby.aggName} AS {agg_name}',
             'from':  local_names_index.CostMetrics.cost_metrics,
