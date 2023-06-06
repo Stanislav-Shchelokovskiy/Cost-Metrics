@@ -57,13 +57,13 @@ async def get_group_by_periods():
 
 
 @app.get('/CostMetrics/Metrics')
-async def get_metrics():
-    return await LocalRepository.cost_metrics.get_metrics()
+async def get_metrics(mode: str | None = Cookie(None)):
+    return await LocalRepository.cost_metrics.get_metrics(mode=os.environ['ADVANCED_MODE_NAME'])#mode
 
 
 @app.get('/CostMetrics/AggBy')
-async def get_agg_by():
-    return await LocalRepository.cost_metrics.get_agg_bys()
+async def get_aggbys():
+    return await LocalRepository.cost_metrics.get_aggbys()
 
 
 @app.get('/PeriodsArray')

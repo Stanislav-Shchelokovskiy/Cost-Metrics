@@ -120,13 +120,17 @@ none_metric = Metric('Fake', 'SUM(0)')
 
 
 def get_metric(metric: str, mode: str | None) -> Metric:
+    return get_metrics(mode).get(metric, none_metric)
+
+
+def get_metrics_names(mode: str | None) -> Iterable[str]:
+    return [x for x in get_metrics(mode).keys()]
+
+
+def get_metrics(mode: str | None):
     if advanced_mode_enabled(mode):
-        return all_metrics[metric]
-    return metrics.get(metric, none_metric)
-
-
-def get_metrics_descs() -> Iterable[Mapping[str, Metric]]:
-    return [{'name': x} for x in all_metrics.keys()]
+        return all_metrics
+    return metrics
 
 
 def advanced_mode_enabled(mode: str | None) -> bool:
