@@ -375,8 +375,8 @@ FROM (
 		FROM	SupportCenterPaid.[c1f0951c-3885-44cf-accb-1a390f34c342].Tickets AS t
 				LEFT JOIN #Employees AS e ON e.scid = t.Owner
 		WHERE	Id = tc.ticket_id
-			AND e.scid IS NULL									-- #Postulate: Время работы считаем по тикетам, в которых овнер является юзером.
-			AND EntityType IN (@question, @bug, @suggestion)	-- #Postulate: Учитываем только тикеты типа (question, suggestion, bug).
+			AND e.scid IS NULL									-- #Postulate: We take into account only tickets created by users.
+			AND EntityType IN (@question, @bug, @suggestion)	-- #Postulate: and tickets of type (question, suggestion, bug).
 	) AS users_tickets_only
 	WHERE tc.ticket_id IS NOT NULL
 	/*	#Postulate: Все ответы и часы работы не в своём трайбе как есть переносятся как ответы и часы в основном трайбе.
