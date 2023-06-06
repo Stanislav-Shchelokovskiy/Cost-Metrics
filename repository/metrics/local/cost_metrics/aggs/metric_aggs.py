@@ -1,5 +1,5 @@
 import os
-from collections.abc import Iterable
+from collections.abc import Iterable, Callable
 from collections import ChainMap
 from sql_queries.meta.cost_metrics import CostmetricsMeta
 
@@ -13,29 +13,39 @@ class DIV:
     def __str__(self) -> str:
         return self.__as_str()
 
-    def __as_str(self, over: str = ''):
-        return f'IIF({self.divider}{over} = 0, 0, {self.dividee}{over} * 1.0 / {self.divider}{over})'
+    def __as_str(self, window: str = ''):
+        dividee, divider = self.dividee, self.divider
+        if window:
+            dividee, divider = self.dividee.over(window), self.divider.over(window)
+        return f'IIF({divider} = 0, 0, {dividee} * 1.0 / {divider})'
 
     def over(self, window: str) -> str:
-        return self.__as_str(f' OVER ({window})')
+        return self.__as_str(window)
 
 
 class SUM:
 
-    def __init__(self, param: str, expression: str | None = None) -> None:
-        self.expression = expression or f'SUM({param})'
+    def __init__(self, param: str, *expressions: str, op: str = '') -> None:
+        self.expressions = expressions or [f'SUM({param})']
+        self.op = op
+
+    def __as_str(self, format: Callable[[str], str] = lambda x: x):
+        res = self.op.join(format(expr) for expr in self.expressions)
+        if len(self.expressions) > 1 and (' + ' == self.op):
+            return f'({res})'
+        return res
 
     def __str__(self) -> str:
-        return self.expression
+        return self.__as_str()
 
     def __repr__(self) -> str:
-        return self.expression
+        return self.__str__()
 
     def __add__(self, other: 'SUM'):
-        return SUM('', f'{self} + {other}')
+        return SUM('', str(self), str(other), op=' + ')
 
-    def __mul__(self, other: float):
-        return SUM('', f'{self} * {other}')
+    def __mul__(self, other: 'SUM'):
+        return SUM('', str(self), str(other), op=' * ')
 
     def __truediv__(self, other: 'SUM') -> 'SUM':
         return DIV(self, other)
@@ -44,7 +54,7 @@ class SUM:
         return str(self) == str(other)
 
     def over(self, window: str) -> str:
-        return (f'{self} OVER ({window})')
+        return self.__as_str(lambda x: f'{x} OVER ({window})')
 
 
 class Metric:
@@ -57,13 +67,13 @@ class Metric:
         return str(self.expression)
 
     def __add__(self, other: 'Metric'):
-        return Metric('', f'{self} + {other}')
+        return Metric('', self.expression + other.expression)
 
-    def __mul__(self, other: float):
-        return Metric('', f'({self}) * {other}')
+    def __mul__(self, other: 'Metric'):
+        return Metric('', self.expression * other.expression)
 
     def __truediv__(self, other: 'Metric'):
-        return Metric('', f'({self}) * 1.0 / {other}')
+        return Metric('', self.expression / other.expression)
 
     def __eq__(self, other: 'Metric') -> bool:
         return str(self) == str(other)
