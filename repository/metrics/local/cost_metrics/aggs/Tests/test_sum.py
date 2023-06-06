@@ -22,11 +22,14 @@ def test_add():
 def test_mul():
     assert SUM('expr1') * 1.0 == SUM('', 'SUM(expr1) * 1.0')
 
+
 def test_SUM_over():
     assert SUM('expr1').over('qwe') == f'SUM(expr1) OVER (qwe)'
 
+
 def test_div():
     assert SUM('expr1') / SUM('expr2') == SUM('', f'IIF(SUM(expr2) = 0, 0, SUM(expr1) * 1.0 / SUM(expr2))' )
+
 
 def test_div_expr():
     assert SUM('', 'expr1') / SUM('', 'expr2') == SUM('', f'IIF(expr2 = 0, 0, expr1 * 1.0 / expr2)' )
