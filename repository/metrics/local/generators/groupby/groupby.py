@@ -1,47 +1,41 @@
-from collections.abc import Iterable
+from collections.abc import Callable
 from typing import NamedTuple
-from toolbox.sql import MetaData, KnotMeta
+from toolbox.sql import KnotMeta
 from sql_queries.meta.cost_metrics import CostmetricsMeta
 import toolbox.sql.generators.sqlite_periods_generator as periods_generator
 from sql_queries.index import local_names_index
+from repository.metrics.local.generators.groupby.groups import (
+    AggBy,
+    employee_group,
+    tribe_group,
+    chapter_group,
+)
+
+
+def get_groupby(group: Callable[[str], str]):
+
+    def groupby(period_expression: str):
+        return f'GROUP BY {group(period_expression)}'
+
+    return groupby
 
 
 # yapf: disable
-def get_chapter_groupby(groupby_period_expression: str) -> str:
-    return f'GROUP BY {groupby_period_expression}, {CostmetricsMeta.team}'
-
-def get_tribe_groupby(groupby_period_expression: str) -> str:
-    return get_chapter_groupby(groupby_period_expression) + f', {CostmetricsMeta.tribe_name}'
-
-def get_employee_group_by(groupby_period_expression: str) -> str:
-    return get_tribe_groupby(groupby_period_expression) + f', {CostmetricsMeta.position_name}, {CostmetricsMeta.name}'
-# yapf: enable
-
-
-class AggBy(MetaData):
-    employee = 'Employee'
-    tribe = 'Tribe'
-    chapter = 'Chapter'
-
-
 group_bys = {
     AggBy.employee: (
-        get_employee_group_by,
+        get_groupby(employee_group),
         CostmetricsMeta.name,
     ),
     AggBy.tribe: (
-        get_tribe_groupby,
+        get_groupby(tribe_group),
         CostmetricsMeta.tribe_name,
     ),
     AggBy.chapter: (
-        get_chapter_groupby,
+        get_groupby(chapter_group),
         f'(SELECT {KnotMeta.name} FROM {local_names_index.CostMetrics.teams} WHERE {KnotMeta.id} = {CostmetricsMeta.team} LIMIT 1)',
     ),
 }
-
-
-def get_groupbys() -> Iterable[str]:
-    return [x for x in AggBy.get_values()]
+# yapf: enable
 
 
 class GroupBy(NamedTuple):

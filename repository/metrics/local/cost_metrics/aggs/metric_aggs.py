@@ -1,93 +1,142 @@
 import os
-from typing import NamedTuple
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable
 from collections import ChainMap
 from sql_queries.meta.cost_metrics import CostmetricsMeta
 
 
-class Metric(NamedTuple):
-    name: str
-    expression: str
+class DIV:
+
+    def __init__(self, dividee: 'SUM', divider: 'SUM') -> None:
+        self.dividee = dividee
+        self.divider = divider
+
+    def __str__(self) -> str:
+        return self.__as_str()
+
+    def __as_str(self, over: str = ''):
+        return f'IIF({self.divider}{over} = 0, 0, {self.dividee}{over} * 1.0 / {self.divider}{over})'
+
+    def over(self, window: str) -> str:
+        return self.__as_str(f' OVER ({window})')
+
+
+class SUM:
+
+    def __init__(self, param: str, expression: str | None = None) -> None:
+        self.expression = expression or f'SUM({param})'
 
     def __str__(self) -> str:
         return self.expression
 
-    def __add__(self, other: 'Metric'):
-        return Metric('', f'{self.expression} + {other.expression}')
+    def __repr__(self) -> str:
+        return self.expression
+
+    def __add__(self, other: 'SUM'):
+        return SUM('', f'{self} + {other}')
 
     def __mul__(self, other: float):
-        return Metric('', f'({self.expression}) * {other}')
+        return SUM('', f'{self} * {other}')
+
+    def __truediv__(self, other: 'SUM') -> 'SUM':
+        return DIV(self, other)
+
+    def __eq__(self, other: 'SUM') -> bool:
+        return str(self) == str(other)
+
+    def over(self, window: str) -> str:
+        return (f'{self} OVER ({window})')
+
+
+class Metric:
+
+    def __init__(self, name: str, expression: SUM | DIV) -> None:
+        self.name = name
+        self.expression = expression
+
+    def __str__(self) -> str:
+        return str(self.expression)
+
+    def __add__(self, other: 'Metric'):
+        return Metric('', f'{self} + {other}')
+
+    def __mul__(self, other: float):
+        return Metric('', f'({self}) * {other}')
 
     def __truediv__(self, other: 'Metric'):
-        return Metric('', f'({self.expression}) / {other.expression}')
+        return Metric('', f'({self}) * 1.0 / {other}')
 
     def __eq__(self, other: 'Metric') -> bool:
-        return self.expression == other.expression
+        return str(self) == str(other)
 
     @classmethod
     def from_metric(cls, name: str, metric: 'Metric'):
         return cls(name, metric.expression)
 
+    def get_over(self, window: str) -> str:
+        return self.expression.over(window)
+
+
+# yapf: disable
 
 sc_work_cost_gross_incl_overtime = Metric(
     'SC Work Cost (gross incl overtime)',
-    f'SUM({CostmetricsMeta.sc_work_cost_gross_incl_overtime})',
+    SUM(CostmetricsMeta.sc_work_cost_gross_incl_overtime),
 )
 sc_work_cost_gross_withAOE_incl_overtime = Metric(
     'SC Work Cost (gross with AOE incl overtime)',
-    f'SUM({CostmetricsMeta.sc_work_cost_gross_withAOE_incl_overtime})',
+    SUM(CostmetricsMeta.sc_work_cost_gross_withAOE_incl_overtime),
 )
 total_work_hours = Metric(
     'Total Work Hours',
-    f'SUM({CostmetricsMeta.total_work_hours})',
+    SUM(CostmetricsMeta.total_work_hours),
 )
 sc_work_cost_gross = Metric(
     'SC Work Cost (gross)',
-    f'SUM({CostmetricsMeta.sc_work_cost_gross})',
+    SUM(CostmetricsMeta.sc_work_cost_gross),
 )
 sc_work_cost_gross_withAOE = Metric(
     'SC Work Cost (gross with AOE)',
-    f'SUM({CostmetricsMeta.sc_work_cost_gross_withAOE})',
+    SUM(CostmetricsMeta.sc_work_cost_gross_withAOE),
 )
 proactive_work_cost_gross = Metric(
     'Proactive Work Cost (gross)',
-    f'SUM({CostmetricsMeta.proactive_work_cost_gross})',
+    SUM(CostmetricsMeta.proactive_work_cost_gross),
 )
 proactive_work_cost_gross_withAOE = Metric(
     'Proactive Work Cost (gross with AOE)',
-    f'SUM({CostmetricsMeta.proactive_work_cost_gross_withAOE})',
+    SUM(CostmetricsMeta.proactive_work_cost_gross_withAOE),
 )
 ticket_cost_gross = Metric(
     'Ticket Cost (gross)',
-    f'IIF(SUM({CostmetricsMeta.unique_tickets})	= 0, 0, SUM({CostmetricsMeta.sc_work_cost_gross_incl_overtime}) * 1.0 / SUM({CostmetricsMeta.unique_tickets}))',
+    SUM(CostmetricsMeta.sc_work_cost_gross_incl_overtime) / SUM(CostmetricsMeta.unique_tickets),
 )
 ticket_cost_gross_withAOE = Metric(
     'Ticket Cost (gross with AOE)',
-    f'IIF(SUM({CostmetricsMeta.unique_tickets})	= 0, 0, SUM({CostmetricsMeta.sc_work_cost_gross_withAOE_incl_overtime}) * 1.0 / SUM({CostmetricsMeta.unique_tickets}))',
+    SUM(CostmetricsMeta.sc_work_cost_gross_withAOE_incl_overtime) / SUM(CostmetricsMeta.unique_tickets),
 )
 iteration_cost_gross = Metric(
     'Iteration Cost (gross)',
-    f'IIF(SUM({CostmetricsMeta.iterations})	= 0, 0, SUM({CostmetricsMeta.sc_work_cost_gross_incl_overtime}) * 1.0 / SUM({CostmetricsMeta.iterations}))',
+    SUM(CostmetricsMeta.sc_work_cost_gross_incl_overtime) / SUM(CostmetricsMeta.iterations),
 )
 iteration_cost_gross_withAOE = Metric(
     'Iteration Cost (gross with AOE)',
-    f'IIF(SUM({CostmetricsMeta.iterations})	= 0, 0, SUM({CostmetricsMeta.sc_work_cost_gross_withAOE_incl_overtime}) * 1.0 / SUM({CostmetricsMeta.iterations}))',
+    SUM(CostmetricsMeta.sc_work_cost_gross_withAOE_incl_overtime) / SUM(CostmetricsMeta.iterations),
 )
 iterations_per_hour = Metric(
     'Iterations per hour',
-    f'IIF(SUM({CostmetricsMeta.sc_hours})	= 0, 0, SUM({CostmetricsMeta.iterations}) * 1.0 / SUM({CostmetricsMeta.sc_hours}))',
+    SUM(CostmetricsMeta.iterations) / SUM(CostmetricsMeta.sc_hours),
 )
 tickets_per_hour = Metric(
     'Tickets per hour',
-    f'IIF(SUM({CostmetricsMeta.sc_hours})	= 0, 0, SUM({CostmetricsMeta.unique_tickets}) * 1.0 / SUM({CostmetricsMeta.sc_hours}))',
+    SUM(CostmetricsMeta.unique_tickets) / SUM({CostmetricsMeta.sc_hours}),
 )
 
 # yapf: disable
 fot_gross = Metric.from_metric('FOT (gross)', sc_work_cost_gross + proactive_work_cost_gross)
 fot_gross_withAOE = Metric.from_metric('FOT (gross with AOE)', sc_work_cost_gross_withAOE + proactive_work_cost_gross_withAOE)
 
-hour_price_gross = Metric.from_metric('Hour price (gross)', (sc_work_cost_gross+proactive_work_cost_gross) * 1.0 / total_work_hours)
-hour_price_gross_withAOE = Metric.from_metric('Hour price (gross with AOE)', (sc_work_cost_gross_withAOE + proactive_work_cost_gross_withAOE) * 1.0 / total_work_hours)
+hour_price_gross = Metric.from_metric('Hour price (gross)', (sc_work_cost_gross + proactive_work_cost_gross) / total_work_hours)
+hour_price_gross_withAOE = Metric.from_metric('Hour price (gross with AOE)', (sc_work_cost_gross_withAOE + proactive_work_cost_gross_withAOE) / total_work_hours)
 
 
 metrics = {
