@@ -1,5 +1,5 @@
 import os
-from collections.abc import Iterable, Callable
+from collections.abc import Iterable, Callable, Mapping
 from collections import ChainMap
 from sql_queries.meta.cost_metrics import CostmetricsMeta
 
@@ -143,7 +143,7 @@ iterations_per_hour = Metric(
 )
 tickets_per_hour = Metric(
     'Tickets per hour',
-    SUM(CostmetricsMeta.unique_tickets) / SUM({CostmetricsMeta.sc_hours}),
+    SUM(CostmetricsMeta.unique_tickets) / SUM(CostmetricsMeta.sc_hours),
 )
 
 # yapf: disable
@@ -191,7 +191,7 @@ def get_metrics_names(mode: str | None) -> Iterable[str]:
     return [x for x in get_metrics(mode).keys()]
 
 
-def get_metrics(mode: str | None):
+def get_metrics(mode: str | None) -> Mapping[str, Metric]:
     if advanced_mode_enabled(mode):
         return all_metrics
     return metrics

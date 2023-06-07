@@ -100,6 +100,21 @@ async def get_cost_metrics_aggregates(
     )
 
 
+@app.post('/CostMetrics/Raw')
+async def get_cost_metrics_raw(
+    range_start: str,
+    range_end: str,
+    body: CostMetricsParams,
+    mode: str | None = Cookie(None),
+):
+    return await LocalRepository.cost_metrics.raw.get_data(
+        range_start=range_start,
+        range_end=range_end,
+        mode=os.environ['ADVANCED_MODE_NAME'],  #mode,
+        **body.get_field_values(),
+    )
+
+
 @app.post('/EnableAdvancedMode', status_code=status.HTTP_201_CREATED)
 async def enable_advanced_mode(body: AdvancedModeParams, response: Response):
     if body.code == os.environ['ADVANCED_MODE_CODE']:

@@ -1,38 +1,60 @@
 from collections.abc import Mapping
-from collections import ChainMap
+from itertools import chain
 from toolbox.sql_async import GeneralSelectAsyncQueryDescriptor
 from toolbox.sql import MetaData
-from toolbox.sql.generators.utils import build_multiline_string_ignore_empties
 from sql_queries.meta.cost_metrics import CostmetricsMeta
 from sql_queries.index import local_names_index
-from repository.metrics.local.generators import cost_metrics, generate_groupby, get_overs_names
-from repository.metrics.local.cost_metrics.aggs.metric_aggs import get_metrics_names
+from repository.metrics.local.generators import cost_metrics, get_windows_names, get_windows
+from repository.metrics.local.cost_metrics.aggs.metric_aggs import get_metrics_names, get_metrics
 
 
 # yapf: disable
 class CostMetricsRawQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
+    __meta = dict()
+    __cols = dict()
+
+
     def get_fields_meta(self, kwargs: Mapping) -> MetaData:
-        if not hasattr(self, 'CostmetricsRawMeta'):
-            metrics = get_metrics_names(mode = kwargs['mode'])
-            attrs = {f'{over_name} {metric}': f'"{over_name} {metric}"' for metric in metrics for over_name in get_overs_names()}
-            self.CostmetricsRawMeta = type('CostmetricsRawMeta', (CostmetricsMeta,), {**CostmetricsMeta.get_attrs(), **attrs})
-        return self.CostmetricsRawMeta
+        mode = kwargs['mode']
+        meta = self.__meta.get(mode, None)
+        if not meta:
+            meta = self.__generate_and_cache_meta(kwargs, mode)
+        return meta
+
 
     def get_format_params(self, kwargs: Mapping) -> Mapping[str, str]:
-        period_field, agg_field, agg_name, *_ = self.get_fields(kwargs)
-        groupby = generate_groupby(
-            groupby_format=kwargs['group_by_period'],
-            agg_by=kwargs['agg_by']
-        )
-        metric = get_metric(metric=kwargs['metric'], mode=kwargs['mode'])
         return {
-            'select': f'{groupby.expression} AS {period_field}, {metric} AS {agg_field}, {groupby.aggName} AS {agg_name}',
+            'select': self.__get_cols(kwargs),
             'from':  local_names_index.CostMetrics.cost_metrics,
-            'where_group_limit': build_multiline_string_ignore_empties(
-                (
-                    cost_metrics.generate_filter(kwargs),
-                    groupby.statement,
-                )
-            )
+            'where_group_limit': cost_metrics.generate_filter(kwargs)
         }
+
+
+    def __generate_and_cache_meta(self, kwargs, mode):
+        metrics = get_metrics_names(mode = kwargs['mode'])
+        attrs = {self.__as_alias(over_name, metric): self.__as_alias(over_name, metric) for metric in metrics for over_name in get_windows_names()}
+        meta = type('CostmetricsRawMeta', (CostmetricsMeta,), {**CostmetricsMeta.get_attrs(), **attrs})
+        self.__meta[mode] = meta
+        return meta
+
+
+    def __get_cols(self, kwargs):
+        mode = kwargs['mode']
+        cols = self.__cols.get(mode, None)
+        if not cols:
+            cols = self.__generate_and_cache_cols(kwargs, mode)
+        return cols
+
+
+    def __generate_and_cache_cols(self, kwargs, mode):
+        metrics = get_metrics(mode = kwargs['mode']).values()
+        windows = get_windows().items()
+        metrics_aliases = (f'{metric.get_over(wnd)} AS {self.__as_alias(wnd_name, metric.name)}' for metric in metrics for wnd_name, wnd in windows)
+        cols = ',\n\t'.join(chain(CostmetricsMeta.get_values(), metrics_aliases))
+        self.__cols[mode] = cols
+        return cols
+
+
+    def __as_alias(self, over_name, metric):
+        return f'{over_name}_{metric}'.replace(' ', '_').replace('(', '').replace(')', '')
 # yapf: enable
