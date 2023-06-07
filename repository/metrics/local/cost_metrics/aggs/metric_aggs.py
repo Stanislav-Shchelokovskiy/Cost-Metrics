@@ -1,4 +1,5 @@
 import os
+from typing import NamedTuple
 from collections.abc import Iterable, Callable, Mapping
 from collections import ChainMap
 from sql_queries.meta.cost_metrics import CostmetricsMeta
@@ -62,11 +63,9 @@ class SUM(Func):
         return self._as_str(lambda x: f'{x} OVER ({window})')
 
 
-class Metric:
-
-    def __init__(self, name: str, expression: Func) -> None:
-        self.name = name
-        self.expression = expression
+class Metric(NamedTuple):
+    name: str
+    expression: Func
 
     def __str__(self) -> str:
         return str(self.expression)
@@ -187,8 +186,8 @@ def get_metric(metric: str, mode: str | None) -> Metric:
     return get_metrics(mode).get(metric, none_metric)
 
 
-def get_metrics_names(mode: str | None) -> Iterable[str]:
-    return [x for x in get_metrics(mode).keys()]
+def get_metrics_names(mode: str | None, formatter: Callable[[Metric], str]= lambda x: x.name) -> Iterable:
+    return [formatter(x) for x in get_metrics(mode).values()]
 
 
 def get_metrics(mode: str | None) -> Mapping[str, Metric]:
