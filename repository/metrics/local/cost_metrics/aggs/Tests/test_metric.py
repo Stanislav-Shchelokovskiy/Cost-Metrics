@@ -31,6 +31,11 @@ def test_div():
             'IIF(SUM(asd) OVER (wnd) = 0, 0, SUM(qwe) OVER (wnd) * 1.0 / SUM(asd) OVER (wnd))',
         ),
         (
+            (SUM('qwe') / SUM('asd')) / SUM('zxc'),
+            'wnd',
+            'IIF(SUM(zxc) OVER (wnd) = 0, 0, IIF(SUM(asd) OVER (wnd) = 0, 0, SUM(qwe) OVER (wnd) * 1.0 / SUM(asd) OVER (wnd)) * 1.0 / SUM(zxc) OVER (wnd))',
+        ),
+        (
             SUM('qwe') / (SUM('asd') + SUM('zxc')),
             'wnd',
             'IIF((SUM(asd) OVER (wnd) + SUM(zxc) OVER (wnd)) = 0, 0, SUM(qwe) OVER (wnd) * 1.0 / (SUM(asd) OVER (wnd) + SUM(zxc) OVER (wnd)))',
