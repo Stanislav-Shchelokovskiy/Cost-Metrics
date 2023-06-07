@@ -1,14 +1,23 @@
 import os
+from typing import Protocol
 from collections.abc import Iterable, Callable
 from collections import ChainMap
 from sql_queries.meta.cost_metrics import CostmetricsMeta
 
 
+class Func(Protocol):
+
+    def __str__(self) -> str:
+        pass
+
+    def over(self, window: str) -> str:
+        pass
+
+
 class DIV:
 
-    def __init__(self, dividee: 'SUM', divider: 'SUM') -> None:
-        self.dividee = dividee
-        self.divider = divider
+    def __init__(self, *funcs: Func) -> None:
+        self.dividee, self.divider, *_ = funcs
 
     def __str__(self) -> str:
         return self.__as_str()
@@ -16,7 +25,8 @@ class DIV:
     def __as_str(self, window: str = ''):
         dividee, divider = self.dividee, self.divider
         if window:
-            dividee, divider = self.dividee.over(window), self.divider.over(window)
+            dividee, divider = self.dividee.over(window
+                                                 ), self.divider.over(window)
         return f'IIF({divider} = 0, 0, {dividee} * 1.0 / {divider})'
 
     def over(self, window: str) -> str:
@@ -25,11 +35,11 @@ class DIV:
 
 class SUM:
 
-    def __init__(self, param: str, *expressions: str, op: str = '') -> None:
+    def __init__(self, param: str, *expressions: Func, op: str = '') -> None:
         self.expressions = expressions or [f'SUM({param})']
         self.op = op
 
-    def __as_str(self, format: Callable[[str], str] = lambda x: x):
+    def __as_str(self, format: Callable[[Func], str] = lambda x: str(x)):
         res = self.op.join(format(expr) for expr in self.expressions)
         if len(self.expressions) > 1 and (' + ' == self.op):
             return f'({res})'
@@ -41,16 +51,16 @@ class SUM:
     def __repr__(self) -> str:
         return self.__str__()
 
-    def __add__(self, other: 'SUM'):
-        return SUM('', str(self), str(other), op=' + ')
+    def __add__(self, other: Func) -> Func:
+        return SUM('', self, other, op=' + ')
 
-    def __mul__(self, other: 'SUM'):
-        return SUM('', str(self), str(other), op=' * ')
+    def __mul__(self, other: Func) -> Func:
+        return SUM('', self, other, op=' * ')
 
-    def __truediv__(self, other: 'SUM') -> 'SUM':
+    def __truediv__(self, other: Func) -> Func:
         return DIV(self, other)
 
-    def __eq__(self, other: 'SUM') -> bool:
+    def __eq__(self, other: Func) -> bool:
         return str(self) == str(other)
 
     def over(self, window: str) -> str:
@@ -59,7 +69,7 @@ class SUM:
 
 class Metric:
 
-    def __init__(self, name: str, expression: SUM | DIV) -> None:
+    def __init__(self, name: str, expression: Func) -> None:
         self.name = name
         self.expression = expression
 
