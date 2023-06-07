@@ -179,7 +179,7 @@ advanced_metrics = {
 
 all_metrics = ChainMap(advanced_metrics, metrics)
 
-none_metric = Metric('Fake', 'SUM(0)')
+none_metric = Metric('Fake', SUM(0))
 
 
 def get_metric(metric: str, mode: str | None) -> Metric:
