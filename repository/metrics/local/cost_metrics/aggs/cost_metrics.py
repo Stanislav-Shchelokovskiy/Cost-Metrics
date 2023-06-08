@@ -6,6 +6,7 @@ from sql_queries.meta.cost_metrics import CostmetricsMeta
 from sql_queries.index import local_names_index
 from repository.metrics.local.generators import cost_metrics, generate_groupby
 from repository.metrics.local.cost_metrics.aggs.metric_aggs import get_metric
+from repository.metrics.local.generators.groupby.groups import AggBy
 
 
 class CostmetricsAggMeta(MetaData):
@@ -24,7 +25,7 @@ class CostMetricsAggsQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
         period_field, agg_field, agg_name, *_ = self.get_fields(kwargs)
         groupby = generate_groupby(
             groupby_format=kwargs['group_by_period'],
-            agg_by=kwargs['agg_by']
+            agg_by=AggBy.chapter
         )
         metric = get_metric(metric=kwargs['metric'], mode=kwargs['mode'])
         return {
