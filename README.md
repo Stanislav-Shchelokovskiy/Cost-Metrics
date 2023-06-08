@@ -7,7 +7,7 @@ Add **.env** file containing the following env vars:
 - FLOWER_PORT=11007
 - REDIS_INSIGHT_PORT=10002
 - REDIS_PORT=6379
-- REDIS_DB=SUPPORT_METRICS
+- REDIS_DB=COST_METRICS
 - DB_HOME=/root/app/data
 - WF_LOGIN_HEADER=AuthLogin
 - WF_LOGIN_PASSWORD=AuthPassword

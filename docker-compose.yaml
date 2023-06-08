@@ -1,8 +1,8 @@
 version: '3.4'
 
-x-support_metrics_service:
-  &support_metrics_service
-  image: shchelokovskiy/support_metrics_service:latest
+x-cost_metrics:
+  &cost_metrics
+  image: shchelokovskiy/cost_metrics:latest
   restart: always
   environment:
     - SQL_SERVER
@@ -18,23 +18,23 @@ x-support_metrics_service:
     - FLOWER_PORT
     - CORS_ORIGINS
     - QUERY_SERVICE
-    - REDIS_SERVICE=support_metrics_redis
+    - REDIS_SERVICE=cost_metrics_redis
     - REDIS_PORT
     - REDIS_DB
     - ADVANCED_MODE_CODE
     - ADVANCED_MODE_NAME
-    - CELERY_BROKER_URL=redis://support_metrics_redis:6379/0
-    - CELERY_RESULT_BACKEND=redis://support_metrics_redis:6379/0
+    - CELERY_BROKER_URL=redis://cost_metrics_redis:6379/0
+    - CELERY_RESULT_BACKEND=redis://cost_metrics_redis:6379/0
     - SQLITE_DATABASE=${DB_HOME}/db
     - LD_LIBRARY_PATH=/usr/lib #https://stackoverflow.com/questions/49920444/upgrading-sqlite3-version-used-in-python3-on-linux
     - PRODUCTION
     - RECALCULATE_FROM_THE_BEGINNING
 
 services:
-  support_metrics_dashboard:
-    <<: *support_metrics_service
-    hostname: support_metrics_dashboard
-    container_name: support_metrics_dashboard
+  cost_metrics_dashboard:
+    <<: *cost_metrics
+    hostname: cost_metrics_dashboard
+    container_name: cost_metrics_dashboard
     command: celery --app=worker flower --port=${FLOWER_PORT}
     healthcheck:
       test:
@@ -51,36 +51,36 @@ services:
     ports:
       - "${FLOWER_PORT}:${FLOWER_PORT}"
     depends_on:
-      support_metrics_redis:
+      cost_metrics_redis:
         condition: service_healthy
 
-  support_metrics_worker:
-    <<: *support_metrics_service
-    hostname: support_metrics_worker
-    container_name: support_metrics_worker
+  cost_metrics_worker:
+    <<: *cost_metrics
+    hostname: cost_metrics_worker
+    container_name: cost_metrics_worker
     command: celery --app=worker worker --beat --loglevel=INFO --concurrency=7
     volumes:
-      - support_metrics-volume:${DB_HOME}
+      - cost_metrics-volume:${DB_HOME}
     depends_on:
-      support_metrics_redis:
+      cost_metrics_redis:
         condition: service_healthy
-      support_metrics_dashboard:
+      cost_metrics_dashboard:
         condition: service_healthy
 
-  support_metrics_server:
-    <<: *support_metrics_service
-    hostname: support_metrics_server
-    container_name: support_metrics_server
+  cost_metrics_server:
+    <<: *cost_metrics
+    hostname: cost_metrics_server
+    container_name: cost_metrics_server
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     command: uvicorn server:app --host 0.0.0.0 --port ${SERVER_PORT} --log-level critical
     volumes:
-      - support_metrics-volume:${DB_HOME}
+      - cost_metrics-volume:${DB_HOME}
 
-  support_metrics_redis:
+  cost_metrics_redis:
     image: redis/redis-stack:latest
-    hostname: support_metrics_redis
-    container_name: support_metrics_redis
+    hostname: cost_metrics_redis
+    container_name: cost_metrics_redis
     restart: always
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
@@ -89,9 +89,9 @@ services:
       retries: 3
       start_period: 5s
     volumes:
-      - support_metrics-volume:/data
+      - cost_metrics-volume:/data
     ports:
       - "${REDIS_INSIGHT_PORT}:8001"
 
 volumes:
-  support_metrics-volume:
+  cost_metrics-volume:

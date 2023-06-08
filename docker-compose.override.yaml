@@ -1,18 +1,18 @@
 version: '3.4'
 
-x-support_metrics_service:
-  &support_metrics_service
+x-cost_metrics:
+  &cost_metrics
   build:
     context: .
     dockerfile: Dockerfile
 
 services:
 
-  support_metrics_worker:
-    <<: *support_metrics_service
+  cost_metrics_worker:
+    <<: *cost_metrics
 
-  support_metrics_dashboard:
-    <<: *support_metrics_service
+  cost_metrics_dashboard:
+    <<: *cost_metrics
 
-  support_metrics_server:
-    <<: *support_metrics_service
+  cost_metrics_server:
+    <<: *cost_metrics
