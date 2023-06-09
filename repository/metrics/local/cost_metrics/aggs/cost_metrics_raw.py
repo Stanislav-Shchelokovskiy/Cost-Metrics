@@ -18,7 +18,7 @@ class CostMetricsRawQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
         mode = kwargs['mode']
         meta = self.__meta.get(mode, None)
         if not meta:
-            meta = self.__generate_and_cache_meta(kwargs, mode)
+            meta = self.__generate_and_cache_fields_meta(kwargs, mode)
         return meta
 
 
@@ -30,7 +30,7 @@ class CostMetricsRawQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
         }
 
 
-    def __generate_and_cache_meta(self, kwargs, mode):
+    def __generate_and_cache_fields_meta(self, kwargs, mode):
         metrics = get_metrics_names(mode = kwargs['mode'])
         attrs = {self.__as_alias(over_name, metric): self.__as_alias(over_name, metric) for metric in metrics for over_name in get_windows_names()}
         meta = type('CostmetricsRawMeta', (CostmetricsMeta,), {**CostmetricsMeta.get_attrs(), **attrs})

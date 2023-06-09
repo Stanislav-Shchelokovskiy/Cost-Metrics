@@ -5,7 +5,6 @@ from sql_queries.meta.cost_metrics import CostmetricsMeta
 from toolbox.sql.aggs import Metric, SUM
 
 # yapf: disable
-
 sc_work_cost_gross_incl_overtime = Metric(
     'SC Work Cost (gross incl overtime)',
     SUM(CostmetricsMeta.sc_work_cost_gross_incl_overtime),

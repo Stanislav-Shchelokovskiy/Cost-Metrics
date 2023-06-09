@@ -1,25 +1,14 @@
 from collections.abc import Mapping
-from toolbox.sql_async import GeneralSelectAsyncQueryDescriptor
-from toolbox.sql import MetaData
+from toolbox.sql_async import MetricAsyncQueryDescriptor
 from toolbox.sql.generators.utils import build_multiline_string_ignore_empties
-from sql_queries.meta.cost_metrics import CostmetricsMeta
 from sql_queries.index import local_names_index
 from repository.metrics.local.generators import cost_metrics, generate_groupby
 from repository.metrics.local.cost_metrics.aggs.metric_aggs import get_metric
 from repository.metrics.local.generators.groupby.groups import AggBy
 
 
-class CostmetricsAggMeta(MetaData):
-    year_month = CostmetricsMeta.year_month
-    agg = 'agg'
-    name = 'name'
-
-
 # yapf: disable
-class CostMetricsAggsQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
-
-    def get_fields_meta(self, kwargs: Mapping) -> MetaData:
-        return CostmetricsAggMeta
+class CostMetricsAggsQueryDescriptor(MetricAsyncQueryDescriptor):
 
     def get_format_params(self, kwargs: Mapping) -> Mapping[str, str]:
         period_field, agg_field, agg_name, *_ = self.get_fields(kwargs)
