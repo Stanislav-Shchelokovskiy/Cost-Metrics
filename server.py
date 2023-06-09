@@ -85,7 +85,6 @@ async def get_cost_metrics_aggregates(
     range_start: str,
     range_end: str,
     metric: str,
-    agg_by: str,
     body: CostMetricsParams,
     mode: str | None = Cookie(None),
 ):
@@ -94,7 +93,6 @@ async def get_cost_metrics_aggregates(
         range_start=range_start,
         range_end=range_end,
         metric=metric,
-        agg_by=agg_by,
         mode=os.environ['ADVANCED_MODE_NAME'],#mode,
         **body.get_field_values(),
     )

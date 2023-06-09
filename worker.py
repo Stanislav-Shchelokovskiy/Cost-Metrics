@@ -10,6 +10,7 @@ import config as config
 
 
 app = Celery(__name__)
+app.conf.setdefault('broker_connection_retry_on_startup', True)
 
 
 @worker_ready.connect
@@ -41,14 +42,12 @@ def setup_periodic_tasks(sender, **kwargs):
 
 @app.task(name='update_cost_metrics')
 def update_cost_metrics(**kwargs):
-    chord(
-        [
-            chain(
-                upsert_work_on_holidays.si(),
-                upsert_cost_metrics.si(),
-            ),
-        ]
-    )(cost_metrics_process_staged_data.si())
+    chord([
+        chain(
+            upsert_work_on_holidays.si(),
+            upsert_cost_metrics.si(),
+        ),
+    ])(cost_metrics_process_staged_data.si())
 
 
 @app.task(name='upsert_work_on_holidays', bind=True)
