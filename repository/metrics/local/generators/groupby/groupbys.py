@@ -34,6 +34,10 @@ group_bys = {
         get_groupby(chapter_group),
         f'(SELECT {KnotMeta.name} FROM {local_names_index.CostMetrics.teams} WHERE {KnotMeta.id} = {CostmetricsMeta.team} LIMIT 1)',
     ),
+    '': (
+        get_groupby(lambda x: x),
+        '""',
+    )
 }
 # yapf: enable
 
@@ -44,7 +48,7 @@ class GroupBy(NamedTuple):
     aggName: str
 
 
-def generate_groupby(groupby_format: str, agg_by: str) -> GroupBy:
+def generate_groupby(groupby_format: str, agg_by: str = '') -> GroupBy:
     groupby_period_expression = periods_generator.generate_group_by_period(
         format=groupby_format,
         field=CostmetricsMeta.year_month,
