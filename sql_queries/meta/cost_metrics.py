@@ -13,12 +13,14 @@ class NameKnotMeta(MetaData):
 
 
 class CostmetricsEmployeesMeta(MetaData):
-    name = 'name'
+    name = NameKnotMeta.name
     tribe = 'tribe'
+    position = 'position'
 
     def get_key_fields() -> Sequence[str]:
         return (
             CostmetricsEmployeesMeta.tribe,
+            CostmetricsEmployeesMeta.position,
             CostmetricsEmployeesMeta.name,
         )
 

@@ -6,7 +6,7 @@ from fastapi.responses import Response
 from toolbox.utils.converters import JSON_to_object
 from toolbox.server_models import ViewState
 from repository import LocalRepository
-from server_models import CostMetricsParams, AdvancedModeParams
+from server_models import CostMetricsParams, AdvancedModeParams, EmployeeParams
 
 
 class CustomJSONResponse(Response):
@@ -41,9 +41,11 @@ async def get_cost_metrics_positions():
     return await LocalRepository.cost_metrics.positions.get_data()
 
 
-@app.get('/CostMetrics/Employees')
-async def get_cost_metrics_employees():
-    return await LocalRepository.cost_metrics.employees.get_data()
+@app.post('/CostMetrics/Employees')
+async def get_cost_metrics_employees(body: EmployeeParams):
+    return await LocalRepository.cost_metrics.employees.get_data(
+        **body.get_field_values()
+    )
 
 
 @app.get('/CostMetrics/Period')
