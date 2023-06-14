@@ -4,7 +4,6 @@ from toolbox.sql.generators.utils import build_multiline_string_ignore_empties
 from sql_queries.index import local_names_index
 from repository.metrics.local.generators import cost_metrics, generate_groupby
 from repository.metrics.local.cost_metrics.aggs.metric_aggs import get_metric
-from repository.metrics.local.generators.groupby.groups import AggBy
 
 
 # yapf: disable
@@ -12,10 +11,7 @@ class CostMetricsAggsQueryDescriptor(MetricAsyncQueryDescriptor):
 
     def get_format_params(self, kwargs: Mapping) -> Mapping[str, str]:
         period_field, agg_field, agg_name, *_ = self.get_fields(kwargs)
-        groupby = generate_groupby(
-            groupby_format=kwargs['group_by_period'],
-            agg_by=AggBy.chapter
-        )
+        groupby = generate_groupby(groupby_format=kwargs['group_by_period'])
         metric = get_metric(metric=kwargs['metric'], mode=kwargs['mode'])
         return {
             'select': f'{groupby.expression} AS {period_field}, {metric} AS {agg_field}, {groupby.aggName} AS {agg_name}',

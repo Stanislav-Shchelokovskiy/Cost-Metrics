@@ -70,6 +70,11 @@ def process_staged_data():
                     type='TEXT',
                 ),
                 QueryField(
+                    source_name=CostmetricsMeta.position_name,
+                    target_name=CostmetricsEmployeesMeta.position,
+                    type='TEXT',
+                ),
+                QueryField(
                     source_name=CostmetricsMeta.tribe_name,
                     target_name=CostmetricsEmployeesMeta.tribe,
                     type='TEXT',

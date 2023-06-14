@@ -14,3 +14,8 @@ class CostMetricsParams(ServerModel):
 
 class AdvancedModeParams(BaseModel):
     code: str
+
+
+class EmployeeParams(ServerModel):
+    tribes: FilterParametersNode
+    positions: FilterParametersNode
