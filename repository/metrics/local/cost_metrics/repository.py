@@ -32,7 +32,7 @@ class CostMetricsRepository:
         self.period = create_repository(PeriodQueryDescriptor())
 
     async def get_metrics(self, mode: str | None) -> str:
-        return Object_to_JSON.convert(get_metrics_names(mode=mode, formatter=lambda x: {'name' : x.name}))
+        return Object_to_JSON.convert(get_metrics_names(mode=mode, formatter=lambda x: {'name' : x.name, 'context' : 1}))
 
     async def get_aggbys(self) -> str:
         return Object_to_JSON.convert(get_aggbys())
