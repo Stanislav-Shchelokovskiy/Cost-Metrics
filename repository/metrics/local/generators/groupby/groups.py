@@ -1,4 +1,3 @@
-from collections.abc import Iterable
 from toolbox.sql import MetaData
 from sql_queries.meta.cost_metrics import CostmetricsMeta
 
@@ -7,10 +6,6 @@ class AggBy(MetaData):
     employee = 'Employee'
     tribe = 'Tribe'
     chapter = 'Chapter'
-
-
-def get_aggbys() -> Iterable[str]:
-    return [x for x in AggBy.get_values()]
 
 
 # yapf: disable
