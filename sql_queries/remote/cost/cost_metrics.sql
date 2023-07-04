@@ -287,7 +287,10 @@ emp_activity AS (
 )
 
 SELECT 	year_month										AS {year_month},
-		team											AS {team},
+		CASE team
+			WHEN @support 	THEN 'Support'
+			WHEN @devs		THEN 'DevTeam'
+		END												AS {team},
 		emp_tribe_name									AS {tribe_name},
 		emp_name										AS {name},
 		position_name									AS {position_name},

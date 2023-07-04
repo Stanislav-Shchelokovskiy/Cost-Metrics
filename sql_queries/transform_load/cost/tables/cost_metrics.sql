@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS {CostMetricsTable}(
     {year_month}                                TEXT,
-    {team}                                      INTEGER,
+    {team}                                      TEXT,
     {tribe_name}                                TEXT,
     {name}                                      TEXT,
     {position_name}                             TEXT,
