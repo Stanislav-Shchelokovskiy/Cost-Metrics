@@ -14,8 +14,6 @@ x-cost_metrics:
     - WF_LOGIN
     - WF_PASSWORD
     - WF_ENDPOINT
-    - SERVER_PORT
-    - FLOWER_PORT
     - CORS_ORIGINS
     - QUERY_SERVICE
     - REDIS_SERVICE=cost_metrics_redis
@@ -35,21 +33,19 @@ services:
     <<: *cost_metrics
     hostname: cost_metrics_dashboard
     container_name: cost_metrics_dashboard
-    command: celery --app=worker flower --port=${FLOWER_PORT}
+    command: celery --app=worker flower --url_prefix=CostMetricsDash
     healthcheck:
       test:
         [
           "CMD",
           "curl",
           "-f",
-          "http://localhost:${FLOWER_PORT}/healthcheck"
+          "http://localhost:5555/CostMetricsDash/healthcheck"
         ]
       interval: 5s
       timeout: 5s
       retries: 3
       start_period: 5s
-    ports:
-      - "${FLOWER_PORT}:${FLOWER_PORT}"
     depends_on:
       cost_metrics_redis:
         condition: service_healthy
@@ -71,9 +67,7 @@ services:
     <<: *cost_metrics
     hostname: cost_metrics_server
     container_name: cost_metrics_server
-    ports:
-      - "${SERVER_PORT}:${SERVER_PORT}"
-    command: uvicorn server:app --host 0.0.0.0 --port ${SERVER_PORT} --log-level critical
+    command: uvicorn server:app --host 0.0.0.0 --port 80 --log-level critical
     volumes:
       - cost_metrics-volume:${DB_HOME}
 
@@ -90,8 +84,18 @@ services:
       start_period: 5s
     volumes:
       - cost_metrics-volume:/data
-    ports:
-      - "${REDIS_INSIGHT_PORT}:8001"
+    environment:
+      - RITRUSTEDORIGINS=http://localhost,http://localhost:80,http://localhost:80/CostMetricsRedis/,http://localhost/CostMetricsRedis/" # Trust the proxy origin
+      - RIPROXYENABLE=t # Enable Subpath Proxy
+      - RIPROXYPATH=/CostMetricsRedis/
+    # ports:
+    #   - "8001:8001"
 
 volumes:
   cost_metrics-volume:
+
+
+networks:
+  default:
+    name: support_analytics
+    external: true
