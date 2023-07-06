@@ -33,7 +33,7 @@ services:
     <<: *cost_metrics
     hostname: cost_metrics_dashboard
     container_name: cost_metrics_dashboard
-    command: celery --app=worker flower --url_prefix=CostMetricsDash
+    command: celery --app=worker flower --url_prefix=CostMetricsDash --port=5555
     healthcheck:
       test:
         [
@@ -46,6 +46,8 @@ services:
       timeout: 5s
       retries: 3
       start_period: 5s
+    expose:
+      - "5555"
     depends_on:
       cost_metrics_redis:
         condition: service_healthy
@@ -68,6 +70,8 @@ services:
     hostname: cost_metrics_server
     container_name: cost_metrics_server
     command: uvicorn server:app --host 0.0.0.0 --port 80 --log-level critical
+    expose:
+      - "80"
     volumes:
       - cost_metrics-volume:${DB_HOME}
 
