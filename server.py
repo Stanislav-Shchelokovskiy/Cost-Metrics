@@ -1,12 +1,13 @@
 import os
 import toolbox.cache.view_state_cache as view_state_cache
-from fastapi import FastAPI, Cookie, status
+from fastapi import FastAPI, Cookie
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from toolbox.utils.converters import JSON_to_object
 from toolbox.server_models import ViewState
 from repository import LocalRepository
-from server_models import CostMetricsParams, AdvancedModeParams, EmployeeParams
+from server_models import CostMetricsParams, EmployeeParams
+from utils import authorize_state_access
 
 
 class CustomJSONResponse(Response):
@@ -117,5 +118,9 @@ def push_state(params: ViewState):
 
 
 @app.get('/PullState')
-def pull_state(state_id: str):
-    return view_state_cache.pull_state(state_id)
+def pull_state(
+    state_id: str,
+    role: str | None = Cookie(None),
+):
+    state = view_state_cache.pull_state(state_id)
+    return authorize_state_access(role=role, state=state)

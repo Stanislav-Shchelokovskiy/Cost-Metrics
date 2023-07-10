@@ -99,6 +99,10 @@ admin_role_metrics = ChainMap(basic_metrics, advanced_metrics, admin_metrics)
 none_metric = Metric('Fake', SUM(0))
 
 
+def is_authorized_metric(metric: str, role: str) -> bool:
+    return metric in get_metrics(role)
+
+
 def get_metric(metric: str, role: str | None) -> Metric:
     return get_metrics(role).get(metric, none_metric)
 
