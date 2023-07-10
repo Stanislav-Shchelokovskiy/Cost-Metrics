@@ -27,10 +27,10 @@ class CostMetricsRawQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
 
 
     def get_fields_meta(self, kwargs: Mapping) -> MetaData:
-        mode = kwargs['mode']
-        meta = self.__meta.get(mode, None)
+        role = kwargs['role']
+        meta = self.__meta.get(role, None)
         if not meta:
-            meta = self.__generate_and_cache_fields_meta(mode)
+            meta = self.__generate_and_cache_fields_meta(role)
         return meta
 
 
@@ -43,14 +43,14 @@ class CostMetricsRawQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
 
 # yapf: enable
 
-    def __generate_and_cache_fields_meta(self, mode):
+    def __generate_and_cache_fields_meta(self, role):
         emp_metrics_attrs = self.__get_fields(
             metrics_names=get_emp_metrics_names(),
             windows_names=(employee_window.name, ),
         )
 
         tribe_chapter_metrics_attrs = self.__get_fields(
-            metrics_names=get_metrics_names(mode=mode),
+            metrics_names=get_metrics_names(role=role),
             windows_names=(tribe_window.name, chapter_window.name),
         )
         meta = type(
@@ -62,7 +62,7 @@ class CostMetricsRawQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
                 **tribe_chapter_metrics_attrs,
             },
         )
-        self.__meta[mode] = meta
+        self.__meta[role] = meta
         return meta
 
     def __get_fields(
@@ -77,19 +77,19 @@ class CostMetricsRawQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
         }
 
     def __get_cols(self, kwargs):
-        mode = kwargs['mode']
-        cols = self.__cols.get(mode, None)
+        role = kwargs['role']
+        cols = self.__cols.get(role, None)
         if not cols:
-            cols = self.__generate_and_cache_cols(mode)
+            cols = self.__generate_and_cache_cols(role=role)
         return cols
 
-    def __generate_and_cache_cols(self, mode):
+    def __generate_and_cache_cols(self, role):
         emp_metrics_aliases = self.__get_metrics_cols(
             metrics=get_emp_metrics().values(),
             windows=(employee_window, ),
         )
         tribe_chapter_metrics_aliases = self.__get_metrics_cols(
-            metrics=get_metrics(mode=mode).values(),
+            metrics=get_metrics(role=role).values(),
             windows=(tribe_window, chapter_window),
         )
         cols = ',\n\t'.join(
@@ -99,7 +99,7 @@ class CostMetricsRawQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
                 tribe_chapter_metrics_aliases,
             )
         )
-        self.__cols[mode] = cols
+        self.__cols[role] = cols
         return cols
 
     def __get_metrics_cols(

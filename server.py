@@ -59,8 +59,8 @@ async def get_group_by_periods():
 
 
 @app.get('/CostMetrics/Metrics')
-async def get_metrics(mode: str | None = Cookie(None)):
-    return await LocalRepository.cost_metrics.get_metrics(mode=os.environ['ADVANCED_MODE_NAME'])#mode
+async def get_metrics(role: str | None = Cookie(None)):
+    return await LocalRepository.cost_metrics.get_metrics(role=role)
 
 
 @app.get('/PeriodsArray')
@@ -83,14 +83,14 @@ async def get_cost_metrics_aggregates(
     range_end: str,
     metric: str,
     body: CostMetricsParams,
-    mode: str | None = Cookie(None),
+    role: str | None = Cookie(None),
 ):
     return await LocalRepository.cost_metrics.aggregates.get_data(
         group_by_period=group_by_period,
         range_start=range_start,
         range_end=range_end,
         metric=metric,
-        mode=os.environ['ADVANCED_MODE_NAME'],#mode,
+        role=role,
         **body.get_field_values(),
     )
 
@@ -100,26 +100,14 @@ async def get_cost_metrics_raw(
     range_start: str,
     range_end: str,
     body: CostMetricsParams,
-    mode: str | None = Cookie(None),
+    role: str | None = Cookie(None),
 ):
     return await LocalRepository.cost_metrics.raw.get_data(
         range_start=range_start,
         range_end=range_end,
-        mode=os.environ['ADVANCED_MODE_NAME'],  #mode,
+        role=role,
         **body.get_field_values(),
     )
-
-
-@app.post('/EnableAdvancedMode', status_code=status.HTTP_201_CREATED)
-async def enable_advanced_mode(body: AdvancedModeParams, response: Response):
-    if body.code == os.environ['ADVANCED_MODE_CODE']:
-        response.set_cookie(
-            key='mode',
-            value=os.environ['ADVANCED_MODE_NAME'],
-            max_age=2628288,
-        )
-    else:
-        response.status_code = status.HTTP_200_OK
 
 
 @app.post('/PushState')

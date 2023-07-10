@@ -30,5 +30,5 @@ class CostMetricsRepository:
         self.teams = create_repository(TeamsQueryDescriptor())
         self.period = create_repository(PeriodQueryDescriptor())
 
-    async def get_metrics(self, mode: str | None) -> str:
-        return Object_to_JSON.convert(get_metrics_names(mode=mode, formatter=lambda x: {'name' : x.name, 'context' : 1}))
+    async def get_metrics(self, role: str | None) -> str:
+        return Object_to_JSON.convert(get_metrics_names(role=role, formatter=lambda x: {'name' : x.name, 'context' : 1}))
