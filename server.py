@@ -1,6 +1,6 @@
 import os
 import toolbox.cache.view_state_cache as view_state_cache
-from fastapi import FastAPI, Cookie
+from fastapi import FastAPI, Cookie, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from toolbox.utils.converters import JSON_to_object
@@ -117,10 +117,21 @@ def push_state(params: ViewState):
     return state_id
 
 
-@app.get('/PullState')
+@app.get('/PullState', status_code=status.HTTP_200_OK)
 def pull_state(
     state_id: str,
+    response: Response,
     role: str | None = Cookie(None),
 ):
     state = view_state_cache.pull_state(state_id)
-    return authorize_state_access(role=role, state=state)
+    default = '{}'
+    res = authorize_state_access(
+        role=role,
+        state=state,
+        default=default,
+    )
+    if state is None:
+        response.status_code = status.HTTP_404_NOT_FOUND
+    elif res == default:
+        response.status_code = status.HTTP_403_FORBIDDEN
+    return res

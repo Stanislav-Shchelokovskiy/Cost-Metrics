@@ -9,10 +9,14 @@ def try_get_metric(obj: dict):
         return try_get_metric(v)
 
 
-def authorize_state_access(role: str, state: str | None) -> str:
+def authorize_state_access(
+    role: str,
+    state: str | None,
+    default: str,
+) -> str:
     if state:
         state_obj = json.loads(state)
         metric = try_get_metric(state_obj)
         if is_authorized_metric(metric=metric, role=role):
             return state
-    return '{}'
+    return default
