@@ -19,8 +19,8 @@ x-cost_metrics:
     - REDIS_SERVICE=cost_metrics_redis
     - REDIS_PORT
     - REDIS_DB
-    - ADVANCED_MODE_CODE
-    - ADVANCED_MODE_NAME
+    - ADMIN_ROLE
+    - ADVANCED_ROLE
     - CELERY_BROKER_URL=redis://cost_metrics_redis:6379/0
     - CELERY_RESULT_BACKEND=redis://cost_metrics_redis:6379/0
     - SQLITE_DATABASE=${DB_HOME}/db
