@@ -2,7 +2,7 @@ import json
 from repository.metrics.local.cost_metrics.aggs.metric_aggs import is_authorized_metric
 
 
-def try_get_metric(obj: dict):
+def try_get_metric(obj: dict[str, dict]):
     for v in obj.values():
         if metric := v.get('metric', None):
             return metric
