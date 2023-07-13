@@ -7,6 +7,7 @@ from toolbox.sql.aggs import Metric, SUM, NONE_METRIC
 class MetricGroup:
     cost = 'Cost'
     efficiency = 'Efficiency'
+    indepth = 'In-depth'
 
 # yapf: disable
 sc_work_cost_gross_incl_overtime = Metric(
