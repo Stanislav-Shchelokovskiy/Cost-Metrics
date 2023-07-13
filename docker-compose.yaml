@@ -76,7 +76,7 @@ services:
       - cost_metrics-volume:${DB_HOME}
 
   cost_metrics_redis:
-    image: redis/redis-stack:latest
+    image: redis/redis-stack-server:latest
     hostname: cost_metrics_redis
     container_name: cost_metrics_redis
     restart: always
@@ -88,12 +88,6 @@ services:
       start_period: 5s
     volumes:
       - cost_metrics-volume:/data
-    environment:
-      - RITRUSTEDORIGINS=http://localhost,http://localhost:80,http://localhost:80/CostMetricsRedis/,http://localhost/CostMetricsRedis/" # Trust the proxy origin
-      - RIPROXYENABLE=t # Enable Subpath Proxy
-      - RIPROXYPATH=/CostMetricsRedis/
-    # ports:
-    #   - "8001:8001"
 
 volumes:
   cost_metrics-volume:
