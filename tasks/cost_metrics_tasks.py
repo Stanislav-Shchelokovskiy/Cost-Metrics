@@ -5,7 +5,6 @@ from toolbox.sql.crud_queries import (
     SqliteCreateTableFromTableQuery,
     QueryField,
 )
-from toolbox.sql.meta_data import KnotMeta
 from sql_queries.transform_load.table_defs import get_create_table_statements
 from sql_queries.transform_load.index_defs import get_create_index_statements
 from repository import RemoteRepository
@@ -82,19 +81,12 @@ def process_staged_data():
             )
         ),
         SqliteCreateTableFromTableQuery(
-            source_table_or_subquery='''(VALUES (0, 'Support'), (1, 'DevTeam'))''',
+            source_table_or_subquery=local_names_index.CostMetrics.cost_metrics,
             target_table_name=local_names_index.CostMetrics.teams,
             unique_key_field=QueryField(
-                    source_name='column1',
-                    target_name=KnotMeta.id,
-                    type='INTEGER',
-                ),
-            values_fields=(
-                QueryField(
-                    source_name='column2',
-                    target_name=KnotMeta.name,
-                    type='TEXT',
-                ),
+                source_name=CostmetricsMeta.team,
+                target_name=NameKnotMeta.name,
+                type='TEXT',
             )
         ),
     )

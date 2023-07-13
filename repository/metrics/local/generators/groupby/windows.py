@@ -1,7 +1,9 @@
-from collections.abc import Iterable, Callable, Mapping
+from typing import NamedTuple
+from collections.abc import Callable
 from sql_queries.meta.cost_metrics import CostmetricsMeta
 from repository.metrics.local.generators.groupby.groups import (
     AggBy,
+    employee_group,
     tribe_group,
     chapter_group,
 )
@@ -11,15 +13,11 @@ def __get_window(group: Callable[[str], str]):
     return f'PARTITION BY {group(CostmetricsMeta.year_month)}'
 
 
-windows = {
-    AggBy.tribe: __get_window(tribe_group),
-    AggBy.chapter: __get_window(chapter_group),
-}
+class Window(NamedTuple):
+    name: str
+    statement: str
 
 
-def get_windows() -> Mapping[str, str]:
-    return windows
-
-
-def get_windows_names() -> Iterable[str]:
-    return windows.keys()
+employee_window = Window(AggBy.employee, __get_window(employee_group))
+tribe_window = Window(AggBy.tribe, __get_window(tribe_group))
+chapter_window = Window(AggBy.chapter, __get_window(chapter_group))

@@ -1,4 +1,4 @@
-from pydantic import Field, BaseModel
+from pydantic import Field
 from toolbox.server_models import (
     ServerModel,
     FilterParametersNode,
@@ -6,14 +6,10 @@ from toolbox.server_models import (
 
 
 class CostMetricsParams(ServerModel):
-    teams: FilterParametersNode[int] | None = Field(alias='Teams')
+    teams: FilterParametersNode[str] | None = Field(alias='Teams')
     tribes: FilterParametersNode[str] | None = Field(alias='Tribes')
     positions: FilterParametersNode[str] | None = Field(alias='Positions')
     employees: FilterParametersNode[str] | None = Field(alias='Employees')
-
-
-class AdvancedModeParams(BaseModel):
-    code: str
 
 
 class EmployeeParams(ServerModel):
