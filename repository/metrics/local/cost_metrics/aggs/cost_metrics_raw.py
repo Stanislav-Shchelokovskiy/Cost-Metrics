@@ -5,7 +5,7 @@ from toolbox.sql import MetaData
 from sql_queries.meta.cost_metrics import CostmetricsMeta
 from sql_queries.index import local_names_index
 from repository.metrics.local.cost_metrics.aggs.metric_aggs import (
-    get_metrics_names,
+    get_metrics_projections,
     get_metrics,
     get_emp_metrics_names,
     get_emp_metrics,
@@ -50,7 +50,7 @@ class CostMetricsRawQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
         )
 
         tribe_chapter_metrics_attrs = self.__get_fields(
-            metrics_names=get_metrics_names(role=role),
+            metrics_names=get_metrics_projections(role=role),
             windows_names=(tribe_window.name, chapter_window.name),
         )
         meta = type(
