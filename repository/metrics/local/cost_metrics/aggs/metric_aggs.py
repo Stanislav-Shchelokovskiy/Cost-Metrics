@@ -4,10 +4,12 @@ from collections import ChainMap
 from sql_queries.meta.cost_metrics import CostmetricsMeta
 from toolbox.sql.aggs import Metric, SUM, NONE_METRIC
 
+
 class MetricGroup:
     cost = 'Cost'
     efficiency = 'Efficiency'
     indepth = 'In-depth'
+
 
 # yapf: disable
 sc_work_cost_gross_incl_overtime = Metric(
@@ -66,12 +68,12 @@ iteration_cost_gross_withAOE = Metric(
     SUM(CostmetricsMeta.sc_work_cost_gross_withAOE_incl_overtime) / SUM(CostmetricsMeta.iterations),
 )
 iterations_per_hour = Metric(
-    'Iterations per hour',
+    'Iterations per Hour',
     MetricGroup.efficiency,
     SUM(CostmetricsMeta.iterations) / SUM(CostmetricsMeta.sc_hours),
 )
 tickets_per_hour = Metric(
-    'Tickets per hour',
+    'Tickets per Hour',
     MetricGroup.efficiency,
     SUM(CostmetricsMeta.unique_tickets) / SUM(CostmetricsMeta.sc_hours),
 )
