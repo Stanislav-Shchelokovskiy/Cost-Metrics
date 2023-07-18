@@ -10,7 +10,7 @@ Add **.env** file containing the following env vars:
 - WF_LOGIN_PASSWORD=AuthPassword
 - WF_LOGIN=...
 - WF_PASSWORD=...
-- WF_ENDPOINT=https://internal.devexpress.com/wf/data/
+- WF_ENDPOINT=https://int.devexpress.com/wf/data/
 - CORS_ORIGINS=["https://ubuntu-support.corp.devexpress.com","http://localhost:3000"]
 - QUERY_SERVICE=query_service
 - ADVANCED_MODE_CODE=Advanced
