@@ -96,6 +96,11 @@ async def get_cost_metrics_aggregates(
     )
 
 
+@app.post('/DisplayFilter')
+async def get_display_filter(body: CostMetricsParams):
+    return await LocalRepository.display_filter.generate_display_filter(body)
+
+
 @app.post('/CostMetrics/Raw')
 async def get_cost_metrics_raw(
     range_start: str,

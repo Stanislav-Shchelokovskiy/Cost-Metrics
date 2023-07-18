@@ -42,6 +42,15 @@ def process_staged_data():
     _save_tables(
         SqliteCreateTableFromTableQuery(
             source_table_or_subquery=local_names_index.CostMetrics.cost_metrics,
+            target_table_name=local_names_index.CostMetrics.teams,
+            unique_key_field=QueryField(
+                source_name=CostmetricsMeta.team,
+                target_name=NameKnotMeta.name,
+                type='TEXT',
+            )
+        ),
+        SqliteCreateTableFromTableQuery(
+            source_table_or_subquery=local_names_index.CostMetrics.cost_metrics,
             target_table_name=local_names_index.CostMetrics.tribes,
             unique_key_field=QueryField(
                 source_name=CostmetricsMeta.tribe_name,
@@ -78,15 +87,6 @@ def process_staged_data():
                     target_name=CostmetricsEmployeesMeta.tribe,
                     type='TEXT',
                 ),
-            )
-        ),
-        SqliteCreateTableFromTableQuery(
-            source_table_or_subquery=local_names_index.CostMetrics.cost_metrics,
-            target_table_name=local_names_index.CostMetrics.teams,
-            unique_key_field=QueryField(
-                source_name=CostmetricsMeta.team,
-                target_name=NameKnotMeta.name,
-                type='TEXT',
             )
         ),
     )
