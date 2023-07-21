@@ -8,18 +8,6 @@ DECLARE @new_life_start DATE = '2022-10-01'
 DECLARE @period_start	DATE = '{start}'
 DECLARE @period_end		DATE = '{end}'
 
-DECLARE @support_developers_chapter UNIQUEIDENTIFIER = '29B6E93D-8644-4977-9010-983076353DC6'
-
-DECLARE @support_developer_ph	UNIQUEIDENTIFIER = '10D4EC1A-8EEA-4930-A88B-76D0CAC11E89'
-DECLARE @support_developer		UNIQUEIDENTIFIER = '7A8E1B05-385E-4C91-B61E-81446B0C404A'
-DECLARE @chapter_leader			UNIQUEIDENTIFIER = '945FDE96-987B-4608-85F4-7393F00D341B'
-DECLARE @tribe_leader			UNIQUEIDENTIFIER = '0CF0BDBA-7DE3-4A06-9493-8F90720526B7'
-DECLARE @pm						UNIQUEIDENTIFIER = '835B63C4-D357-497A-A184-3F4FEAAA2AA7'
-DECLARE @principal_pm			UNIQUEIDENTIFIER = 'E8D90D9A-4C9D-45A6-A828-02CD6FA14924'
-DECLARE @developer				UNIQUEIDENTIFIER = '5739E91C-83AE-46CB-A9A0-32517CB1BAAA'
-DECLARE @technical_writer		UNIQUEIDENTIFIER = '4D017739-BA85-4C71-AEFD-1B7098BE81A2'
-DECLARE @squad_leader			UNIQUEIDENTIFIER = '520C9118-F21C-4B49-B937-A5ED2806B10C'
-
 DECLARE @working_hours_per_month TINYINT = 168
 
 
@@ -128,7 +116,7 @@ SELECT	months.year_month														AS year_month,
 		ISNULL(emps_levels.level_name, 
 			ISNULL(emp_position_audit.position_name, employees.position_name))	AS level_name,
 		ISNULL(tax_coefficients.value, 1)										AS tax_coefficient,
-		--	#Postulate: ФОТ на работу в sc считается по цене часа, затраченного на работу в sc.
+		--	#Postulate: SC fot is calculated by using sc work hour price.
 		-------------------------------------------------------------------------------------------------------
 		ROUND(	(
 					ISNULL(salaries.value, IIF(employees.crmid IS NOT NULL, 0, NULL))
@@ -172,7 +160,7 @@ SELECT	months.year_month														AS year_month,
 INTO	#Employees
 FROM	#Months AS months
 		OUTER APPLY (
-			-- #Postulate: Трейни не выкидываются
+			-- #Postulate: Trainees aren't thrown away
 			SELECT	e.*
 			FROM	DXStatisticsV2.dbo.support_analytics_employees() AS e
 		) AS employees
@@ -378,10 +366,12 @@ FROM (
 			AND e.scid IS NULL									-- #Postulate: We take into account only tickets created by users.
 			AND EntityType IN (@question, @bug, @suggestion)	-- #Postulate: and tickets of type (question, suggestion, bug).
 	) AS users_tickets_only
-	WHERE tc.ticket_id IS NOT NULL
-	/*	#Postulate: Все ответы и часы работы не в своём трайбе как есть переносятся как ответы и часы в основном трайбе.
-		Перенос происходит помесячно.
-		Don't group by anything else here. Otherwise make sure to filter result further by the new group field.*/
+	WHERE 	tc.ticket_id IS NOT NULL
+		/*	Throw away weekends work hours.	*/
+		AND	DATEPART(DW, time_stamp) NOT IN (7 /*saturday*/ , 1/*sunday*/)
+	/*	#Postulate: All replies and work hours in non primary tribe are moved (as is) as replies and work hours in the primary tribe.
+		The move is per month.	*/
+	/*	Don't group by anything else here. Otherwise make sure to filter result further by the new group field.*/
 GROUP BY	tc.emp_scid,
 			year_month
 
@@ -415,7 +405,6 @@ FROM (	SELECT	psts.Created, psts.Owner, psts.Ticket_Id, psts.Id
 		FROM	SupportCenterPaid.[c1f0951c-3885-44cf-accb-1a390f34c342].Posts AS psts
 		WHERE	psts.Created BETWEEN @period_start AND @period_end
 			AND psts.Type  != @note
-				--AND ticket_id IN ('8DE6294D-1D04-49BD-A7E9-771102A49879', '2B4E7D94-15FE-4C2B-BD9A-E629C713DF2C', '480B8439-E981-4A81-854B-2250AE9B128F')
 	) AS posts
 	OUTER APPLY (
 		SELECT TOP 1 u.Id
@@ -428,7 +417,7 @@ FROM (	SELECT	psts.Created, psts.Owner, psts.Ticket_Id, psts.Id
 		SELECT	t.Id, CASE WHEN t.Owner = posts.Owner THEN 1 ELSE 0 END AS is_ticket_owner
 		FROM	SupportCenterPaid.[c1f0951c-3885-44cf-accb-1a390f34c342].Tickets AS t
 		WHERE	t.Id = posts.Ticket_Id
-			AND t.EntityType IN (@question, @bug, @suggestion) -- #Postulate: Учитываем только тикеты типа (question, suggestion, bug).
+			AND t.EntityType IN (@question, @bug, @suggestion) -- #Postulate: Take into account only questions, suggestions, bugs.
 			AND	t.Created BETWEEN @period_start AND @period_end
 	) AS tickets
 	OUTER APPLY (
@@ -531,8 +520,8 @@ iterations_reduced AS (
 																AND psts_inner.year_month	= psts.year_month
 															GROUP BY emp_crmid, year_month, tribe_id) AS psts_outer)
 			) AS emp_main_tribes
-	/*	#Postulate: Все ответы и часы работы не в своём трайбе как есть переносятся как ответы и часы в основном трайбе.
-		Перенос происходит помесячно.	*/
+	/*	#Postulate: All replies and work hours in non primary tribe are moved (as is) as replies and work hours in the primary tribe.
+		The move is per month.	*/
 	GROUP BY	i.emp_crmid, 
 				i.user_scid,
 				i.year_month,
