@@ -36,6 +36,7 @@ class CostMetricsRepository:
                 role=role,
                 projector=lambda x: {
                     'name': x.name,
+                    'displayName': x.displayName or x.name,
                     'group': x.group,
                     'context': 1
                 }
