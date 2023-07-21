@@ -64,6 +64,11 @@ async def get_metrics(role: str | None = Cookie(None)):
     return await LocalRepository.cost_metrics.get_metrics(role=role)
 
 
+@app.get('/CostMetrics/MetricDescription')
+async def get_help(metric: str, role: str | None = Cookie(None)):
+    return await LocalRepository.help.get_description(metric, role)
+
+
 @app.get('/PeriodsArray')
 async def get_periods_array(
     start: str,
