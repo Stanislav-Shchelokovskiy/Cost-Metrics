@@ -93,7 +93,7 @@ tickets_per_hour = Metric(
 
 # yapf: disable
 support_service_cost_gross = Metric.from_metric('Support Service Cost (gross)', '', MetricGroup.cost, sc_work_cost_gross + proactive_work_cost_gross)
-support_service_cost_gross_withAOE = Metric.from_metric('Support Service Cost (gross with AOE) ', '', MetricGroup.cost, sc_work_cost_gross_withAOE + proactive_work_cost_gross_withAOE)
+support_service_cost_gross_withAOE = Metric.from_metric('Support Service Cost (gross with AOE)', '', MetricGroup.cost, sc_work_cost_gross_withAOE + proactive_work_cost_gross_withAOE)
 
 work_hour_cost_gross = Metric.from_metric('Work Hour Cost (gross)', '',  MetricGroup.cost, (sc_work_cost_gross + proactive_work_cost_gross) / total_work_hours_incl_overtime)
 work_hour_gross_withAOE = Metric.from_metric('Work Hour Cost (gross with AOE)', '', MetricGroup.cost, (sc_work_cost_gross_withAOE + proactive_work_cost_gross_withAOE) / total_work_hours_incl_overtime)
