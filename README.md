@@ -16,5 +16,6 @@ Add **.env** file containing the following env vars:
 - ADVANCED_MODE_CODE=Advanced
 - ADVANCED_MODE_NAME=Advanced
 - PRODUCTION=1 # 0 = false, 1 = true
+- RECALCULATE_FROM_THE_BEGINNING=0 # 0 = false, 1 = true
 
 Then run <b>docker-compose up</b>.

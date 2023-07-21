@@ -14,76 +14,89 @@ class MetricGroup:
 # yapf: disable
 sc_work_cost_gross_incl_overtime = Metric(
     'SC Work Cost (gross incl overtime)',
+    '',
     MetricGroup.cost,
     SUM(CostmetricsMeta.sc_work_cost_gross_incl_overtime),
 )
 sc_work_cost_gross_withAOE_incl_overtime = Metric(
     'SC Work Cost (gross with AOE incl overtime)',
+    '',
     MetricGroup.cost,
     SUM(CostmetricsMeta.sc_work_cost_gross_withAOE_incl_overtime),
 )
 total_work_hours_incl_overtime = Metric(
     'Total Work Hours (incl overtime)',
+    '',
     MetricGroup.efficiency,
     SUM(CostmetricsMeta.total_work_hours),
 )
 sc_work_cost_gross = Metric(
     'SC Work Cost (gross)',
+    '',
     MetricGroup.cost,
     SUM(CostmetricsMeta.sc_work_cost_gross),
 )
 sc_work_cost_gross_withAOE = Metric(
     'SC Work Cost (gross with AOE)',
+    '',
     MetricGroup.cost,
     SUM(CostmetricsMeta.sc_work_cost_gross_withAOE),
 )
 proactive_work_cost_gross = Metric(
     'Proactive Work Cost (gross)',
+    '',
     MetricGroup.cost,
     SUM(CostmetricsMeta.proactive_work_cost_gross),
 )
 proactive_work_cost_gross_withAOE = Metric(
     'Proactive Work Cost (gross with AOE)',
+    '',
     MetricGroup.cost,
     SUM(CostmetricsMeta.proactive_work_cost_gross_withAOE),
 )
 ticket_cost_gross = Metric(
     'Ticket Cost (gross)',
+    '',
     MetricGroup.cost,
     SUM(CostmetricsMeta.sc_work_cost_gross_incl_overtime) / SUM(CostmetricsMeta.unique_tickets),
 )
 ticket_cost_gross_withAOE = Metric(
     'Ticket Cost (gross with AOE)',
+    '',
     MetricGroup.cost,
     SUM(CostmetricsMeta.sc_work_cost_gross_withAOE_incl_overtime) / SUM(CostmetricsMeta.unique_tickets),
 )
 iteration_cost_gross = Metric(
     'Iteration Cost (gross)',
+    '',
     MetricGroup.cost,
     SUM(CostmetricsMeta.sc_work_cost_gross_incl_overtime) / SUM(CostmetricsMeta.iterations),
 )
 iteration_cost_gross_withAOE = Metric(
     'Iteration Cost (gross with AOE)',
+    '',
     MetricGroup.cost,
     SUM(CostmetricsMeta.sc_work_cost_gross_withAOE_incl_overtime) / SUM(CostmetricsMeta.iterations),
 )
 iterations_per_hour = Metric(
     'Iterations per Hour',
+    '',
     MetricGroup.efficiency,
     SUM(CostmetricsMeta.iterations) / SUM(CostmetricsMeta.sc_hours),
 )
 tickets_per_hour = Metric(
     'Tickets per Hour',
+    '',
     MetricGroup.efficiency,
     SUM(CostmetricsMeta.unique_tickets) / SUM(CostmetricsMeta.sc_hours),
 )
 
 # yapf: disable
-support_service_cost_gross = Metric.from_metric('Support Service Cost (gross)', MetricGroup.cost, sc_work_cost_gross + proactive_work_cost_gross)
-support_service_cost_gross_withAOE = Metric.from_metric('Support Service Cost (gross with AOE) ', MetricGroup.cost, sc_work_cost_gross_withAOE + proactive_work_cost_gross_withAOE)
+support_service_cost_gross = Metric.from_metric('Support Service Cost (gross)', '', MetricGroup.cost, sc_work_cost_gross + proactive_work_cost_gross)
+support_service_cost_gross_withAOE = Metric.from_metric('Support Service Cost (gross with AOE)', '', MetricGroup.cost, sc_work_cost_gross_withAOE + proactive_work_cost_gross_withAOE)
 
-work_hour_cost_gross = Metric.from_metric('Work Hour Cost (gross)', MetricGroup.cost, (sc_work_cost_gross + proactive_work_cost_gross) / total_work_hours_incl_overtime)
-work_hour_gross_withAOE = Metric.from_metric('Work Hour Cost (gross with AOE)', MetricGroup.cost, (sc_work_cost_gross_withAOE + proactive_work_cost_gross_withAOE) / total_work_hours_incl_overtime)
+work_hour_cost_gross = Metric.from_metric('Work Hour Cost (gross)', '',  MetricGroup.cost, (sc_work_cost_gross + proactive_work_cost_gross) / total_work_hours_incl_overtime)
+work_hour_gross_withAOE = Metric.from_metric('Work Hour Cost (gross with AOE)', '', MetricGroup.cost, (sc_work_cost_gross_withAOE + proactive_work_cost_gross_withAOE) / total_work_hours_incl_overtime)
 
 
 basic_metrics = {

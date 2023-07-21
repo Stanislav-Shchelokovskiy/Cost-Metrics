@@ -86,7 +86,7 @@ emp_activity_reduced AS (
 			employees.hourly_pay_gross								AS hourly_pay_gross,
 			employees.hourly_pay_gross_withAOE						AS hourly_pay_gross_withAOE,
 			-----------------------------------------------------------------------------------
-			/*	#Postulate: Все ответы и часы работы не в своём трайбе как есть переносятся как ответы и часы в основном трайбе. */
+			/*	#Postulate: All replies and work hours in non primary tribe are moved (as is) as replies and work hours in the primary tribe.	*/
 			ISNULL(employees.tribe_id, emps_empirical_tribe.id)		AS emp_tribe_id,
 			ISNULL(employees.tribe_name, emps_empirical_tribe.name)	AS emp_tribe_name,
 			-----------------------------------------------------------------------------------
@@ -160,7 +160,7 @@ emp_activity_reduced AS (
 emp_activity_by_team AS (
 	SELECT 	*,
 			CASE
-				WHEN	/*	#Postulate: Учитываются только сапортёры трайба, включая чаптер мэнеджеров и лидов поддержки.	*/
+				WHEN	/*	#Postulate: Take into account only tribe suppor including support chapter managers and support leaders.	*/
 						position_id IN (@support_developer_ph, @support_developer)
 					OR	(position_id = @chapter_leader	AND chapter_id = @support_developers_chapter)
 					OR	(position_id = @tribe_leader	AND has_support_processing_role = 1)
