@@ -14,6 +14,7 @@ def _get_wf_response(
         headers={
             os.environ['WF_LOGIN_HEADER']: os.environ['WF_LOGIN'],
             os.environ['WF_LOGIN_PASSWORD']: os.environ['WF_PASSWORD'],
+            'User-Agent': 'CostMetrics',
         },
         params=params,
     )
