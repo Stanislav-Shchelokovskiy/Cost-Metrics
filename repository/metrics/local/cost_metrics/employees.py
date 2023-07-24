@@ -14,7 +14,7 @@ class EmployeesQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
 
     def get_format_params(self, kwargs: Mapping) -> Mapping[str, str]:
         return {
-            'select': f'{KnotMeta.name} AS {KnotMeta.name}, {KnotMeta.name} AS {KnotMeta.id}',
+            'select': f'DISTINCT {KnotMeta.name} AS {KnotMeta.name}, {KnotMeta.name} AS {KnotMeta.id}',
             'from': local_names_index.CostMetrics.employees,
             'where_group_limit': employees.generate_tribes_positions_filter(tribes=kwargs['tribes'], positions=kwargs['positions']),
         }
