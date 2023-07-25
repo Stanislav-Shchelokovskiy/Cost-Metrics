@@ -26,7 +26,7 @@ from sql_queries.meta.cost_metrics import CostmetricsMeta, CostmetricsEmployeesM
         ),
         (
             employees.generate_employees_filter,
-            CostmetricsMeta.name,
+            CostmetricsMeta.emp_crmid,
             'employees',
             None,
         ),

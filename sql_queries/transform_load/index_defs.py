@@ -18,13 +18,7 @@ def get_create_index_statements() -> dict[str, tuple[str]]:
             (
                 _create_index_statement(
                     tbl=local_names_index.CostMetrics.cost_metrics,
-                    cols=(
-                        CostmetricsMeta.year_month,
-                        CostmetricsMeta.team,
-                        CostmetricsMeta.tribe_name,
-                        CostmetricsMeta.position_name,
-                        CostmetricsMeta.name,
-                    ),
+                    cols=CostmetricsMeta.get_index_fields(),
                 ),
                 _create_index_statement(
                     tbl=local_names_index.CostMetrics.cost_metrics,

@@ -48,7 +48,7 @@ def generate_positions_filter(
 def generate_employees_filter(employees: FilterParametersNode) -> str:
     generate_filter = SqlFilterClauseFromFilterParametersGeneratorFactory.get_in_filter_generator(employees)
     return generate_filter(
-        col=CostmetricsMeta.name,
+        col=CostmetricsMeta.emp_crmid,
         values=employees.values,
         filter_prefix='AND',
     )
