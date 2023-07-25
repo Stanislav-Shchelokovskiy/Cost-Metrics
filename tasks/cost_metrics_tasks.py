@@ -87,6 +87,11 @@ def process_staged_data():
                     target_name=CostmetricsEmployeesMeta.tribe,
                     type='TEXT',
                 ),
+                QueryField(
+                    source_name=CostmetricsMeta.emp_crmid,
+                    target_name=CostmetricsEmployeesMeta.crmid,
+                    type='TEXT',
+                ),
             )
         ),
     )

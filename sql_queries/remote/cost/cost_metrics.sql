@@ -286,7 +286,8 @@ emp_activity AS (
 			) AS work_on_holidays
 )
 
-SELECT 	year_month										AS {year_month},
+SELECT 	emp_crmid										AS {emp_crmid},
+		year_month										AS {year_month},
 		CASE team
 			WHEN @support 	THEN 'Support'
 			WHEN @devs		THEN 'DevTeam'
