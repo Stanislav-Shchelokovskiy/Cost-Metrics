@@ -72,6 +72,7 @@ class CostmetricsMeta(MetaData):
         return (
             CostmetricsMeta.year_month,
             CostmetricsMeta.emp_crmid,
+            CostmetricsMeta.tribe_name,
         )
 
     @staticmethod
