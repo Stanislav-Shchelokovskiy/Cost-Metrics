@@ -418,7 +418,6 @@ FROM (	SELECT	psts.Created, psts.Owner, psts.Ticket_Id, psts.Id
 		FROM	SupportCenterPaid.[c1f0951c-3885-44cf-accb-1a390f34c342].Tickets AS t
 		WHERE	t.Id = posts.Ticket_Id
 			AND t.EntityType IN (@question, @bug, @suggestion) -- #Postulate: Take into account only questions, suggestions, bugs.
-			AND	t.Created BETWEEN @period_start AND @period_end
 	) AS tickets
 	OUTER APPLY (
 		SELECT	e.*
