@@ -65,7 +65,7 @@ class CostmetricsMeta(MetaData):
             CostmetricsMeta.tribe_name,
             CostmetricsMeta.position_name,
             CostmetricsMeta.emp_crmid,
-        ),
+        )
 
     @staticmethod
     def get_key_fields() -> Sequence[str]:
