@@ -21,7 +21,7 @@ from toolbox.utils.converters import DateTimeToSqlString
         (
             0,
             {
-                'start': DateTimeToSqlString.convert(date.today() - relativedelta(days=7), '-'),
+                'start': DateTimeToSqlString.convert(date.today() - relativedelta(day=1), '-'),
                 'end': DateTimeToSqlString.convert(date.today(), '-'),
             },
             config.get_cost_metrics_period,
@@ -37,7 +37,7 @@ from toolbox.utils.converters import DateTimeToSqlString
         (
             0,
             {
-                'start': DateTimeToSqlString.convert(date.today() - relativedelta(days=7)),
+                'start': DateTimeToSqlString.convert(date.today() - relativedelta(day=1)),
                 'end': DateTimeToSqlString.convert(date.today()),
             },
             config.get_work_on_holidays_period,
