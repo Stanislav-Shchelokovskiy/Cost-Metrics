@@ -30,4 +30,4 @@ def get_start():
 
 
 def offset_in_months():
-    return relativedelta(months=3, day=1)
+    return relativedelta(days=7)
