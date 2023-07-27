@@ -25,7 +25,7 @@ def get_end():
 
 def get_start():
     if recalculate_from_beginning():
-        return date(2023, 1, 1)
+        return date(2018, 1, 1)
     return get_end() - offset_in_months()
 
 
