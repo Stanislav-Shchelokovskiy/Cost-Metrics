@@ -19,4 +19,4 @@ class CostMetrics:
 
 
 class WF:
-    upsert_work_on_holidays = _get_wf_path() + '/upsert_work_on_holidays.sql'
+    upsert_wf_hours = _get_wf_path() + '/upsert_wf_hours.sql'

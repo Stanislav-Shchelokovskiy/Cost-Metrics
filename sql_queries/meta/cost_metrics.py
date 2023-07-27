@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from toolbox.sql.meta_data import MetaData, KnotMeta
 
 
-class WorkOnHolidaysMeta(MetaData):
+class WFMeta(MetaData):
     crmid = 'crmid'
     date = 'date'
     hours = 'hours'
