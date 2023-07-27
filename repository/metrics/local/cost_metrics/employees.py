@@ -19,7 +19,12 @@ class EmployeesQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
             'from': local_names_index.CostMetrics.employees,
             'where_group_limit': build_multiline_string_ignore_empties(
                 (
-                    employees.generate_tribes_positions_filter(tribes=kwargs['tribes'], positions=kwargs['positions']),
+                    employees.generate_emps_filter(
+                        teams=kwargs['teams'],
+                        tribes=kwargs['tribes'],
+                        tents=kwargs['tents'],
+                        positions=kwargs['positions']
+                    ),
                     f'ORDER BY {KnotMeta.name}',
                 )
             ),

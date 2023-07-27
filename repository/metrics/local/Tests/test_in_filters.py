@@ -1,6 +1,6 @@
 import pytest
 import repository.metrics.local.generators.employees as employees
-from sql_queries.meta.cost_metrics import CostmetricsMeta, CostmetricsEmployeesMeta
+from sql_queries.meta.cost_metrics import CostmetricsMeta
 
 
 # yapf: disable
@@ -16,6 +16,12 @@ from sql_queries.meta.cost_metrics import CostmetricsMeta, CostmetricsEmployeesM
             employees.generate_tribes_filter,
             CostmetricsMeta.tribe_name,
             'tribes',
+            None,
+        ),
+        (
+            employees.generate_tents_filter,
+            CostmetricsMeta.tent_name,
+            'tents',
             None,
         ),
         (
@@ -42,31 +48,3 @@ def test_single_in_filters(
     for values, output in single_in_filter_cases(values_converter, prefix='AND'):
         print(values)
         assert generator(**{param_name: values}) == output.format(field=field)
-
-
-@pytest.mark.parametrize(
-    'generator, field1, field2, param_name1, param_name2, values_converter', [
-        (
-            employees.generate_tribes_positions_filter,
-            CostmetricsEmployeesMeta.tribe,
-            CostmetricsEmployeesMeta.position,
-            'tribes',
-            'positions',
-            None,
-        )
-    ]
-)
-def test_double_in_filter(
-    generator,
-    field1,
-    field2,
-    param_name1,
-    param_name2,
-    values_converter,
-    double_in_filter_cases,
-):
-    for values1, values2, output in double_in_filter_cases(values_converter):
-        assert generator(**{
-            param_name1: values1,
-            param_name2: values2
-        }) == output.format(field1=field1, field2=field2)

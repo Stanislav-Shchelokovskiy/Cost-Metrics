@@ -7,6 +7,7 @@ from repository.metrics.local.cost_metrics import (
     CostMetricsAggsQueryDescriptor,
     CostMetricsRawQueryDescriptor,
     TribesQueryDescriptor,
+    TentsQueryDescriptor,
     PositionsQueryDescriptor,
     EmployeesQueryDescriptor,
     TeamsQueryDescriptor,
@@ -25,6 +26,7 @@ class CostMetricsRepository:
         self.aggregates = create_repository(CostMetricsAggsQueryDescriptor())
         self.raw = create_repository(CostMetricsRawQueryDescriptor())
         self.tribes = create_repository(TribesQueryDescriptor())
+        self.tents = create_repository(TentsQueryDescriptor())
         self.positions = create_repository(PositionsQueryDescriptor())
         self.employees = create_repository(EmployeesQueryDescriptor())
         self.teams = create_repository(TeamsQueryDescriptor())

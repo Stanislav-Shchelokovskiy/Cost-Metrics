@@ -1,7 +1,7 @@
-import os
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from toolbox.utils.converters import DateTimeToSqlString
+from config.environ import recalculate_from_beginning
 
 
 def get_cost_metrics_period() -> dict[str, str]:
@@ -24,8 +24,8 @@ def get_end():
 
 
 def get_start():
-    if int(os.environ['RECALCULATE_FROM_THE_BEGINNING']) == 1:
-        return date(2018, 1, 1)
+    if recalculate_from_beginning():
+        return date(2023, 1, 1)
     return get_end() - offset_in_months()
 
 

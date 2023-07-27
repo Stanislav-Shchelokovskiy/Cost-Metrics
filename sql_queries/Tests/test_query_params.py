@@ -5,7 +5,7 @@ from sql_queries.index import remote_paths_index
 from sql_queries.index import transform_load_paths_index
 from pathlib import Path
 from sql_queries.meta.cost_metrics import (
-    WorkOnHolidaysMeta,
+    WFMeta,
     CostmetricsMeta,
 )
 
@@ -14,10 +14,11 @@ from sql_queries.meta.cost_metrics import (
     'get_query_file_path, format_params',
     [
         (
-            remote_paths_index.WF.upsert_work_on_holidays,
+            remote_paths_index.WF.upsert_wf_hours,
             {
                 'values': '(qwe, 2, 3)',
-                **WorkOnHolidaysMeta.get_attrs(),
+                'target': 'target',
+                **WFMeta.get_attrs(),
             },
         ),
         (

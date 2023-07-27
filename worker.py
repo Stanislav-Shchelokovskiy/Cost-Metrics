@@ -44,17 +44,17 @@ def setup_periodic_tasks(sender, **kwargs):
 def update_cost_metrics(**kwargs):
     chord([
         chain(
-            upsert_work_on_holidays.si(),
+            upsert_wf_work_hours.si(),
             upsert_cost_metrics.si(),
         ),
     ])(cost_metrics_process_staged_data.si())
 
 
-@app.task(name='upsert_work_on_holidays', bind=True)
-def upsert_work_on_holidays(self, **kwargs):
+@app.task(name='upsert_wf_work_hours', bind=True)
+def upsert_wf_work_hours(self, **kwargs):
     return run_retriable_task(
         self,
-        wf_tasks.upsert_work_on_holidays,
+        wf_tasks.upsert_work_hours,
         **config.get_work_on_holidays_period(),
     )
 

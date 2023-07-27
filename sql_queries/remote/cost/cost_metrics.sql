@@ -13,7 +13,10 @@ DECLARE @squad_leader			UNIQUEIDENTIFIER = '520C9118-F21C-4B49-B937-A5ED2806B10C
 DECLARE @working_hours_per_month TINYINT = 168
 
 DECLARE @devexpress_tribe_id	UNIQUEIDENTIFIER = '340E06F5-9B98-4923-97A4-CA02BA73F075'
+DECLARE @devexpress_tent_id		UNIQUEIDENTIFIER = '1D44AA47-58B6-4064-99FE-A2B4513861DA'
 DECLARE @current_month			DATE = DATEFROMPARTS(YEAR(GETUTCDATE()), MONTH(GETUTCDATE()), 1)
+
+DECLARE @tents_introduction_date DATE = '2023-04-01'
 
 DECLARE @support 	TINYINT = 0
 DECLARE @devs		TINYINT = 1;
@@ -23,21 +26,25 @@ WITH emp_activity_in_tribe AS (
 			emp_scid			AS emp_scid,
 			year_month			AS year_month,
 			emp_tribe_id		AS emp_tribe_id,
+			emp_tent_id			AS emp_tent_id,
 			emp_tribe_name		AS emp_tribe_name,
+			emp_tent_name		AS emp_tent_name,
 			sc_hours			AS sc_hours,
 			--------------------------------------
 			SUM(unique_tickets)	AS unique_tickets,
 			SUM(iterations)		AS iterations
 			--------------------------------------
 	FROM	#Iterations
-	GROUP BY emp_crmid, emp_scid, year_month, emp_tribe_id, emp_tribe_name, sc_hours
+	GROUP BY emp_crmid, emp_scid, year_month, emp_tribe_id, emp_tribe_name, emp_tent_id, emp_tent_name, sc_hours
 ),
 
 emp_activity_in_tribe_with_external_activity AS (
 	SELECT	emp_crmid,
 			year_month,
 			emp_tribe_id,
+			emp_tent_id,
 			emp_tribe_name,
+			emp_tent_name,
 			sc_hours,
 			emp_activity_in_tribe.unique_tickets + ISNULL(external_activity.unique_tickets, 0)	AS unique_tickets,
 			emp_activity_in_tribe.iterations	 + ISNULL(external_activity.iterations, 0)		AS iterations
@@ -66,7 +73,9 @@ emp_activity_in_tribe_transformed AS (
 	SELECT	emp_crmid,
 			year_month,
 			emp_tribe_id,
+			emp_tent_id,
 			emp_tribe_name,
+			emp_tent_name,
 			IIF(ignore_sc_activity = 1, 0, sc_hours)		AS sc_hours,
 			IIF(ignore_sc_activity = 1, 0, unique_tickets)	AS unique_tickets,
 			IIF(ignore_sc_activity = 1, 0, iterations)		AS iterations
@@ -85,17 +94,24 @@ emp_activity_reduced AS (
 			employees.hourly_pay_net								AS hourly_pay_net,
 			employees.hourly_pay_gross								AS hourly_pay_gross,
 			employees.hourly_pay_gross_withAOE						AS hourly_pay_gross_withAOE,
-			-----------------------------------------------------------------------------------
+			--********************************************************************************************
 			/*	#Postulate: All replies and work hours in non primary tribe are moved (as is) as replies and work hours in the primary tribe.	*/
-			ISNULL(employees.tribe_id, emps_empirical_tribe.id)		AS emp_tribe_id,
-			ISNULL(employees.tribe_name, emps_empirical_tribe.name)	AS emp_tribe_name,
-			-----------------------------------------------------------------------------------
+			ISNULL(employees.tribe_id, emps_empirical_tribe_tent.tribe_id)				AS emp_tribe_id,
+			ISNULL(employees.tribe_name, emps_empirical_tribe_tent.tribe_name)			AS emp_tribe_name,
+			----------------------------------------------------------------------------------------------
+			IIF(employees.year_month > @tents_introduction_date,
+				ISNULL(employees.tent_id, emps_empirical_tribe_tent.tent_id), NULL)		AS emp_tent_id,
+			----------------------------------------------------------------------------------------------
+			IIF(employees.year_month > @tents_introduction_date,
+				ISNULL(employees.tent_name, emps_empirical_tribe_tent.tent_name), NULL)	AS emp_tent_name,
+			--********************************************************************************************
 			ISNULL(emps_activity_aggs.sc_hours, 0)					AS sc_hours,
+			ISNULL(wf_proactive.hours, 0)							AS wf_proactive_hours,
 			ISNULL(emps_activity_aggs.unique_tickets, 0)			AS unique_tickets,
 			ISNULL(emps_activity_aggs.iterations, 0)				AS iterations,
 			ISNULL(v.paid_hours, 0)									AS paid_vacation_hours,
 			ISNULL(v.free_hours, 0)									AS free_vacation_hours,
-			-----------------------------------------------------------------------------------
+			-----------------------------------------------------------------------------------------------
 			CASE WHEN retired = 1 AND DATEDIFF(MONTH, employees.year_month, retired_at) = 0
 					/*	#Postulate: Number of paid hours in the retirement month cannot be greater than number of working days before the retirement day x 8	*/
 					THEN DXStatisticsV2.dbo.get_working_days(employees.year_month, employees.retired_at) * 8
@@ -116,12 +132,14 @@ emp_activity_reduced AS (
 	FROM	#Employees AS employees
 			OUTER APPLY (
 				/*	Find tribe which emp worked most in.	*/
-				SELECT  TOP 1	emps_transformed.emp_tribe_id	AS id,
-								emps_transformed.emp_tribe_name AS name
+				SELECT  TOP 1	emps_transformed.emp_tribe_id	AS tribe_id,
+								emps_transformed.emp_tribe_name AS tribe_name,
+								emps_transformed.emp_tent_id	AS tent_id,
+								emps_transformed.emp_tent_name	AS tent_name
 				FROM	emp_activity_in_tribe_transformed AS emps_transformed
 				WHERE	emps_transformed.emp_crmid = employees.crmid
 				ORDER BY sc_hours DESC
-			) AS emps_empirical_tribe
+			) AS emps_empirical_tribe_tent
 			OUTER APPLY (
 				SELECT	emps_transformed.sc_hours,
 						emps_transformed.unique_tickets,
@@ -130,6 +148,12 @@ emp_activity_reduced AS (
 				WHERE	emps_transformed.emp_crmid	= employees.crmid
 					AND emps_transformed.year_month	= employees.year_month
 			) AS emps_activity_aggs
+			OUTER APPLY (
+				SELECT	SUM(hours) AS hours
+				FROM	DXStatisticsV2.dbo.EmployeesProactiveHours AS eph
+				WHERE	eph.crmid = employees.crmid
+					AND	eph.date >= year_month AND eph.date < DATEADD(MONTH, 1, year_month)
+			) AS wf_proactive
 			LEFT JOIN #Vacations AS v ON	v.crmid			= employees.crmid
 										AND	v.year_month	= employees.year_month
 			OUTER APPLY (
@@ -181,21 +205,25 @@ emp_activity_with_dev_sc_hours AS (
 		emp_name,
 		position_id,
 		chapter_id,
+		emp_tribe_id,
+		emp_tent_id,
+		emp_tribe_name,
+		emp_tent_name,
 		has_support_processing_role,
 		position_name,
 		emp_level_name,
 		hourly_pay_net,
 		hourly_pay_gross,
 		hourly_pay_gross_withAOE,
-		emp_tribe_id,
-		emp_tribe_name,
-		IIF(team = @support, sc_hours, 
+		IIF(team = @support, 
+			IIF(sc_hours > wf_proactive_hours,  sc_hours - wf_proactive_hours, 0), /* pure sc hours. We take proactive hours from wf into account. */
 			paid_hours * ISNULL(eds.perc_of_worktime_spent_on_support,
 									IIF(emp_tribe_id = '7EA63303-B033-4CCA-800A-B8461E2E8364' /* IDETeam */, 0.5,
 										IIF(SUM(eds.perc_of_worktime_spent_on_support) OVER (PARTITION BY emp_tribe_name) = 0, 0,
 											SUM(eds.perc_of_worktime_spent_on_support) OVER (PARTITION BY emp_tribe_name) * 1.0
 											/ SUM(CASE WHEN eds.perc_of_worktime_spent_on_support IS NULL OR eds.perc_of_worktime_spent_on_support = 0 
 														THEN 0 ELSE 1 END) OVER (PARTITION BY emp_tribe_name))))) AS sc_hours,
+		wf_proactive_hours,
 		unique_tickets,
 		iterations,
 		paid_vacation_hours,
@@ -226,7 +254,8 @@ emp_activity_with_sc_paidvacs_hours AS (
 
 emp_activity_with_total_hours AS (
 	SELECT	*,
-			IIF(sc_paidvacs_hours > paid_hours, 0,	paid_hours - sc_paidvacs_hours)	AS proactive_paidvacs_hours
+			/* proactive_paidvacs_hours = [required] proactive hours from wf plus [optional] (paid_hours - wf_proactive_hours - pure sc hours) */
+			wf_proactive_hours + IIF(sc_paidvacs_hours > paid_hours - wf_proactive_hours, 0, paid_hours - wf_proactive_hours - sc_paidvacs_hours) AS proactive_paidvacs_hours
 	FROM	emp_activity_with_sc_paidvacs_hours
 ),
 
@@ -237,9 +266,15 @@ emp_activity AS (
 			IIF(emp_crmid = 'BE79612E-8677-4C33-923A-5F555AE12A77' /*Skorkin*/ AND year_month >= '2022-01-01', 
 				@devexpress_tribe_id,
 				emp_tribe_id)	AS emp_tribe_id,
+			IIF(emp_crmid = 'BE79612E-8677-4C33-923A-5F555AE12A77' /*Skorkin*/ AND year_month >= @tents_introduction_date, 
+				@devexpress_tent_id,
+				emp_tent_id)	AS emp_tent_id,
 			IIF(emp_crmid = 'BE79612E-8677-4C33-923A-5F555AE12A77' /*Skorkin*/ AND year_month >= '2022-01-01', 
-			(SELECT TOP 1 Name FROM CRM.dbo.Tribes WHERE Id = @devexpress_tribe_id),
-			emp_tribe_name)		AS emp_tribe_name,
+				(SELECT TOP 1 Name FROM CRM.dbo.Tribes WHERE Id = @devexpress_tribe_id),
+				emp_tribe_name)	AS emp_tribe_name,
+			IIF(emp_crmid = 'BE79612E-8677-4C33-923A-5F555AE12A77' /*Skorkin*/ AND year_month >= @tents_introduction_date, 
+				(SELECT TOP 1 Name FROM CRM.dbo.Tents WHERE Id = @devexpress_tent_id),
+				emp_tent_name)	AS emp_tent_name,
 			--------------------------------------------------------------------------------------------------
 			emp_name,
 			position_name,
@@ -293,6 +328,7 @@ SELECT 	emp_crmid										AS {emp_crmid},
 			WHEN @devs		THEN 'DevTeam'
 		END												AS {team},
 		emp_tribe_name									AS {tribe_name},
+		emp_tent_name									AS {tent_name},
 		emp_name										AS {name},
 		position_name									AS {position_name},
 		emp_level_name									AS {level_name},

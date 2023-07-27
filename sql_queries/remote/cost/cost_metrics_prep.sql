@@ -29,6 +29,7 @@ WITH months(year_month, next_month) AS (
 SELECT	*
 INTO	#Months
 FROM	months
+OPTION(MAXRECURSION 1000)
 
 
 /*******************
@@ -103,9 +104,12 @@ DECLARE @eur CHAR(3) = 'EUR'
 DECLARE @php_to_usd DECIMAL(5,3) = 0.018
 DECLARE @eur_to_usd DECIMAL(5,3) = 1.0
 
-DECLARE @philippines	UNIQUEIDENTIFIER = '69D186BB-CF91-4A5B-BF75-D3F1036C33E3'
+DECLARE @philippines UNIQUEIDENTIFIER = '69D186BB-CF91-4A5B-BF75-D3F1036C33E3'
 
-DECLARE @null_date DATE = '1990-01-01'
+DECLARE @tents_introduction_date	DATE = '2023-04-01'
+
+DECLARE @null_date	DATE = '1990-01-01'
+
 
 DROP TABLE IF EXISTS #Employees
 SELECT	months.year_month														AS year_month,
@@ -150,6 +154,13 @@ SELECT	months.year_month														AS year_month,
 		employees.retired_at													AS retired_at,
 		ISNULL(emp_tribe_audit.tribe_id, employees.tribe_id)					AS tribe_id,
 		ISNULL(emp_tribe_audit.tribe_name, employees.tribe_name)				AS tribe_name,
+		-------------------------------------------------------------------------------------------------------
+		IIF(months.year_month > @tents_introduction_date,
+			ISNULL(emp_tent_audit.tent_id, employees.tent_id), NULL)			AS tent_id,
+		-------------------------------------------------------------------------------------------------------
+		IIF(months.year_month > @tents_introduction_date,
+			ISNULL(emp_tent_audit.tent_name, employees.tent_name), NULL)		AS tent_name,
+		-------------------------------------------------------------------------------------------------------
 		ISNULL(emp_position_audit.position_id, employees.position_id)			AS position_id,
 		ISNULL(emp_position_audit.position_name, employees.position_name)		AS position_name,
 		ISNULL(emp_chapter_audit.chapter_id, employees.chapter_id)				AS chapter_id,
@@ -193,6 +204,28 @@ FROM	#Months AS months
 			WHERE	emps_audit.period_start <= months.year_month 
 				AND (emps_audit.period_end IS NULL OR months.year_month < emps_audit.period_end)
 		) AS emp_tribe_audit
+		OUTER APPLY (
+			SELECT TOP 1 *
+			FROM (	SELECT	tent_id,
+							tent_name,
+							LAG(removed_at, 1, @null_date) OVER (ORDER BY removed_at) AS period_start,
+							removed_at	AS period_end
+					FROM (	SELECT	*,
+									IIF(added_at != removed_at, DATEDIFF(DAY, added_at, removed_at), NULL) AS days_in_tent
+							FROM (	SELECT	Tent_Id		AS tent_id,
+											t.Name		AS tent_name,
+											MIN(EntityModified) OVER (PARTITION BY Tent_Id) AS added_at,
+											MAX(EntityModified) OVER (PARTITION BY Tent_Id) AS removed_at,
+											AuditAction
+									FROM	CRMAudit.dxcrm.Tent_Employee AS te
+											LEFT JOIN CRM.dbo.Tents AS t ON t.Id = te.Tent_Id
+									WHERE	Employee_Id = employees.crmid
+								) AS au_inner
+						) AS au_outer
+					WHERE	AuditAction = 2 /* DELETED */
+						AND	(days_in_tent IS NULL OR days_in_tent > 1)
+			) AS emp_tent_audit_inner
+		) AS emp_tent_audit
 		OUTER APPLY (
 			SELECT TOP 1 *
 			FROM (	SELECT	emps_audit_outer.position_id									AS position_id,
@@ -314,7 +347,7 @@ WHERE	(emp_position_audit.position_id IS NOT NULL OR employees.position_id IS NO
 
 CREATE CLUSTERED INDEX idx ON #Employees(scid, year_month)
 CREATE NONCLUSTERED INDEX idx_ ON #Employees(position_id, chapter_id, has_support_processing_role) 
-INCLUDE(year_month, crmid, name, level_name, hourly_pay_net, hourly_pay_gross, hourly_pay_gross_withAOE, retired, retired_at, tribe_id, tribe_name)
+INCLUDE(year_month, crmid, name, level_name, hourly_pay_net, hourly_pay_gross, hourly_pay_gross_withAOE, retired, retired_at, tribe_id, tribe_name, tent_id, tent_name)
 
 
 /*******************
@@ -392,6 +425,8 @@ SELECT	posts.Ticket_Id							AS ticket_id,
 			MONTH(posts.Created),1)				AS year_month,
 		tribes.id								AS tribe_id,
 		tribes.name								AS tribe_name,
+		tents.id								AS tent_id,
+		tents.name								AS tent_name,
 		posts.Owner								AS user_scid,
 		tickets.is_ticket_owner					AS is_ticket_owner,
 		employees.crmid							AS emp_crmid,
@@ -429,11 +464,15 @@ FROM (	SELECT	psts.Created, psts.Owner, psts.Ticket_Id, psts.Id
 		SELECT	id, name
 		FROM	DXStatisticsV2.dbo.get_ticket_tribes(tickets.Id, DEFAULT, employees.tribe_id)
 	) AS tribes
+	OUTER APPLY (
+		SELECT	id, name
+		FROM	DXStatisticsV2.dbo.get_ticket_tent(tickets.Id)
+	) AS tents
 	/*	Post owner is not service user	*/
 	WHERE serivce_users.Id IS NULL
 
-CREATE CLUSTERED INDEX idx ON #Posts(tribe_id, ticket_id, post_created)
-CREATE NONCLUSTERED INDEX idx_ ON #Posts(emp_crmid, year_month, tribe_id) INCLUDE(post_id)
+CREATE CLUSTERED INDEX idx ON #Posts(tribe_id, tent_id, ticket_id, post_created)
+CREATE NONCLUSTERED INDEX idx_ ON #Posts(emp_crmid, year_month, tribe_id, tent_id) INCLUDE(post_id)
 
 
 /*******************
@@ -441,21 +480,21 @@ CREATE NONCLUSTERED INDEX idx_ ON #Posts(emp_crmid, year_month, tribe_id) INCLUD
 ********************/
 DROP TABLE IF EXISTS #Iterations;
 WITH posts_with_prev_emp_crmid AS (
-	SELECT	*, LAG(emp_crmid) OVER (PARTITION BY tribe_id, ticket_id ORDER BY post_created) AS prev_emp_crmid
+	SELECT	*, LAG(emp_crmid) OVER (PARTITION BY tribe_id, tent_id, ticket_id ORDER BY post_created) AS prev_emp_crmid
 	FROM	#Posts
 ),
 
 posts_split_into_iterations AS (
-	SELECT	*, SUM(IIF(prev_emp_crmid IS NOT NULL AND emp_crmid IS NULL, 1, 0)) OVER (PARTITION BY tribe_id, ticket_id ORDER BY post_created) AS iteration_no
+	SELECT	*, SUM(IIF(prev_emp_crmid IS NOT NULL AND emp_crmid IS NULL, 1, 0)) OVER (PARTITION BY tribe_id, tent_id, ticket_id ORDER BY post_created) AS iteration_no
 	FROM posts_with_prev_emp_crmid
 ),
 
 iterations_raw AS (
 	SELECT	*,
-			MIN(post_created) OVER (PARTITION BY tribe_id, ticket_id, iteration_no) AS iteration_start,
-			MAX(post_created) OVER (PARTITION BY tribe_id, ticket_id, iteration_no) AS iteration_end,
-			IIF(MIN(CASE WHEN emp_crmid IS NULL THEN 0 ELSE 1 END)		OVER (PARTITION BY tribe_id, ticket_id, iteration_no) = 0 AND 
-				MAX(CASE WHEN emp_crmid IS NOT NULL THEN 1 ELSE 0 END)	OVER (PARTITION BY tribe_id, ticket_id, iteration_no) = 1,
+			MIN(post_created) OVER (PARTITION BY tribe_id, tent_id, ticket_id, iteration_no) AS iteration_start,
+			MAX(post_created) OVER (PARTITION BY tribe_id, tent_id, ticket_id, iteration_no) AS iteration_end,
+			IIF(MIN(CASE WHEN emp_crmid IS NULL THEN 0 ELSE 1 END)		OVER (PARTITION BY tribe_id, tent_id, ticket_id, iteration_no) = 0 AND 
+				MAX(CASE WHEN emp_crmid IS NOT NULL THEN 1 ELSE 0 END)	OVER (PARTITION BY tribe_id, tent_id, ticket_id, iteration_no) = 1,
 				1, 0 ) AS is_iteration
 	FROM posts_split_into_iterations
 ),
@@ -472,7 +511,9 @@ iterations AS (
 			emp_name,
 			user_scid,
 			tribe_name,
+			tent_name,
 			tribe_id,
+			tent_id,
 			DATEFROMPARTS(YEAR(post_created), MONTH(post_created), 1) AS year_month,
 			emp_position_id,
 			emp_chapter_id,
@@ -490,9 +531,11 @@ iterations_reduced AS (
 	SELECT	i.emp_crmid						AS emp_crmid,
 			i.user_scid						AS emp_scid,
 			i.tribe_id						AS tribe_id,
-			emp_main_tribes.tribe_id		AS emp_tribe_id,
+			emp_main_tribe_tent.tribe_id	AS emp_tribe_id,
+			emp_main_tribe_tent.tent_id		AS emp_tent_id,
 			MIN(i.emp_name)					AS emp_name,
-			emp_main_tribes.tribe_name		AS emp_tribe_name,
+			emp_main_tribe_tent.tribe_name	AS emp_tribe_name,
+			emp_main_tribe_tent.tent_name	AS emp_tent_name,
 			i.tribe_name					AS tribe_name,
 			i.year_month					AS year_month,
 			emp_position_id					AS emp_position_id,
@@ -507,27 +550,33 @@ iterations_reduced AS (
 				/*	Calc emp primary tribe on monthly basis.
 					Emp main tribe is the tribe which emp has most posts in.	*/
 				SELECT TOP 1 tribe_id,
-							 tribe_name
+							 tent_id,
+							 tribe_name,
+							 tent_name
 				FROM	 #Posts AS psts
 				WHERE	 psts.emp_crmid		= i.emp_crmid
 					 AND psts.year_month	= i.year_month
-				GROUP BY psts.emp_crmid, psts.year_month, psts.tribe_id, psts.tribe_name
+				GROUP BY psts.emp_crmid, psts.year_month, psts.tribe_id, psts.tribe_name, psts.tent_id, psts.tent_name
 				HAVING	 COUNT(psts.post_id) = (	SELECT MAX(psts_outer.posts)
 													FROM (	SELECT	COUNT(psts_inner.post_id) AS posts
 															FROM	#Posts AS psts_inner
 															WHERE	psts_inner.emp_crmid	= psts.emp_crmid
 																AND psts_inner.year_month	= psts.year_month
-															GROUP BY emp_crmid, year_month, tribe_id) AS psts_outer)
-			) AS emp_main_tribes
+															GROUP BY emp_crmid, year_month, tribe_id, tent_id) AS psts_outer)
+			) AS emp_main_tribe_tent
 	/*	#Postulate: All replies and work hours in non primary tribe are moved (as is) as replies and work hours in the primary tribe.
 		The move is per month.	*/
 	GROUP BY	i.emp_crmid, 
 				i.user_scid,
 				i.year_month,
-				emp_main_tribes.tribe_id, 
-				emp_main_tribes.tribe_name, 
+				emp_main_tribe_tent.tribe_id, 
+				emp_main_tribe_tent.tribe_name, 
+				emp_main_tribe_tent.tent_id, 
+				emp_main_tribe_tent.tent_name, 
 				i.tribe_id, 
 				i.tribe_name,
+				i.tent_id,
+				i.tent_name,
 				emp_position_id,
 				emp_chapter_id,
 				has_support_processing_role
@@ -540,4 +589,4 @@ FROM	iterations_reduced AS i
 		INNER JOIN #WorkingHours AS wh ON	wh.emp_scid		= i.emp_scid 
 										AND wh.year_month	= i.year_month
 
-CREATE CLUSTERED INDEX idx ON #Iterations(emp_position_id, emp_chapter_id, has_support_processing_role, emp_crmid, year_month, emp_tribe_id);
+CREATE CLUSTERED INDEX idx ON #Iterations(emp_position_id, emp_chapter_id, has_support_processing_role, emp_crmid, year_month, emp_tribe_id, emp_tent_id);

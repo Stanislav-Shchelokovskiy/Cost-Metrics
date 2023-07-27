@@ -1,4 +1,4 @@
-MERGE INTO EmployeesWorkOnHolidays AS target
+MERGE INTO {target} AS target
 USING (
 	SELECT	*
 	FROM (VALUES

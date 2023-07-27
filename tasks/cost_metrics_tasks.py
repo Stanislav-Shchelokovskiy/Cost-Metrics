@@ -60,6 +60,15 @@ def process_staged_data():
         ),
         SqliteCreateTableFromTableQuery(
             source_table_or_subquery=local_names_index.CostMetrics.cost_metrics,
+            target_table_name=local_names_index.CostMetrics.tents,
+            unique_key_field=QueryField(
+                source_name=CostmetricsMeta.tent_name,
+                target_name=NameKnotMeta.name,
+                type='TEXT',
+            )
+        ),
+        SqliteCreateTableFromTableQuery(
+            source_table_or_subquery=local_names_index.CostMetrics.cost_metrics,
             target_table_name=local_names_index.CostMetrics.positions,
             unique_key_field=QueryField(
                 source_name=CostmetricsMeta.position_name,
@@ -73,13 +82,18 @@ def process_staged_data():
             unique_key_field=None,
             values_fields=(
                 QueryField(
+                    source_name=CostmetricsMeta.emp_crmid,
+                    target_name=CostmetricsEmployeesMeta.crmid,
+                    type='TEXT',
+                ),
+                QueryField(
                     source_name=CostmetricsMeta.name,
                     target_name=CostmetricsEmployeesMeta.name,
                     type='TEXT',
                 ),
                 QueryField(
-                    source_name=CostmetricsMeta.position_name,
-                    target_name=CostmetricsEmployeesMeta.position,
+                    source_name=CostmetricsMeta.team,
+                    target_name=CostmetricsEmployeesMeta.team,
                     type='TEXT',
                 ),
                 QueryField(
@@ -88,10 +102,20 @@ def process_staged_data():
                     type='TEXT',
                 ),
                 QueryField(
-                    source_name=CostmetricsMeta.emp_crmid,
-                    target_name=CostmetricsEmployeesMeta.crmid,
+                    source_name=CostmetricsMeta.tent_name,
+                    target_name=CostmetricsEmployeesMeta.tent,
+                    type='TEXT',
+                ),
+                QueryField(
+                    source_name=CostmetricsMeta.position_name,
+                    target_name=CostmetricsEmployeesMeta.position,
                     type='TEXT',
                 ),
             )
         ),
     )
+    __post_process()
+
+def __post_process():
+    from config.environ import reset_recalculate_from_beginning
+    reset_recalculate_from_beginning()
