@@ -325,6 +325,7 @@ SELECT 	emp_crmid										AS {emp_crmid},
 			WHEN @devs		THEN 'DevTeam'
 		END												AS {team},
 		emp_tribe_name									AS {tribe_name},
+		emp_tent_name									AS {tent_name},
 		emp_name										AS {name},
 		position_name									AS {position_name},
 		emp_level_name									AS {level_name},
