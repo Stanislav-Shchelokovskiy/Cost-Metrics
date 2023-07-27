@@ -15,6 +15,8 @@ DECLARE @working_hours_per_month TINYINT = 168
 DECLARE @devexpress_tribe_id	UNIQUEIDENTIFIER = '340E06F5-9B98-4923-97A4-CA02BA73F075'
 DECLARE @current_month			DATE = DATEFROMPARTS(YEAR(GETUTCDATE()), MONTH(GETUTCDATE()), 1)
 
+DECLARE @tents_introduction_date DATE = '2023-04-01'
+
 DECLARE @support 	TINYINT = 0
 DECLARE @devs		TINYINT = 1;
 
