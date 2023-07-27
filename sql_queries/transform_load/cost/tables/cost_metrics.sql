@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS {CostMetricsTable}(
     {year_month}                                TEXT,
     {team}                                      TEXT,
     {tribe_name}                                TEXT,
+    {tent_name}                                 TEXT,
     {name}                                      TEXT,
     {position_name}                             TEXT,
     {level_name}                                TEXT,

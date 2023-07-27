@@ -12,6 +12,7 @@ def generate_filter(kwargs: dict) -> str:
             ),
             employees.generate_teams_filter(teams=kwargs['teams']),
             employees.generate_tribes_filter(tribes=kwargs['tribes']),
+            employees.generate_tents_filter(tents=kwargs['tents']),
             employees.generate_positions_filter(positions=kwargs['positions']),
             employees.generate_employees_filter(employees=kwargs['employees']),
         )

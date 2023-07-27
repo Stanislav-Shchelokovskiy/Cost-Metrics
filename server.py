@@ -37,6 +37,11 @@ async def get_cost_metrics_tribes():
     return await LocalRepository.cost_metrics.tribes.get_data()
 
 
+@app.get('/CostMetrics/Tents')
+async def get_cost_metrics_tents():
+    return await LocalRepository.cost_metrics.tents.get_data()
+
+
 @app.get('/CostMetrics/Positions')
 async def get_cost_metrics_positions():
     return await LocalRepository.cost_metrics.positions.get_data()

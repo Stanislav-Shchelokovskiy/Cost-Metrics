@@ -15,13 +15,17 @@ class NameKnotMeta(MetaData):
 class CostmetricsEmployeesMeta(MetaData):
     crmid = 'crmid'
     name = NameKnotMeta.name
+    team = 'team'
     tribe = 'tribe'
+    tent = 'tent'
     position = 'position'
 
     @staticmethod
     def get_key_fields() -> Sequence[str]:
         return (
+            CostmetricsEmployeesMeta.team,
             CostmetricsEmployeesMeta.tribe,
+            CostmetricsEmployeesMeta.tent,
             CostmetricsEmployeesMeta.position,
             CostmetricsEmployeesMeta.name,
             CostmetricsEmployeesMeta.crmid,
@@ -33,6 +37,7 @@ class CostmetricsMeta(MetaData):
     year_month = 'year_month'
     team = 'team'
     tribe_name = 'tribe_name'
+    tent_name = 'tent_name'
     position_name = 'position_name'
     name = 'name'
     level_name = 'level_name'
@@ -63,6 +68,7 @@ class CostmetricsMeta(MetaData):
             CostmetricsMeta.year_month,
             CostmetricsMeta.team,
             CostmetricsMeta.tribe_name,
+            CostmetricsMeta.tent_name,
             CostmetricsMeta.position_name,
             CostmetricsMeta.emp_crmid,
         )
@@ -72,7 +78,6 @@ class CostmetricsMeta(MetaData):
         return (
             CostmetricsMeta.year_month,
             CostmetricsMeta.emp_crmid,
-            CostmetricsMeta.tribe_name,
         )
 
     @staticmethod
