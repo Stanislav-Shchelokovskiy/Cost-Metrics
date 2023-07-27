@@ -95,3 +95,8 @@ def process_staged_data():
             )
         ),
     )
+    __post_process()
+
+def __post_process():
+    from config.environ import reset_recalculate_from_beginning
+    reset_recalculate_from_beginning()
