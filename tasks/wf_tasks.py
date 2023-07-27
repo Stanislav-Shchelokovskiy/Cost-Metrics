@@ -41,6 +41,6 @@ def upsert_work_on_holidays(start: str, end: str):
                     item['hours'],
                 )
             ) for item in json.loads(work_on_holydays_json)
-            if item['isHoliday'] == 1
+            if item['isHoliday'] == 1 and item['hours'] > 0
         )
     )
