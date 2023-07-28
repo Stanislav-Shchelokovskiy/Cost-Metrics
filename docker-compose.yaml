@@ -2,7 +2,7 @@ version: '3.4'
 
 x-cost_metrics:
   &cost_metrics
-  image: shchelokovskiy/cost_metrics:latest
+  image: dxservices/cost_metrics:latest
   restart: always
   environment:
     - SQL_SERVER
