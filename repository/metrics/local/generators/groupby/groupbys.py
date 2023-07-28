@@ -7,6 +7,7 @@ from sql_queries.index import local_names_index
 from repository.metrics.local.generators.groupby.groups import (
     AggBy,
     employee_group,
+    tent_group,
     tribe_group,
     chapter_group,
 )
@@ -25,6 +26,10 @@ group_bys = {
     AggBy.employee: (
         get_groupby(employee_group),
         CostmetricsMeta.name,
+    ),
+    AggBy.tent: (
+        get_groupby(tent_group),
+        CostmetricsMeta.tent_name,
     ),
     AggBy.tribe: (
         get_groupby(tribe_group),

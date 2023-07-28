@@ -15,6 +15,7 @@ from repository.metrics.local.generators import (
     Window,
     cost_metrics,
     employee_window,
+    tent_window,
     tribe_window,
     chapter_window,
 )
@@ -24,6 +25,9 @@ from repository.metrics.local.generators import (
 class CostMetricsRawQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
     __meta = dict()
     __cols = dict()
+    __emp_windows = employee_window,
+    __agg_windows = tent_window, tribe_window, chapter_window,
+
 
 
     def get_fields_meta(self, kwargs: Mapping) -> MetaData:
@@ -46,12 +50,12 @@ class CostMetricsRawQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
     def __generate_and_cache_fields_meta(self, role):
         emp_metrics_attrs = self.__get_fields(
             metrics_names=get_emp_metrics_names(),
-            windows_names=(employee_window.name, ),
+            windows_names=[w.name for w in self.__emp_windows]
         )
 
-        tribe_chapter_metrics_attrs = self.__get_fields(
+        agg_metrics_attrs = self.__get_fields(
             metrics_names=get_metrics_projections(role=role),
-            windows_names=(tribe_window.name, chapter_window.name),
+            windows_names=[w.name for w in self.__agg_windows],
         )
         meta = type(
             'CostmetricsRawMeta',
@@ -59,7 +63,7 @@ class CostMetricsRawQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
             {
                 **CostmetricsMeta.get_attrs(),
                 **emp_metrics_attrs,
-                **tribe_chapter_metrics_attrs,
+                **agg_metrics_attrs,
             },
         )
         self.__meta[role] = meta
@@ -86,17 +90,17 @@ class CostMetricsRawQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
     def __generate_and_cache_cols(self, role):
         emp_metrics_aliases = self.__get_metrics_cols(
             metrics=get_emp_metrics().values(),
-            windows=(employee_window, ),
+            windows=self.__emp_windows,
         )
-        tribe_chapter_metrics_aliases = self.__get_metrics_cols(
+        agg_metrics_aliases = self.__get_metrics_cols(
             metrics=get_metrics(role=role).values(),
-            windows=(tribe_window, chapter_window),
+            windows=self.__agg_windows,
         )
         cols = ',\n\t'.join(
             chain(
                 CostmetricsMeta.get_values(),
                 emp_metrics_aliases,
-                tribe_chapter_metrics_aliases,
+                agg_metrics_aliases,
             )
         )
         self.__cols[role] = cols
