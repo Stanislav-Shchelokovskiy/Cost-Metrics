@@ -1,13 +1,13 @@
 from typing import NamedTuple
 from collections.abc import Sequence
 from sql_queries.meta.cost_metrics import CostmetricsMeta
+from toolbox.sql.aggs.metrics import Metric
 import toolbox.sql.generators.sqlite_periods_generator as periods_generator
 
 
 class GroupBy(NamedTuple):
     expression: str
     statement: str
-    aggName: str
 
 
 def generate_groupby(
@@ -22,5 +22,4 @@ def generate_groupby(
     return GroupBy(
         groupby_period_expression,
         f'GROUP BY {groupby_period_expression}' + agg_bys,
-        "''",
     )

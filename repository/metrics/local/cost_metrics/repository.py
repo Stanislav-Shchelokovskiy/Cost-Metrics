@@ -36,10 +36,10 @@ class CostMetricsRepository:
         return Object_to_JSON.convert(
             select_metrics(
                 role=role,
-                projector=lambda x: {
-                    'name': x.name,
-                    'displayName': x.display_name or x.name,
-                    'group': x.group,
+                projector=lambda metric: {
+                    'name': metric.name,
+                    'displayName': metric.get_display_name(),
+                    'group': metric.group,
                     'context': 1
                 }
             )

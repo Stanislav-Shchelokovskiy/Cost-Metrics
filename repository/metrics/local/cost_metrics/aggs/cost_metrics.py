@@ -11,10 +11,10 @@ class CostMetricsAggsQueryDescriptor(MetricAsyncQueryDescriptor):
 
     def get_format_params(self, kwargs: Mapping) -> Mapping[str, str]:
         period_field, agg_field, agg_name, *_ = self.get_fields(kwargs)
-        groupby = generate_groupby(groupby_format=kwargs['group_by_period'])
         metric = get_metric(metric=kwargs['metric'], role=kwargs['role'])
+        groupby = generate_groupby(groupby_format=kwargs['group_by_period'])
         return {
-            'select': f'{groupby.expression} AS {period_field}, {metric} AS {agg_field}, {groupby.aggName} AS {agg_name}',
+            'select': f"{groupby.expression} AS {period_field}, {metric} AS {agg_field}, '{metric.get_display_name()}' AS {agg_name}",
             'from':  local_names_index.CostMetrics.cost_metrics,
             'where_group_limit': build_multiline_string_ignore_empties(
                 (
