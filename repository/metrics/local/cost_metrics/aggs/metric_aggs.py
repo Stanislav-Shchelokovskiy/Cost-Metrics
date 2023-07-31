@@ -2,7 +2,12 @@ import os
 from collections.abc import Iterable, Callable, Mapping
 from collections import ChainMap
 from sql_queries.meta.cost_metrics import CostmetricsMeta
-from toolbox.sql.aggs import Metric, SUM, NONE_METRIC
+from toolbox.sql.aggs import (
+    Metric,
+    SUM,
+    COUNT_DISTINCT,
+    NONE_METRIC,
+)
 
 
 class MetricGroup:
@@ -90,6 +95,54 @@ tickets_per_hour = Metric(
     MetricGroup.efficiency,
     SUM(CostmetricsMeta.unique_tickets) / SUM(CostmetricsMeta.sc_hours),
 )
+sc_proactive_work_ratio = Metric(
+    'SC to Proactive Work Ratio',
+    'SC/Proactive Work Ratio',
+    MetricGroup.indepth,
+    SUM(CostmetricsMeta.sc_paidvacs_hours_incl_overtime) / SUM(CostmetricsMeta.proactive_paidvacs_hours),
+)
+sc_work_hours_incl_overtime = Metric(
+    'SC Work Hours (incl overtime)',
+    '',
+    MetricGroup.indepth,
+    SUM(CostmetricsMeta.sc_hours),
+)
+sc_work_hours_incl_leaves = Metric(
+    'SC Work Hours (incl leaves)',
+    '',
+    MetricGroup.indepth,
+    SUM(CostmetricsMeta.sc_paidvacs_hours),
+)
+sc_work_hours_incl_leaves_overtime = Metric(
+    'SC Work Hours (incl leaves and overtime)',
+    '',
+    MetricGroup.indepth,
+    SUM(CostmetricsMeta.sc_paidvacs_hours_incl_overtime),
+)
+proactive_work_hours_incl_leaves = Metric(
+    'Proactive Work Hours (incl leaves)',
+    '',
+    MetricGroup.indepth,
+    SUM(CostmetricsMeta.proactive_paidvacs_hours),
+)
+paid_leave_hours = Metric(
+    'Paid Leave Hours',
+    '',
+    MetricGroup.indepth,
+    SUM(CostmetricsMeta.paid_vacation_hours),
+)
+unpaid_leave_hours = Metric(
+    'Unpaid Leave Hours',
+    '',
+    MetricGroup.indepth,
+    SUM(CostmetricsMeta.free_vacation_hours),
+)
+emp_availability = Metric(
+    'Employee Availability',
+    '',
+    MetricGroup.indepth,
+    COUNT_DISTINCT(CostmetricsMeta.emp_crmid),
+)
 
 # yapf: disable
 support_service_cost_gross = Metric.from_metric('Support Service Cost (gross)', '', MetricGroup.cost, sc_work_cost_gross + proactive_work_cost_gross)
@@ -110,6 +163,7 @@ advanced_metrics = {
     sc_work_cost_gross.name: sc_work_cost_gross,
     proactive_work_cost_gross.name: proactive_work_cost_gross,
     work_hour_cost_gross.name: work_hour_cost_gross,
+    sc_proactive_work_ratio.name: sc_proactive_work_ratio,
 }
 
 admin_metrics = {
@@ -123,6 +177,13 @@ admin_metrics = {
     total_work_hours_incl_overtime.name: total_work_hours_incl_overtime,
     support_service_cost_gross.name: support_service_cost_gross,
     support_service_cost_gross_withAOE.name: support_service_cost_gross_withAOE,
+    sc_work_hours_incl_overtime.name: sc_work_hours_incl_overtime,
+    sc_work_hours_incl_leaves.name: sc_work_hours_incl_leaves,
+    sc_work_hours_incl_leaves_overtime.name: sc_work_hours_incl_leaves_overtime,
+    proactive_work_hours_incl_leaves.name: proactive_work_hours_incl_leaves,
+    paid_leave_hours.name: paid_leave_hours,
+    unpaid_leave_hours.name: unpaid_leave_hours,
+    emp_availability.name: emp_availability,
 }
 # yapf: enable
 
@@ -138,11 +199,15 @@ def get_metric(metric: str, role: str | None) -> Metric:
     return get_metrics(role).get(metric, NONE_METRIC)
 
 
-def get_metrics_projections(
+def select_metrics(
     role: str | None,
-    projector: Callable[[Metric], str] = lambda x: x.name
+    projector: Callable[[Metric], str] = lambda x: x,
+    filter: Callable[[Metric], bool] = lambda x: True,
 ) -> Iterable:
-    return [projector(x) for x in get_metrics(role).values()]
+    return [
+        projector(metric) for metric in get_metrics(role).values()
+        if filter(metric)
+    ]
 
 
 def get_metrics(role: str | None) -> Mapping[str, Metric]:

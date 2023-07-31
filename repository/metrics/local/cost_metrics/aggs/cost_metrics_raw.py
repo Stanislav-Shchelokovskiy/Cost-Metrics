@@ -5,8 +5,7 @@ from toolbox.sql import MetaData
 from sql_queries.meta.cost_metrics import CostmetricsMeta
 from sql_queries.index import local_names_index
 from repository.metrics.local.cost_metrics.aggs.metric_aggs import (
-    get_metrics_projections,
-    get_metrics,
+    select_metrics,
     get_emp_metrics_names,
     get_emp_metrics,
     Metric,
@@ -54,7 +53,11 @@ class CostMetricsRawQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
         )
 
         agg_metrics_attrs = self.__get_fields(
-            metrics_names=get_metrics_projections(role=role),
+            metrics_names=select_metrics(
+                role=role,
+                projector=lambda m: m.name,
+                filter=lambda m: m.supports_over(),
+            ),
             windows_names=[w.name for w in self.__agg_windows],
         )
         meta = type(
@@ -93,7 +96,10 @@ class CostMetricsRawQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
             windows=self.__emp_windows,
         )
         agg_metrics_aliases = self.__get_metrics_cols(
-            metrics=get_metrics(role=role).values(),
+            metrics=select_metrics(
+                role=role,
+                filter=lambda m: m.supports_over()
+            ),
             windows=self.__agg_windows,
         )
         cols = ',\n\t'.join(

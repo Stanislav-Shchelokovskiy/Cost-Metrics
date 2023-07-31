@@ -12,7 +12,7 @@ from repository.metrics.local.cost_metrics import (
     EmployeesQueryDescriptor,
     TeamsQueryDescriptor,
     PeriodQueryDescriptor,
-    get_metrics_projections,
+    select_metrics,
 )
 from toolbox.utils.converters import Object_to_JSON
 
@@ -34,7 +34,7 @@ class CostMetricsRepository:
 
     async def get_metrics(self, role: str | None) -> str:
         return Object_to_JSON.convert(
-            get_metrics_projections(
+            select_metrics(
                 role=role,
                 projector=lambda x: {
                     'name': x.name,
