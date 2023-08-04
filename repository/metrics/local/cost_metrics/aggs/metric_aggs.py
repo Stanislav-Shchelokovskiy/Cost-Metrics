@@ -160,27 +160,27 @@ basic_metrics = {
 }
 
 advanced_metrics = {
+    sc_work_hours_incl_overtime.name: sc_work_hours_incl_overtime,
+    sc_work_hours_incl_leaves.name: sc_work_hours_incl_leaves,
+    sc_work_hours_incl_leaves_overtime.name: sc_work_hours_incl_leaves_overtime,
+    proactive_work_hours_incl_leaves.name: proactive_work_hours_incl_leaves,
+    total_work_hours_incl_overtime.name: total_work_hours_incl_overtime,
+    sc_proactive_work_ratio.name: sc_proactive_work_ratio,
     sc_work_cost_gross.name: sc_work_cost_gross,
+    sc_work_cost_gross_incl_overtime.name: sc_work_cost_gross_incl_overtime,
     proactive_work_cost_gross.name: proactive_work_cost_gross,
     work_hour_cost_gross.name: work_hour_cost_gross,
-    sc_proactive_work_ratio.name: sc_proactive_work_ratio,
 }
 
 admin_metrics = {
-    sc_work_cost_gross_incl_overtime.name: sc_work_cost_gross_incl_overtime,
     sc_work_cost_gross_withAOE.name: sc_work_cost_gross_withAOE,
     sc_work_cost_gross_withAOE_incl_overtime.name: sc_work_cost_gross_withAOE_incl_overtime,
     proactive_work_cost_gross_withAOE.name: proactive_work_cost_gross_withAOE,
     ticket_cost_gross_withAOE.name: ticket_cost_gross_withAOE,
     iteration_cost_gross_withAOE.name: iteration_cost_gross_withAOE,
     work_hour_gross_withAOE.name: work_hour_gross_withAOE,
-    total_work_hours_incl_overtime.name: total_work_hours_incl_overtime,
     support_service_cost_gross.name: support_service_cost_gross,
     support_service_cost_gross_withAOE.name: support_service_cost_gross_withAOE,
-    sc_work_hours_incl_overtime.name: sc_work_hours_incl_overtime,
-    sc_work_hours_incl_leaves.name: sc_work_hours_incl_leaves,
-    sc_work_hours_incl_leaves_overtime.name: sc_work_hours_incl_leaves_overtime,
-    proactive_work_hours_incl_leaves.name: proactive_work_hours_incl_leaves,
     paid_leave_hours.name: paid_leave_hours,
     unpaid_leave_hours.name: unpaid_leave_hours,
     emp_availability.name: emp_availability,
