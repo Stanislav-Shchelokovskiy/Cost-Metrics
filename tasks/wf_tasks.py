@@ -39,23 +39,23 @@ def upsert_work_hours(start: str, end: str):
 
 
 def _upsert_work_on_holidays(wf_hours: Iterable):
-    WfRepository.work_on_holidays.update_data(
-        values=__get_values(
-            wf_hours,
-            'hours',
-            lambda item: item['isHoliday'] == 1 and item['hours'] > 0
-        )
+    values = __get_values(
+        wf_hours,
+        'hours',
+        lambda item: item['isHoliday'] == 1 and item['hours'] > 0,
     )
+    if values:
+        WfRepository.work_on_holidays.update_data(values=values)
 
 
 def _upsert_proactive_hours(wf_hours: Iterable):
-    WfRepository.proactive_hours.update_data(
-        values=__get_values(
-            wf_hours,
-            'proactiveHours',
-            lambda item: item['proactiveHours'] > 0
-        )
+    values = __get_values(
+        wf_hours,
+        'proactiveHours',
+        lambda item: item['proactiveHours'] > 0,
     )
+    if values:
+        WfRepository.proactive_hours.update_data(values=values)
 
 
 def __get_values(wf_hours: Iterable, field: str, filter: Callable[..., bool]):
