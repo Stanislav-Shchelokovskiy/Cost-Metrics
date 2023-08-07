@@ -6,6 +6,7 @@ from toolbox.sql.aggs import (
     Metric,
     SUM,
     COUNT_DISTINCT,
+    AVG,
     NONE_METRIC,
 )
 
@@ -143,6 +144,12 @@ emp_availability = Metric(
     MetricGroup.indepth,
     COUNT_DISTINCT(CostmetricsMeta.emp_crmid),
 )
+avg_emp_level = Metric(
+    'Employee Level',
+    '',
+    MetricGroup.indepth,
+    AVG(CostmetricsMeta.level_value),
+)
 
 # yapf: disable
 support_service_cost_gross = Metric.from_metric('Support Service Cost (gross)', '', MetricGroup.cost, sc_work_cost_gross + proactive_work_cost_gross)
@@ -170,6 +177,7 @@ advanced_metrics = {
     sc_work_cost_gross_incl_overtime.name: sc_work_cost_gross_incl_overtime,
     proactive_work_cost_gross.name: proactive_work_cost_gross,
     work_hour_cost_gross.name: work_hour_cost_gross,
+    avg_emp_level.name: avg_emp_level,
 }
 
 admin_metrics = {

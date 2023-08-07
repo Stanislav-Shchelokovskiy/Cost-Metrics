@@ -119,36 +119,16 @@ SELECT	months.year_month														AS year_month,
 		employees.name															AS name,
 		ISNULL(emps_levels.level_name, 
 			ISNULL(emp_position_audit.position_name, employees.position_name))	AS level_name,
+		salaries.level_value													AS level_value,
 		ISNULL(tax_coefficients.value, 1)										AS tax_coefficient,
 		--	#Postulate: SC fot is calculated by using sc work hour price.
-		-------------------------------------------------------------------------------------------------------
-		ROUND(	(
-					ISNULL(salaries.value, IIF(employees.crmid IS NOT NULL, 0, NULL))
-					* CASE salaries.currency	WHEN @php THEN @php_to_usd
-												WHEN @eur THEN @eur_to_usd
-												ELSE 1.0 END
-				 )
-				/ @working_hours_per_month, 3)									AS hourly_pay_net,
-		-------------------------------------------------------------------------------------------------------
-		ROUND(	(
-					ISNULL(salaries.value, IIF(employees.crmid IS NOT NULL, 0, NULL))
-					* CASE salaries.currency	WHEN @php THEN @php_to_usd
-												WHEN @eur THEN @eur_to_usd
-												ELSE 1.0 END
-					* ISNULL(tax_coefficients.value, 1)
-				 )
-				/ @working_hours_per_month, 3)									AS hourly_pay_gross,
-		-------------------------------------------------------------------------------------------------------
-		ROUND(	(
-					ISNULL(salaries.value, IIF(employees.crmid IS NOT NULL, 0, NULL))
-					* CASE salaries.currency	WHEN @php THEN @php_to_usd
-												WHEN @eur THEN @eur_to_usd
-												ELSE 1.0 END
-					* ISNULL(tax_coefficients.value, 1)
-					+ ISNULL(operating_expenses.value_usd, 0)
-				 )
-				/ @working_hours_per_month, 3)									AS hourly_pay_gross_withAOE,
-		-------------------------------------------------------------------------------------------------------
+		--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		ROUND(salaries.value_usd / @working_hours_per_month, 3)																					AS hourly_pay_net,
+		--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		ROUND(salaries.value_usd * ISNULL(tax_coefficients.value, 1) / @working_hours_per_month, 3)												AS hourly_pay_gross,
+		--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		ROUND((salaries.value_usd * ISNULL(tax_coefficients.value, 1) + ISNULL(operating_expenses.value_usd, 0)) / @working_hours_per_month, 3)	AS hourly_pay_gross_withAOE,
+		--------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		employees.retired														AS retired,
 		ISNULL(emp_hired_audit.hired_at, employees.hired_at)					AS hired_at,
 		employees.retired_at													AS retired_at,
@@ -299,7 +279,12 @@ FROM	#Months AS months
 			ORDER BY emps_audit.EntityModified DESC
 		) AS emp_level_audit
 		CROSS APPLY (
-			SELECT	es_inner.level_id, es_inner.value, es_inner.currency, es_inner.period
+			SELECT	es_inner.value * CASE es_inner.currency	WHEN @php THEN @php_to_usd
+															WHEN @eur THEN @eur_to_usd
+															ELSE 1.0 END  AS value_usd,
+					es_inner.level_id,
+					es_inner.period,
+					es_inner.level_value
 			FROM	DXStatisticsV2.dbo.EmployeesSalaries AS es_inner
 			WHERE	es_inner.level_id = ISNULL(
 						emp_level_audit.level_id,
@@ -340,10 +325,13 @@ FROM	#Months AS months
 WHERE	(emp_position_audit.position_id IS NOT NULL OR employees.position_id IS NOT NULL)
 		AND months.year_month > ISNULL(ISNULL(emp_hired_audit.hired_at, employees.hired_at), @null_date)
 		AND months.year_month < ISNULL(employees.retired_at, '9999-01-01')	
-		AND	(	salaries.period = @not_applicable	-- ph guys
+		AND	(	salaries.level_value IS NULL -- if level isn't found, we will fail on alter column level_value below stopping future processing.
+				OR	salaries.period = @not_applicable	-- ph guys
 				/*	regular guys corresponding to correct salary period as left joining EmployeesSalaries duplicated them	*/
 				OR (months.year_month <  @new_life_start AND salaries.period = @before_oct_2022)
 				OR (months.year_month >= @new_life_start AND salaries.period = @after_oct_2022))
+
+ALTER TABLE #Employees ALTER COLUMN level_value FLOAT NOT NULL -- if we fail here, this means EmployeesSalaries is outdated.
 
 CREATE CLUSTERED INDEX idx ON #Employees(scid, year_month)
 CREATE NONCLUSTERED INDEX idx_ ON #Employees(position_id, chapter_id, has_support_processing_role) 
