@@ -41,6 +41,7 @@ class CostmetricsMeta(MetaData):
     position_name = 'position_name'
     name = 'name'
     level_name = 'level_name'
+    level_value = 'level_value'
     hourly_pay_net = 'hourly_pay_net'
     hourly_pay_gross = 'hourly_pay_gross'
     hourly_pay_gross_withAOE = 'hourly_pay_gross_withAOE'

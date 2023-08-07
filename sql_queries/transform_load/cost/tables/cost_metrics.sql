@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS {CostMetricsTable}(
     {name}                                      TEXT,
     {position_name}                             TEXT,
     {level_name}                                TEXT,
+    {level_value}                               REAL,
     {hourly_pay_net}                            REAL,
     {hourly_pay_gross}                          REAL,
     {hourly_pay_gross_withAOE}                  REAL,
