@@ -11,7 +11,7 @@ from toolbox.sql_async import (
 from repository.wf.work_hours import WorkOnHolidaysQueries, ProactiveHoursQueries
 from repository.metrics.remote.cost_metrics import CostMetricsQueries
 from repository.metrics.local.cost_metrics.repository import CostMetricsRepository
-import toolbox.sql.generators.sqlite_periods_generator as periods_generator
+import toolbox.sql.generators.sqlite.periods_generator as periods_generator
 import repository.metrics.local.generators.display_filter as DisplayFilterGenerator
 import repository.metrics.local.cost_metrics.aggs.help.index as help
 

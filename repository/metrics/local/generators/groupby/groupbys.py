@@ -1,8 +1,7 @@
 from typing import NamedTuple
 from collections.abc import Sequence
 from sql_queries.meta.cost_metrics import CostmetricsMeta
-from toolbox.sql.aggs.metrics import Metric
-import toolbox.sql.generators.sqlite_periods_generator as periods_generator
+import toolbox.sql.generators.sqlite.periods_generator as periods_generator
 
 
 class GroupBy(NamedTuple):
