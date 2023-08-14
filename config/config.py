@@ -1,7 +1,7 @@
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from toolbox.utils.converters import DateTimeToSqlString
-from config.environ import recalculate_from_beginning
+from toolbox.utils.env import recalculate_from_beginning
 
 
 def get_cost_metrics_period() -> dict[str, str]:
