@@ -10,8 +10,8 @@ jobs:
   deploy:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-    environment: ${{ github.base_ref }}
-    concurrency: ${{ github.base_ref }}
+    environment: ${{ github.ref_name }}
+    concurrency: ${{ github.ref_name }}
     steps:
       - name: Login to Docker Hub
         uses: docker/login-action@v2
