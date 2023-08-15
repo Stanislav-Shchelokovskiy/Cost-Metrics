@@ -63,26 +63,20 @@ class CostmetricsMeta(MetaData):
     proactive_work_cost_gross_withAOE = 'proactive_work_cost_gross_withAOE'
     sc_work_cost_gross_withAOE_incl_overtime = 'sc_work_cost_gross_withAOE_incl_overtime'
 
-    @staticmethod
-    def get_index_fields() -> Sequence[str]:
+    @classmethod
+    def get_index_fields(cls) -> Sequence[str]:
         return (
-            CostmetricsMeta.year_month,
-            CostmetricsMeta.team,
-            CostmetricsMeta.tribe_name,
-            CostmetricsMeta.tent_name,
-            CostmetricsMeta.position_name,
-            CostmetricsMeta.emp_crmid,
+            cls.year_month,
+            cls.team,
+            cls.tribe_name,
+            cls.tent_name,
+            cls.position_name,
+            cls.emp_crmid,
         )
 
-    @staticmethod
-    def get_key_fields() -> Sequence[str]:
+    @classmethod
+    def get_key_fields(cls) -> Sequence[str]:
         return (
-            CostmetricsMeta.year_month,
-            CostmetricsMeta.emp_crmid,
+            cls.year_month,
+            cls.emp_crmid,
         )
-
-    @staticmethod
-    def get_conflicting_fields() -> Sequence[str]:
-        index_fields = set(CostmetricsMeta.get_key_fields())
-        all_fields = set(CostmetricsMeta.get_values())
-        return all_fields - index_fields
