@@ -1,7 +1,7 @@
 # How to run the app
 Add **.env** file containing the following env vars:
 - SQL_SERVER=...
-- SQL_DATABASE=...
+- SQL_DATABASE=DXStatisticsV2
 - SQL_USER=...
 - SQL_PASSWORD=...
 - REDIS_PORT=6379
@@ -14,10 +14,10 @@ Add **.env** file containing the following env vars:
 - WF_ENDPOINT=https://int.devexpress.com/wf/data/
 - CORS_ORIGINS=["https://ubuntu-support.corp.devexpress.com","http://localhost:3000"]
 - QUERY_SERVICE=query_service
-- ADVANCED_MODE_CODE=Advanced
-- ADVANCED_MODE_NAME=Advanced
-- PRODUCTION=1 # 0 = false, 1 = true
-- RECALCULATE_FROM_THE_BEGINNING=0 # 0 = false, 1 = true
+- ADMIN_ROLE=Admin
+- ADVANCED_ROLE=Advanced
+- PRODUCTION=1 #0 = false, 1 = true
+- RECALCULATE_FROM_THE_BEGINNING=0
 
 ## To run locally
 Pull git submodules (git submodule foreach git pull origin main).<br>
