@@ -21,7 +21,7 @@ def get_create_index_statements() -> dict[str, tuple[str]]:
             (
                 sqlite_index.generate_create_index_statement(
                     tbl=local_names_index.CostMetrics.employees,
-                    cols=CostmetricsEmployeesMeta.get_key_fields(),
+                    cols=CostmetricsEmployeesMeta.get_index_fields(),
                     unique=True,
                 ),
             )
