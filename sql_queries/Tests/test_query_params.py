@@ -50,6 +50,7 @@ def test_query_params(
         query = Path(get_query_file_path).read_text(encoding='utf-8')
         for key in format_params:
             assert f'{{{key}}}' in query
+        query.format(**format_params)
 
 
 def prepare_env(monkeypatch: pytest.MonkeyPatch):

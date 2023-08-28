@@ -1,4 +1,6 @@
 from toolbox.sql.connections import SqliteConnection
+from toolbox.sql.db_operations import SaveTableOperation
+from toolbox.sql.query_executors.sqlite_query_executor import SQLiteNonQueryExecutor
 from toolbox.sql.crud_queries.protocols import CRUDQuery
 from toolbox.sql.crud_queries import (
     SqliteUpsertQuery,
@@ -7,10 +9,9 @@ from toolbox.sql.crud_queries import (
 )
 from sql_queries.transform_load.table_defs import get_create_table_statements
 from sql_queries.transform_load.index_defs import get_create_index_statements
-from repository import RemoteRepository
 from sql_queries.index import local_names_index
 from sql_queries.meta.cost_metrics import CostmetricsMeta, NameKnotMeta, CostmetricsEmployeesMeta
-from toolbox.sql.db_operations import SaveTableOperation
+from repository import RemoteRepository
 
 
 def _save_tables(*queries: CRUDQuery):
@@ -30,7 +31,7 @@ def update_cost_metrics(kwargs: dict):
         SqliteUpsertQuery(
             table_name=local_names_index.CostMetrics.cost_metrics,
             cols=df.columns,
-            key_cols=CostmetricsMeta.get_key_fields(),
+            key_cols=CostmetricsMeta.get_index_fields(),
             confilcting_cols=CostmetricsMeta.get_conflicting_fields(),
             rows=df.itertuples(index=False),
         )
@@ -119,3 +120,8 @@ def process_staged_data():
 def __post_process():
     from toolbox.utils.env import reset_recalculate_from_beginning
     reset_recalculate_from_beginning()
+    __execute('vacuum;')
+    __execute('pragma optimize;')
+
+def __execute(query):
+    SQLiteNonQueryExecutor().execute_nonquery(query)
