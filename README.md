@@ -18,11 +18,25 @@ Add **.env** file containing the following env vars:
 - PRODUCTION=1 #0 = false, 1 = true
 - RECALCULATE_FROM_THE_BEGINNING=0
 
-## To run locally
-Pull git submodules (git submodule foreach git pull origin main).<br>
+Make sure:
+<b>support_analytics</b> network is created:<br> **docker network create -d bridge support_analytics**
 
-Then run <b>docker compose build</b> and <b>docker compose up</b>.<br>
-VERSION env var specifies prefix which allows running same container on same machine - just add VERSION to your .env if required and run another version of same containers alongside already running.<br>
+Then run <b>docker-compose up</b>.
+
+## To run locally
+Pull git submodules (**git submodule foreach git pull origin main**).<br>
+
+Then either<br>
+- Run <b>docker compose build</b> and <b>docker compose up</b>.<br>
+VERSION env var specifies prefix which allows running same container on same machine - just add VERSION to your .env if required and run another version of same containers alongside already running.
+<br>
+--OR--
+<br>
+- Create virtual env using [poetry](https://python-poetry.org/docs/#installation). For this run poetry "env use /path/to/python". You can install python from source or download it from a repository. 
+- Install dependencies ("poetry install")
+- Execute ". .dev_env.sh" to export dev env vars
+- start redise_service **docker run -d --name=redis_service -v redis_stack:/data --network=support_analytics --restart always redis/redis-stack:latest** 
+- Run .venv/bin/uvicorn server:app --host 0.0.0.0 --port $SERVER_PORT --reload --log-level=info
 
 ## To run on production
 Copy docker-compose.yaml and .env to the target machine and run "docker compose up".
