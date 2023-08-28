@@ -15,7 +15,6 @@ x-cost_metrics:
     - WF_PASSWORD
     - WF_ENDPOINT
     - CORS_ORIGINS
-    - QUERY_SERVICE
     - REDIS_SERVICE=cost_metrics_redis${VERSION}
     - REDIS_PORT
     - REDIS_DB

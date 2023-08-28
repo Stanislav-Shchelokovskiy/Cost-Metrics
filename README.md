@@ -13,7 +13,6 @@ Add **.env** file containing the following env vars:
 - WF_PASSWORD=...
 - WF_ENDPOINT=https://int.devexpress.com/wf/data/
 - CORS_ORIGINS=["https://ubuntu-support.corp.devexpress.com","http://localhost:3000"]
-- QUERY_SERVICE=query_service
 - ADMIN_ROLE=Admin
 - ADVANCED_ROLE=Advanced
 - PRODUCTION=1 #0 = false, 1 = true
