@@ -218,7 +218,7 @@ emp_activity_with_dev_sc_hours AS (
 		hourly_pay_gross,
 		hourly_pay_gross_withAOE,
 		IIF(team = @support, 
-			IIF(sc_hours > wf_proactive_hours,  sc_hours - wf_proactive_hours, 0), /* pure sc hours. We take proactive hours from wf into account. */
+			sc_hours,
 			paid_hours * ISNULL(eds.perc_of_worktime_spent_on_support,
 									IIF(emp_tribe_id = '7EA63303-B033-4CCA-800A-B8461E2E8364' /* IDETeam */, 0.5,
 										IIF(SUM(eds.perc_of_worktime_spent_on_support) OVER (PARTITION BY emp_tribe_name) = 0, 0,
@@ -295,7 +295,9 @@ emp_activity AS (
 			sc_paidvacs_hours,
 			sc_paidvacs_hours_incl_overtime,
 			proactive_paidvacs_hours,
-			IIF(sc_hours < sc_paidvacs_hours, 0, sc_hours - sc_paidvacs_hours) 								AS overtime_sc_hours,
+			------------------------------------------------------------------------------------------------------------------------------------------------
+			IIF(sc_hours + proactive_paidvacs_hours < @working_hours_per_month, 0,
+				sc_hours + proactive_paidvacs_hours - @working_hours_per_month) 							AS overtime_sc_hours,
 			------------------------------------------------------------------------------------------------------------------------------------------------
 			sc_paidvacs_hours_incl_overtime + proactive_paidvacs_hours										AS emp_total_work_hours,
 			------------------------------------------------------------------------------------------------------------------------------------------------
