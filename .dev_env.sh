@@ -1,4 +1,5 @@
 importenv
+export REDIS_PORT=6379
 export REDIS_SERVICE=localhost
 export CELERY_BROKER_URL=redis://${REDIS_SERVICE}:6379/1
 export CELERY_RESULT_BACKEND=redis://${REDIS_SERVICE}:6379/0
