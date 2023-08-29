@@ -31,7 +31,7 @@ def update_cost_metrics(kwargs: dict):
         SqliteUpsertQuery(
             table_name=local_names_index.CostMetrics.cost_metrics,
             cols=df.columns,
-            key_cols=CostmetricsMeta.get_index_fields(),
+            key_cols=CostmetricsMeta.get_key_fields(),
             confilcting_cols=CostmetricsMeta.get_conflicting_fields(),
             rows=df.itertuples(index=False),
         )
@@ -44,43 +44,51 @@ def process_staged_data():
         SqliteCreateTableFromTableQuery(
             source_table_or_subquery=local_names_index.CostMetrics.cost_metrics,
             target_table_name=local_names_index.CostMetrics.teams,
-            unique_key_field=QueryField(
-                source_name=CostmetricsMeta.team,
-                target_name=NameKnotMeta.name,
-                type='TEXT',
-            )
+            unique_key_fields=(
+                QueryField(
+                    source_name=CostmetricsMeta.team,
+                    target_name=NameKnotMeta.name,
+                    type='TEXT',
+                ),
+            ),
         ),
         SqliteCreateTableFromTableQuery(
             source_table_or_subquery=local_names_index.CostMetrics.cost_metrics,
             target_table_name=local_names_index.CostMetrics.tribes,
-            unique_key_field=QueryField(
-                source_name=CostmetricsMeta.tribe_name,
-                target_name=NameKnotMeta.name,
-                type='TEXT',
-            )
+            unique_key_fields=(
+                QueryField(
+                    source_name=CostmetricsMeta.tribe_name,
+                    target_name=NameKnotMeta.name,
+                    type='TEXT',
+                ),
+            ),
         ),
         SqliteCreateTableFromTableQuery(
             source_table_or_subquery=local_names_index.CostMetrics.cost_metrics,
             target_table_name=local_names_index.CostMetrics.tents,
-            unique_key_field=QueryField(
-                source_name=CostmetricsMeta.tent_name,
-                target_name=NameKnotMeta.name,
-                type='TEXT',
-            )
+            unique_key_fields=(
+                QueryField(
+                    source_name=CostmetricsMeta.tent_name,
+                    target_name=NameKnotMeta.name,
+                    type='TEXT',
+                ),
+            ),
         ),
         SqliteCreateTableFromTableQuery(
             source_table_or_subquery=local_names_index.CostMetrics.cost_metrics,
             target_table_name=local_names_index.CostMetrics.positions,
-            unique_key_field=QueryField(
-                source_name=CostmetricsMeta.position_name,
-                target_name=NameKnotMeta.name,
-                type='TEXT',
-            )
+            unique_key_fields=(
+                QueryField(
+                    source_name=CostmetricsMeta.position_name,
+                    target_name=NameKnotMeta.name,
+                    type='TEXT',
+                ),
+            ),
         ),
         SqliteCreateTableFromTableQuery(
             source_table_or_subquery=local_names_index.CostMetrics.cost_metrics,
             target_table_name=local_names_index.CostMetrics.employees,
-            unique_key_field=None,
+            unique_key_fields=None,
             values_fields=(
                 QueryField(
                     source_name=CostmetricsMeta.emp_crmid,
@@ -112,7 +120,7 @@ def process_staged_data():
                     target_name=CostmetricsEmployeesMeta.position,
                     type='TEXT',
                 ),
-            )
+            ),
         ),
     )
     __post_process()

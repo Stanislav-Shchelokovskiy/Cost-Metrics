@@ -21,7 +21,11 @@ class CostmetricsEmployeesMeta(MetaData):
     position = 'position'
 
     @classmethod
-    def get_index_fields(cls) -> Sequence[str]:
+    def get_index_fields(
+         cls,
+        *args,
+        **kwargs,
+    ) -> Sequence[str]:
         return (
             cls.team,
             cls.tribe,
@@ -64,7 +68,11 @@ class CostmetricsMeta(MetaData):
     sc_work_cost_gross_withAOE_incl_overtime = 'sc_work_cost_gross_withAOE_incl_overtime'
 
     @classmethod
-    def get_index_fields(cls) -> Sequence[str]:
+    def get_index_fields(
+         cls,
+        *args,
+        **kwargs,
+    ) -> Sequence[str]:
         return (
             cls.year_month,
             cls.team,
@@ -75,7 +83,11 @@ class CostmetricsMeta(MetaData):
         )
 
     @classmethod
-    def get_key_fields(cls) -> Sequence[str]:
+    def get_key_fields(
+        cls,
+        *args,
+        **kwargs,
+    ) -> Sequence[str]:
         return (
             cls.year_month,
             cls.emp_crmid,
