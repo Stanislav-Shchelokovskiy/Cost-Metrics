@@ -20,15 +20,15 @@ class CostmetricsEmployeesMeta(MetaData):
     tent = 'tent'
     position = 'position'
 
-    @staticmethod
-    def get_key_fields() -> Sequence[str]:
+    @classmethod
+    def get_index_fields(cls) -> Sequence[str]:
         return (
-            CostmetricsEmployeesMeta.team,
-            CostmetricsEmployeesMeta.tribe,
-            CostmetricsEmployeesMeta.tent,
-            CostmetricsEmployeesMeta.position,
-            CostmetricsEmployeesMeta.name,
-            CostmetricsEmployeesMeta.crmid,
+            cls.team,
+            cls.tribe,
+            cls.tent,
+            cls.position,
+            cls.name,
+            cls.crmid,
         )
 
 
