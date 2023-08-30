@@ -1,3 +1,4 @@
+import os
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from toolbox.utils.converters import DateTimeToSqlString
@@ -30,4 +31,5 @@ def get_start():
 
 
 def offset_in_months():
-    return relativedelta(day=1)
+    months = int(os.environ.get('RECALCULATE_FOR_LAST_MONTHS', 0))
+    return relativedelta(day=1, months=months)

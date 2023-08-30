@@ -26,6 +26,7 @@ x-cost_metrics:
     - LD_LIBRARY_PATH=/usr/lib #https://stackoverflow.com/questions/49920444/upgrading-sqlite3-version-used-in-python3-on-linux
     - PRODUCTION
     - RECALCULATE_FROM_THE_BEGINNING
+    - RECALCULATE_FOR_LAST_MONTHS
 
 services:
   cost_metrics_dashboard:
