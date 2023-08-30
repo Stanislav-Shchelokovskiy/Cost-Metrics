@@ -125,11 +125,19 @@ def process_staged_data():
     )
     __post_process()
 
+
+# yapf: enable
 def __post_process():
-    from toolbox.utils.env import reset_recalculate_from_beginning
+    from toolbox.utils.env import (
+        reset_recalculate_from_beginning,
+        reset_recalculate_for_last_n_months,
+    )
     reset_recalculate_from_beginning()
+    reset_recalculate_for_last_n_months()
+
     __execute('vacuum;')
     __execute('pragma optimize;')
+
 
 def __execute(query):
     SQLiteNonQueryExecutor().execute_nonquery(query)
