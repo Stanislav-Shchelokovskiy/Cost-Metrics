@@ -2,7 +2,7 @@ import os
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from toolbox.utils.converters import DateTimeToSqlString
-from toolbox.utils.env import recalculate_from_beginning
+from toolbox.utils.env import recalculate_from_beginning, recalculate_for_last_n_months
 
 
 def get_cost_metrics_period() -> dict[str, str]:
@@ -31,5 +31,5 @@ def get_start():
 
 
 def offset_in_months():
-    months = int(os.environ.get('RECALCULATE_FOR_LAST_MONTHS', 0))
+    months = recalculate_for_last_n_months()
     return relativedelta(day=1, months=months)
