@@ -17,6 +17,7 @@ Add **.env** file containing the following env vars:
 - ADVANCED_ROLE=Advanced
 - PRODUCTION=1 #0 = false, 1 = true
 - RECALCULATE_FROM_THE_BEGINNING=0
+- RECALCULATE_FOR_LAST_MONTHS=0
 
 Make sure:
 <b>support_analytics</b> network is created:<br> **docker network create -d bridge support_analytics**
