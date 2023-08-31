@@ -11,10 +11,12 @@ from repository.metrics.local.cost_metrics import (
     PositionsQueryDescriptor,
     EmployeesQueryDescriptor,
     TeamsQueryDescriptor,
-    PeriodQueryDescriptor,
     select_metrics,
 )
 from toolbox.utils.converters import Object_to_JSON
+from toolbox.sql_async.repository_queries.async_query_descriptor import PeriodQueryDescriptor
+from sql_queries.meta.cost_metrics import CostmetricsMeta
+from sql_queries.index import local_names_index
 
 
 class CostMetricsRepository:
@@ -30,7 +32,12 @@ class CostMetricsRepository:
         self.positions = create_repository(PositionsQueryDescriptor())
         self.employees = create_repository(EmployeesQueryDescriptor())
         self.teams = create_repository(TeamsQueryDescriptor())
-        self.period = create_repository(PeriodQueryDescriptor())
+        self.period = create_repository(
+            PeriodQueryDescriptor(
+                field=CostmetricsMeta.year_month,
+                tbl=local_names_index.CostMetrics.cost_metrics
+            )
+        )
 
     async def get_metrics(self, role: str | None) -> str:
         return Object_to_JSON.convert(
