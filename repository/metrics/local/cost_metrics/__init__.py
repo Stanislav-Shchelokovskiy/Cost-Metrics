@@ -5,4 +5,3 @@ from repository.metrics.local.cost_metrics.tribes import TribesQueryDescriptor, 
 from repository.metrics.local.cost_metrics.positions import PositionsQueryDescriptor
 from repository.metrics.local.cost_metrics.employees import EmployeesQueryDescriptor
 from repository.metrics.local.cost_metrics.teams import TeamsQueryDescriptor
-from repository.metrics.local.cost_metrics.period import PeriodQueryDescriptor
