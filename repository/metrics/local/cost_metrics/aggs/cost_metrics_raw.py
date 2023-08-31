@@ -56,7 +56,6 @@ class CostMetricsRawQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
             metrics_names=select_metrics(
                 role=role,
                 projector=lambda m: m.name,
-                filter=lambda m: m.supports_over(),
             ),
             windows_names=[w.name for w in self.__agg_windows],
         )
@@ -96,10 +95,7 @@ class CostMetricsRawQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
             windows=self.__emp_windows,
         )
         agg_metrics_aliases = self.__get_metrics_cols(
-            metrics=select_metrics(
-                role=role,
-                filter=lambda m: m.supports_over()
-            ),
+            metrics=select_metrics(role=role),
             windows=self.__agg_windows,
         )
         cols = ',\n\t'.join(
