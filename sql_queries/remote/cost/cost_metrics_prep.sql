@@ -338,18 +338,18 @@ CREATE NONCLUSTERED INDEX idx_ ON #Employees(position_id, chapter_id, has_suppor
 INCLUDE(year_month, crmid, name, level_name, hourly_pay_net, hourly_pay_gross, hourly_pay_gross_withAOE, retired, retired_at, tribe_id, tribe_name, tent_id, tent_name)
 
 
-/*******************
-	WorkingHours
-********************/
+/*************************
+	SC WORK HOURS
+*************************/
 DECLARE @question		TINYINT = 1
 DECLARE @bug			TINYINT = 2
 DECLARE @suggestion		TINYINT = 3
 
-DROP TABLE IF EXISTS #WorkingHours
+DROP TABLE IF EXISTS #SCWorkHours
 SELECT	tc.emp_scid						AS emp_scid,
 		year_month						AS year_month,
 		COUNT(DISTINCT tc.time_stamp)	AS hours_worked
-INTO #WorkingHours
+INTO #SCWorkHours
 FROM (
 		SELECT	EntityOid						AS ticket_id,
 				AuditOwner						AS emp_scid,	
@@ -396,7 +396,7 @@ FROM (
 GROUP BY	tc.emp_scid,
 			year_month
 
-CREATE CLUSTERED INDEX idx ON #WorkingHours(emp_scid, year_month)
+CREATE CLUSTERED INDEX idx ON #SCWorkHours(emp_scid, year_month)
 
 
 /*******************
@@ -426,7 +426,9 @@ SELECT	posts.Ticket_Id							AS ticket_id,
 INTO	#Posts
 FROM (	SELECT	psts.Created, psts.Owner, psts.Ticket_Id, psts.Id
 		FROM	SupportCenterPaid.[c1f0951c-3885-44cf-accb-1a390f34c342].Posts AS psts
-		WHERE	psts.Created BETWEEN @period_start AND @period_end
+		/*	we offset start by a week in order to include iterations started erlier than @period_start.
+			otherwise we miss such iterations.	[1] */
+		WHERE	psts.Created BETWEEN DATEADD(WEEK, -1 , @period_start) AND @period_end
 			AND psts.Type  != @note
 	) AS posts
 	OUTER APPLY (
@@ -481,10 +483,10 @@ iterations_raw AS (
 	SELECT	*,
 			MIN(post_created) OVER (PARTITION BY tribe_id, tent_id, ticket_id, iteration_no) AS iteration_start,
 			MAX(post_created) OVER (PARTITION BY tribe_id, tent_id, ticket_id, iteration_no) AS iteration_end,
-			IIF(MIN(CASE WHEN emp_crmid IS NULL THEN 0 ELSE 1 END)		OVER (PARTITION BY tribe_id, tent_id, ticket_id, iteration_no) = 0 AND 
-				MAX(CASE WHEN emp_crmid IS NOT NULL THEN 1 ELSE 0 END)	OVER (PARTITION BY tribe_id, tent_id, ticket_id, iteration_no) = 1,
+			IIF(MIN(CASE WHEN emp_crmid IS NULL		THEN 0 ELSE 1 END) OVER (PARTITION BY tribe_id, tent_id, ticket_id, iteration_no) = 0 AND 
+				MAX(CASE WHEN emp_crmid IS NOT NULL THEN 1 ELSE 0 END) OVER (PARTITION BY tribe_id, tent_id, ticket_id, iteration_no) = 1,
 				1, 0 ) AS is_iteration
-	FROM posts_split_into_iterations
+	FROM	posts_split_into_iterations
 ),
 
 iterations AS (
@@ -509,6 +511,8 @@ iterations AS (
 	FROM	iterations_raw
 	WHERE	is_iteration = 1 
 		AND	emp_crmid IS NOT NULL
+		/*	we restore previously extended period period here. see [1] above.	*/
+		AND post_created >= @period_start
 		/*	Sequential answers are considered to be different iterations. ex T1161862, T1163662.
 			This is because is_iteration is set to 1 from the very start to the very end of the iteration.
 			We may want add additional conditions to recognize such cases and collapse them.*/
@@ -574,7 +578,7 @@ SELECT	i.*,
 		wh.hours_worked AS sc_hours
 INTO	#Iterations
 FROM	iterations_reduced AS i
-		INNER JOIN #WorkingHours AS wh ON	wh.emp_scid		= i.emp_scid 
+		INNER JOIN #SCWorkHours AS wh ON	wh.emp_scid		= i.emp_scid 
 										AND wh.year_month	= i.year_month
 
 CREATE CLUSTERED INDEX idx ON #Iterations(emp_position_id, emp_chapter_id, has_support_processing_role, emp_crmid, year_month, emp_tribe_id, emp_tent_id);
