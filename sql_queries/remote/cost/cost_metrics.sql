@@ -250,14 +250,16 @@ emp_activity_with_sc_paidvacs_hours_incl_overtime AS (
 
 emp_activity_with_sc_paidvacs_hours AS (
 	SELECT	*,
-			IIF(sc_paidvacs_hours_incl_overtime > paid_hours, paid_hours, sc_paidvacs_hours_incl_overtime) AS sc_paidvacs_hours
+			/*	sc_paidvacs_hours + wf_proactive_hours should be <= paid_hours	*/
+			IIF(sc_paidvacs_hours_incl_overtime > paid_hours - wf_proactive_hours, 
+				IIF(paid_hours - wf_proactive_hours < 0, 0, paid_hours - wf_proactive_hours), sc_paidvacs_hours_incl_overtime) AS sc_paidvacs_hours
 	FROM	emp_activity_with_sc_paidvacs_hours_incl_overtime
 ),
 
 emp_activity_with_total_hours AS (
 	SELECT	*,
 			/* proactive_paidvacs_hours = [required] proactive hours from wf plus [optional] (paid_hours - wf_proactive_hours - pure sc hours) */
-			wf_proactive_hours + IIF(sc_paidvacs_hours > paid_hours - wf_proactive_hours, 0, paid_hours - wf_proactive_hours - sc_paidvacs_hours) AS proactive_paidvacs_hours
+			paid_hours - sc_paidvacs_hours AS proactive_paidvacs_hours
 	FROM	emp_activity_with_sc_paidvacs_hours
 ),
 
