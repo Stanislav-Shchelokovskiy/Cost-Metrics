@@ -2,7 +2,7 @@ from typing import Iterable
 from toolbox.sql.repository_queries import RepositoryAlchemyQueries
 from toolbox.sql.sql_query import SqlAlchemyQuery
 from sql_queries.index import remote_paths_index
-from sql_queries.meta.cost_metrics import CostmetricsMeta
+from sql_queries.meta import CostMetrics
 
 
 class CostMetricsQueries(RepositoryAlchemyQueries):
@@ -19,7 +19,7 @@ class CostMetricsQueries(RepositoryAlchemyQueries):
         return remote_paths_index.CostMetrics.cost_metrics
 
     def get_main_query_format_params(self, **kwargs) -> dict[str, str]:
-        return CostmetricsMeta.get_attrs()
+        return CostMetrics.get_attrs()
 
     def get_must_have_columns(self, **kwargs) -> Iterable[str]:
         return []

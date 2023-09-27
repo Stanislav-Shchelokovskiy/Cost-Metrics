@@ -1,6 +1,6 @@
 import pytest
 import repository.metrics.local.generators.common as common
-from sql_queries.meta.cost_metrics import CostmetricsMeta
+from sql_queries.meta import CostMetrics
 
 
 @pytest.mark.parametrize(
@@ -10,7 +10,7 @@ from sql_queries.meta.cost_metrics import CostmetricsMeta
                 'range_start': 'qwe',
                 'range_end': 'asd',
             },
-            f"WHERE 'qwe' <= {CostmetricsMeta.year_month} AND {CostmetricsMeta.year_month} < 'asd'",
+            f"WHERE 'qwe' <= {CostMetrics.year_month} AND {CostMetrics.year_month} < 'asd'",
         ),
         (
             {
@@ -18,7 +18,7 @@ from sql_queries.meta.cost_metrics import CostmetricsMeta
                 'range_end': 'asd',
                 'filter_prefix': 'AND',
             },
-            f"AND 'qwe' <= {CostmetricsMeta.year_month} AND {CostmetricsMeta.year_month} < 'asd'",
+            f"AND 'qwe' <= {CostMetrics.year_month} AND {CostMetrics.year_month} < 'asd'",
         ),
     ]
 )
