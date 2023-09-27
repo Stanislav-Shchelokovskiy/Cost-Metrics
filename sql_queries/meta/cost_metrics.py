@@ -38,6 +38,10 @@ class CostmetricsEmployeesMeta(MetaData):
 
 class CostmetricsMeta(MetaData):
     emp_crmid = 'emp_crmid'
+    emp_scid = 'emp_scid'
+    position_id = 'position_id'
+    tribe_id = 'tribe_id'
+    tent_id = 'tent_id'
     year_month = 'year_month'
     team = 'team'
     tribe_name = 'tribe_name'
@@ -76,10 +80,10 @@ class CostmetricsMeta(MetaData):
         return (
             cls.year_month,
             cls.team,
-            cls.tribe_name,
-            cls.tent_name,
-            cls.position_name,
-            cls.emp_crmid,
+            cls.tribe_id,
+            cls.tent_id,
+            cls.position_id,
+            cls.emp_scid,
         )
 
     @classmethod
@@ -90,5 +94,5 @@ class CostmetricsMeta(MetaData):
     ) -> Sequence[str]:
         return (
             cls.year_month,
-            cls.emp_crmid,
+            cls.emp_scid,
         )

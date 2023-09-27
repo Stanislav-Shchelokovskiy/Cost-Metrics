@@ -1,5 +1,9 @@
 CREATE TABLE IF NOT EXISTS {CostMetricsTable}(
     {emp_crmid}                                 TEXT,
+    {emp_scid}                                  TEXT,
+    {position_id}                               TEXT,
+    {tribe_id}                                  TEXT,
+    {tent_id}                                   TEXT,
     {year_month}                                TEXT,
     {team}                                      TEXT,
     {tribe_name}                                TEXT,
