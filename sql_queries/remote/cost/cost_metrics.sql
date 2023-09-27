@@ -85,6 +85,7 @@ emp_activity_in_tribe_transformed AS (
 emp_activity_reduced AS (
 	SELECT	employees.year_month									AS year_month,
 			employees.crmid											AS emp_crmid,
+			employees.scid											AS emp_scid,
 			employees.name											AS emp_name,
 			employees.position_id									AS position_id,
 			employees.chapter_id									AS chapter_id,
@@ -203,6 +204,7 @@ emp_activity_with_dev_sc_hours AS (
 	SELECT
 		year_month,
 		emp_crmid,
+		emp_scid,
 		emp_name,
 		position_id,
 		chapter_id,
@@ -266,6 +268,8 @@ emp_activity_with_total_hours AS (
 emp_activity AS (
 	SELECT	year_month,
 			emp_crmid,
+			emp_scid,
+			position_id,
 			--------------------------------------------------------------------------------------------------
 			IIF(emp_crmid = 'BE79612E-8677-4C33-923A-5F555AE12A77' /*Skorkin*/ AND year_month >= '2022-01-01', 
 				@devexpress_tribe_id,
@@ -329,6 +333,10 @@ emp_activity AS (
 )
 
 SELECT 	emp_crmid										AS {emp_crmid},
+		emp_scid										AS {emp_scid},
+		position_id										AS {position_id},
+		emp_tent_id										AS {tent_id},
+		emp_tribe_id									AS {tribe_id},
 		year_month										AS {year_month},
 		CASE team
 			WHEN @support 	THEN 'Support'

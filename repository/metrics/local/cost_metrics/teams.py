@@ -1,7 +1,6 @@
 from collections.abc import Mapping
 from toolbox.sql_async import GeneralSelectAsyncQueryDescriptor
-from toolbox.sql import MetaData
-from sql_queries.meta.cost_metrics import KnotMeta
+from toolbox.sql import MetaData, KnotMeta
 from sql_queries.index import local_names_index
 
 

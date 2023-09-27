@@ -1,7 +1,7 @@
 import os
 from collections.abc import Iterable, Callable, Mapping
 from collections import ChainMap
-from sql_queries.meta.cost_metrics import CostmetricsMeta
+from sql_queries.meta import CostMetrics
 from toolbox.sql.aggs import (
     Metric,
     SUM,
@@ -22,133 +22,133 @@ sc_work_cost_gross_incl_overtime = Metric(
     'SC Work Cost (gross incl overtime)',
     '',
     MetricGroup.cost,
-    SUM(CostmetricsMeta.sc_work_cost_gross_incl_overtime),
+    SUM(CostMetrics.sc_work_cost_gross_incl_overtime),
 )
 sc_work_cost_gross_withAOE_incl_overtime = Metric(
     'SC Work Cost (gross with AOE incl overtime)',
     '',
     MetricGroup.cost,
-    SUM(CostmetricsMeta.sc_work_cost_gross_withAOE_incl_overtime),
+    SUM(CostMetrics.sc_work_cost_gross_withAOE_incl_overtime),
 )
 total_work_hours_incl_overtime = Metric(
     'Total Work Hours (incl overtime)',
     '',
     MetricGroup.efficiency,
-    SUM(CostmetricsMeta.total_work_hours),
+    SUM(CostMetrics.total_work_hours),
 )
 sc_work_cost_gross = Metric(
     'SC Work Cost (gross)',
     '',
     MetricGroup.cost,
-    SUM(CostmetricsMeta.sc_work_cost_gross),
+    SUM(CostMetrics.sc_work_cost_gross),
 )
 sc_work_cost_gross_withAOE = Metric(
     'SC Work Cost (gross with AOE)',
     '',
     MetricGroup.cost,
-    SUM(CostmetricsMeta.sc_work_cost_gross_withAOE),
+    SUM(CostMetrics.sc_work_cost_gross_withAOE),
 )
 proactive_work_cost_gross = Metric(
     'Proactive Work Cost (gross)',
     '',
     MetricGroup.cost,
-    SUM(CostmetricsMeta.proactive_work_cost_gross),
+    SUM(CostMetrics.proactive_work_cost_gross),
 )
 proactive_work_cost_gross_withAOE = Metric(
     'Proactive Work Cost (gross with AOE)',
     '',
     MetricGroup.cost,
-    SUM(CostmetricsMeta.proactive_work_cost_gross_withAOE),
+    SUM(CostMetrics.proactive_work_cost_gross_withAOE),
 )
 ticket_cost_gross = Metric(
     'Ticket Cost (gross)',
     '',
     MetricGroup.cost,
-    SUM(CostmetricsMeta.sc_work_cost_gross_incl_overtime) / SUM(CostmetricsMeta.unique_tickets),
+    SUM(CostMetrics.sc_work_cost_gross_incl_overtime) / SUM(CostMetrics.unique_tickets),
 )
 ticket_cost_gross_withAOE = Metric(
     'Ticket Cost (gross with AOE)',
     '',
     MetricGroup.cost,
-    SUM(CostmetricsMeta.sc_work_cost_gross_withAOE_incl_overtime) / SUM(CostmetricsMeta.unique_tickets),
+    SUM(CostMetrics.sc_work_cost_gross_withAOE_incl_overtime) / SUM(CostMetrics.unique_tickets),
 )
 iteration_cost_gross = Metric(
     'Iteration Cost (gross)',
     '',
     MetricGroup.cost,
-    SUM(CostmetricsMeta.sc_work_cost_gross_incl_overtime) / SUM(CostmetricsMeta.iterations),
+    SUM(CostMetrics.sc_work_cost_gross_incl_overtime) / SUM(CostMetrics.iterations),
 )
 iteration_cost_gross_withAOE = Metric(
     'Iteration Cost (gross with AOE)',
     '',
     MetricGroup.cost,
-    SUM(CostmetricsMeta.sc_work_cost_gross_withAOE_incl_overtime) / SUM(CostmetricsMeta.iterations),
+    SUM(CostMetrics.sc_work_cost_gross_withAOE_incl_overtime) / SUM(CostMetrics.iterations),
 )
 iterations_per_hour = Metric(
     'Iterations per Hour',
     '',
     MetricGroup.efficiency,
-    SUM(CostmetricsMeta.iterations) / SUM(CostmetricsMeta.sc_hours),
+    SUM(CostMetrics.iterations) / SUM(CostMetrics.sc_hours),
 )
 tickets_per_hour = Metric(
     'Tickets per Hour',
     '',
     MetricGroup.efficiency,
-    SUM(CostmetricsMeta.unique_tickets) / SUM(CostmetricsMeta.sc_hours),
+    SUM(CostMetrics.unique_tickets) / SUM(CostMetrics.sc_hours),
 )
 sc_proactive_work_ratio = Metric(
     'SC to Proactive Work Ratio',
     'SC/Proactive Work Ratio',
     MetricGroup.indepth,
-    SUM(CostmetricsMeta.sc_paidvacs_hours_incl_overtime) / SUM(CostmetricsMeta.proactive_paidvacs_hours),
+    SUM(CostMetrics.sc_paidvacs_hours_incl_overtime) / SUM(CostMetrics.proactive_paidvacs_hours),
 )
 sc_work_hours_incl_overtime = Metric(
     'SC Work Hours (incl overtime)',
     '',
     MetricGroup.indepth,
-    SUM(CostmetricsMeta.sc_hours),
+    SUM(CostMetrics.sc_hours),
 )
 sc_work_hours_incl_leaves = Metric(
     'SC Work Hours (incl leaves)',
     '',
     MetricGroup.indepth,
-    SUM(CostmetricsMeta.sc_paidvacs_hours),
+    SUM(CostMetrics.sc_paidvacs_hours),
 )
 sc_work_hours_incl_leaves_overtime = Metric(
     'SC Work Hours (incl leaves and overtime)',
     '',
     MetricGroup.indepth,
-    SUM(CostmetricsMeta.sc_paidvacs_hours_incl_overtime),
+    SUM(CostMetrics.sc_paidvacs_hours_incl_overtime),
 )
 proactive_work_hours_incl_leaves = Metric(
     'Proactive Work Hours (incl leaves)',
     '',
     MetricGroup.indepth,
-    SUM(CostmetricsMeta.proactive_paidvacs_hours),
+    SUM(CostMetrics.proactive_paidvacs_hours),
 )
 paid_leave_hours = Metric(
     'Paid Leave Hours',
     '',
     MetricGroup.indepth,
-    SUM(CostmetricsMeta.paid_vacation_hours),
+    SUM(CostMetrics.paid_vacation_hours),
 )
 unpaid_leave_hours = Metric(
     'Unpaid Leave Hours',
     '',
     MetricGroup.indepth,
-    SUM(CostmetricsMeta.free_vacation_hours),
+    SUM(CostMetrics.free_vacation_hours),
 )
 emp_availability = Metric(
     'Employee Availability',
     '',
     MetricGroup.indepth,
-    COUNT_DISTINCT(CostmetricsMeta.emp_crmid),
+    COUNT_DISTINCT(CostMetrics.emp_crmid),
 )
 avg_emp_level = Metric(
     'Employee Level',
     '',
     MetricGroup.indepth,
-    AVG(CostmetricsMeta.level_value),
+    AVG(CostMetrics.level_value),
 )
 
 # yapf: disable

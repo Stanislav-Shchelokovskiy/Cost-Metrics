@@ -2,7 +2,7 @@ from collections.abc import Mapping, Iterable
 from itertools import chain
 from toolbox.sql_async import GeneralSelectAsyncQueryDescriptor
 from toolbox.sql import MetaData
-from sql_queries.meta.cost_metrics import CostmetricsMeta
+from sql_queries.meta import CostMetrics
 from sql_queries.index import local_names_index
 from repository.metrics.local.cost_metrics.aggs.metric_aggs import (
     select_metrics,
@@ -61,9 +61,9 @@ class CostMetricsRawQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
         )
         meta = type(
             'CostmetricsRawMeta',
-            (CostmetricsMeta, ),
+            (CostMetrics, ),
             {
-                **CostmetricsMeta.get_attrs(),
+                **CostMetrics.get_attrs(),
                 **emp_metrics_attrs,
                 **agg_metrics_attrs,
             },
@@ -100,7 +100,7 @@ class CostMetricsRawQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
         )
         cols = ',\n\t'.join(
             chain(
-                CostmetricsMeta.get_values(),
+                CostMetrics.get_values(),
                 emp_metrics_aliases,
                 agg_metrics_aliases,
             )

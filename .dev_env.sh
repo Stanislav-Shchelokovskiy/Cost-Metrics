@@ -1,7 +1,7 @@
 importenv
 export REDIS_PORT=6379
 export REDIS_SERVICE=localhost
-export CELERY_BROKER_URL=redis://${REDIS_SERVICE}:6379/1
+export CELERY_BROKER_URL=redis://${REDIS_SERVICE}:6379/0
 export CELERY_RESULT_BACKEND=redis://${REDIS_SERVICE}:6379/0
 export DB_HOME=/home/shchelokovskiy/code/cost_metrics/data
 export SQLITE_DATABASE=/home/shchelokovskiy/code/cost_metrics/data/db

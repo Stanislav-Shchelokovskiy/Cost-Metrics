@@ -1,8 +1,9 @@
+import toolbox.sql.generators.display_filter as DisplayFilterGenerator
+from toolbox.sql.meta_data import KnotMeta
 from toolbox.sql.generators.display_filter import QueryParams
 from toolbox.sql.generators.filter_clause_generator_factory import BaseNode
-import toolbox.sql.generators.display_filter as DisplayFilterGenerator
 from sql_queries.index import local_names_index
-from sql_queries.meta.cost_metrics import CostmetricsEmployeesMeta
+from sql_queries.meta import Employees
 
 
 def custom_display_filter(
@@ -14,13 +15,16 @@ def custom_display_filter(
 
 
 class DisplayValuesStore:
+
     # yapf: disable
     _query_params_store = {
-    'employees':
-        QueryParams(
+        'tribes': QueryParams(table=local_names_index.CostMetrics.tribes),
+        'tents': QueryParams(table=local_names_index.CostMetrics.tents),
+        'positions': QueryParams(table=local_names_index.CostMetrics.positions),
+        'employees': QueryParams(
             table=local_names_index.CostMetrics.employees,
-            value_field=CostmetricsEmployeesMeta.crmid,
-            display_field=CostmetricsEmployeesMeta.name,
+            value_field=Employees.scid,
+            display_field=Employees.name,
         )
     }
 
