@@ -1,6 +1,6 @@
 import pytest
 import repository.metrics.local.generators.employees as employees
-from sql_queries.meta.cost_metrics import CostmetricsMeta
+from sql_queries.meta import CostMetrics
 
 
 # yapf: disable
@@ -8,31 +8,31 @@ from sql_queries.meta.cost_metrics import CostmetricsMeta
     'generator, field, param_name, values_converter', [
         (
             employees.generate_teams_filter,
-            CostmetricsMeta.team,
+            CostMetrics.team,
             'teams',
             None,
         ),
         (
             employees.generate_tribes_filter,
-            CostmetricsMeta.tribe_name,
+            CostMetrics.tribe_id,
             'tribes',
             None,
         ),
         (
             employees.generate_tents_filter,
-            CostmetricsMeta.tent_name,
+            CostMetrics.tent_id,
             'tents',
             None,
         ),
         (
             employees.generate_positions_filter,
-            CostmetricsMeta.position_name,
+            CostMetrics.position_id,
             'positions',
             None,
         ),
         (
             employees.generate_employees_filter,
-            CostmetricsMeta.emp_crmid,
+            CostMetrics.emp_scid,
             'employees',
             None,
         ),

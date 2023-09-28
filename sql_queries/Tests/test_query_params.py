@@ -2,11 +2,10 @@ import pytest
 from os import getcwd
 import toolbox.sql.index as RootPath
 from sql_queries.index import remote_paths_index
-from sql_queries.index import transform_load_paths_index
 from pathlib import Path
-from sql_queries.meta.cost_metrics import (
-    WFMeta,
-    CostmetricsMeta,
+from sql_queries.meta import (
+    WF,
+    CostMetrics,
 )
 
 
@@ -18,7 +17,7 @@ from sql_queries.meta.cost_metrics import (
             {
                 'values': '(qwe, 2, 3)',
                 'target': 'target',
-                **WFMeta.get_attrs(),
+                **WF.get_attrs(),
             },
         ),
         (
@@ -30,14 +29,7 @@ from sql_queries.meta.cost_metrics import (
         ),
         (
             remote_paths_index.CostMetrics.cost_metrics,
-            CostmetricsMeta.get_attrs(),
-        ),
-        (
-            transform_load_paths_index.CostMetrics.cost_metrics_table,
-            {
-                'CostMetricsTable': 'qwe',
-                **CostmetricsMeta.get_attrs(),
-            },
+            CostMetrics.get_attrs(),
         ),
     ],
 )

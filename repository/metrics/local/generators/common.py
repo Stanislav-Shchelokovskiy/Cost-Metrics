@@ -1,4 +1,4 @@
-from sql_queries.meta.cost_metrics import CostmetricsMeta
+from sql_queries.meta import CostMetrics
 from toolbox.sql.generators.filter_clause_generator_factory import SqlFilterClauseFromFilterParametersGeneratorFactory
 
 
@@ -9,7 +9,7 @@ def generate_year_month_filter(
 ) -> str:
     generate_filter = SqlFilterClauseFromFilterParametersGeneratorFactory.get_right_halfopen_interval_filter_generator(True)
     return generate_filter(
-        col=CostmetricsMeta.year_month,
+        col=CostMetrics.year_month,
         values=(range_start, range_end),
         filter_prefix=filter_prefix,
     )

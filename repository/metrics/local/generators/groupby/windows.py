@@ -1,6 +1,6 @@
 from typing import NamedTuple
 from collections.abc import Callable
-from sql_queries.meta.cost_metrics import CostmetricsMeta
+from sql_queries.meta import CostMetrics
 from repository.metrics.local.generators.groupby.groups import (
     AggBy,
     employee_group,
@@ -11,7 +11,7 @@ from repository.metrics.local.generators.groupby.groups import (
 
 
 def __get_window(group: Callable[[str], str]):
-    return f'PARTITION BY {group(CostmetricsMeta.year_month)}'
+    return f'PARTITION BY {group(CostMetrics.year_month)}'
 
 
 class Window(NamedTuple):

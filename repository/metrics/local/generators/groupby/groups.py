@@ -1,5 +1,5 @@
 from toolbox.sql import MetaData
-from sql_queries.meta.cost_metrics import CostmetricsMeta
+from sql_queries.meta import CostMetrics
 
 
 class AggBy(MetaData):
@@ -11,13 +11,13 @@ class AggBy(MetaData):
 
 # yapf: disable
 def chapter_group(period_expression: str) -> str:
-    return f'{period_expression}, {CostmetricsMeta.team}'
+    return f'{period_expression}, {CostMetrics.team}'
 
 def tribe_group(period_expression: str) -> str:
-    return chapter_group(period_expression) + f', {CostmetricsMeta.tribe_name}'
+    return chapter_group(period_expression) + f', {CostMetrics.tribe_id}'
 
 def tent_group(period_expression: str) -> str:
-    return tribe_group(period_expression) + f', {CostmetricsMeta.tent_name}'
+    return tribe_group(period_expression) + f', {CostMetrics.tent_id}'
 
 def employee_group(period_expression: str) -> str:
-    return tent_group(period_expression) + f', {CostmetricsMeta.position_name}, {CostmetricsMeta.emp_crmid}, {CostmetricsMeta.name}'
+    return tent_group(period_expression) + f', {CostMetrics.position_id}, {CostMetrics.emp_scid}, {CostMetrics.name}'

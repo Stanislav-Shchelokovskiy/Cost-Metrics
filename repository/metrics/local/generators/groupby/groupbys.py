@@ -1,6 +1,6 @@
 from typing import NamedTuple
 from collections.abc import Sequence
-from sql_queries.meta.cost_metrics import CostmetricsMeta
+from sql_queries.meta import CostMetrics
 import toolbox.sql.generators.sqlite.periods_generator as periods_generator
 
 
@@ -15,7 +15,7 @@ def generate_groupby(
 ) -> GroupBy:
     groupby_period_expression = periods_generator.generate_group_by_period(
         format=groupby_format,
-        field=CostmetricsMeta.year_month,
+        field=CostMetrics.year_month,
     )
     agg_bys = f', {", ".join(agg_bys)}' if agg_bys else ''
     return GroupBy(
