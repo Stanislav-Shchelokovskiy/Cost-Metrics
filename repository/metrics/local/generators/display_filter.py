@@ -1,5 +1,4 @@
 import toolbox.sql.generators.display_filter as DisplayFilterGenerator
-from toolbox.sql.meta_data import KnotMeta
 from toolbox.sql.generators.display_filter import QueryParams
 from toolbox.sql.generators.filter_clause_generator_factory import BaseNode
 from sql_queries.index import local_names_index
@@ -23,8 +22,8 @@ class DisplayValuesStore:
         'positions': QueryParams(table=local_names_index.CostMetrics.positions),
         'employees': QueryParams(
             table=local_names_index.CostMetrics.employees,
-            value_field=Employees.scid,
-            display_field=Employees.name,
+            value_field=Employees.scid.name,
+            display_field=Employees.name.name,
         )
     }
 
