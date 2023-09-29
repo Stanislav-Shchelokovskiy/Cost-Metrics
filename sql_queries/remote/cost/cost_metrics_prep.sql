@@ -107,6 +107,7 @@ DECLARE @eur_to_usd DECIMAL(5,3) = 1.0
 DECLARE @philippines UNIQUEIDENTIFIER = '69D186BB-CF91-4A5B-BF75-D3F1036C33E3'
 
 DECLARE @tents_introduction_date	DATE = '2023-04-01'
+DECLARE @relocation_date	DATE = '2022-03-01'
 
 DECLARE @null_date	DATE = '1990-01-01'
 
@@ -304,14 +305,14 @@ FROM	#Months AS months
 		OUTER APPLY (
 			SELECT	TOP 1 eoe.value_usd
 			FROM	DXStatisticsV2.dbo.EmployeesOperatingExpenses AS eoe
-			WHERE	((emp_location_audit.location_id IS NULL AND eoe.location_id IS NULL) OR eoe.location_id = emp_location_audit.location_id)
+			WHERE	((emp_location_audit.location_id IS NULL AND eoe.location_id IS NULL) OR eoe.location_id = ISNULL(emp_location_audit.location_id, employees.location_id))
 				AND eoe.actual_since <= months.year_month
 			ORDER BY eoe.actual_since DESC
 		) AS operating_expenses
 		OUTER APPLY (
 			SELECT	TOP 1 etc.value
 			FROM	DXStatisticsV2.dbo.EmployeesTaxCoefficients AS etc
-			WHERE	((emp_location_audit.location_id IS NULL AND etc.location_id IS NULL) OR etc.location_id = emp_location_audit.location_id)
+			WHERE	((emp_location_audit.location_id IS NULL AND etc.location_id IS NULL) OR etc.location_id = ISNULL(emp_location_audit.location_id, IIF(months.year_month >= @relocation_date, employees.location_id, NULL)))
 				AND etc.actual_since <= months.year_month
 				AND etc.self_employed = IIF(EXISTS(SELECT TOP 1 ese.crmid FROM DXStatisticsV2.dbo.EmployeesSelfEmployed AS ese WHERE ese.crmid = employees.crmid), 1, 0)
 			ORDER BY etc.actual_since DESC
