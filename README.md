@@ -17,7 +17,8 @@ Add **.env** file containing the following env vars:
 - ADVANCED_ROLE=Advanced
 - PRODUCTION=1 #0 = false, 1 = true
 - RECALCULATE_FROM_THE_BEGINNING=0
-- RECALCULATE_FOR_LAST_MONTHS=0
+- RECALCULATE_FOR_LAST_MONTHS=1 # 0 = current, 1 = previous month, 2 = last two months etc. We run calculation every first day of each months for last month. See config:get_schedule and config:offset_in_months for details. So, RECALCULATE_FOR_LAST_MONTHS should be 1 or greater.
+
 
 Make sure:
 <b>support_analytics</b> network is created:<br> **docker network create -d bridge support_analytics**
