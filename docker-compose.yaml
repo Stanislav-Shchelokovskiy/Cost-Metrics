@@ -25,6 +25,7 @@ x-cost_metrics:
     - SQLITE_DATABASE=${DB_HOME}/db
     - LD_LIBRARY_PATH=/usr/lib #https://stackoverflow.com/questions/49920444/upgrading-sqlite3-version-used-in-python3-on-linux
     - PRODUCTION
+    - UPDATE_ON_STARTUP
     - RECALCULATE_FROM_THE_BEGINNING
     - RECALCULATE_FOR_LAST_MONTHS
 

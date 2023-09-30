@@ -8,5 +8,6 @@ export SQLITE_DATABASE=/home/shchelokovskiy/code/cost_metrics/data/db
 export REDIS_DB=COST_METRICS
 export RECALCULATE_FROM_THE_BEGINNING=0
 export RECALCULATE_FOR_LAST_MONTHS=3
+export UPDATE_ON_STARTUP=1
 export SERVER_PORT=11002
 export VERSION=_rc
