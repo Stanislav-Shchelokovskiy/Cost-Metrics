@@ -1,4 +1,4 @@
-import os
+from celery.schedules import crontab
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from toolbox.utils.converters import DateTimeToSqlString
@@ -33,3 +33,15 @@ def get_start():
 def offset_in_months():
     months = recalculate_for_last_n_months()
     return relativedelta(day=1, months=months)
+
+
+def get_schedule():
+    '''
+    Returns schedule which runs calculation every first day of each month for last N months.
+    So, RECALCULATE_FOR_LAST_MONTHS should be 1 or greater.
+    '''
+    return crontab(
+        minute=0,
+        hour=1,
+        day_of_month=1,
+    )
