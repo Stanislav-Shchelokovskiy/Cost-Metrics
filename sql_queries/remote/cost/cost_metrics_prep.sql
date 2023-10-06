@@ -23,7 +23,7 @@ WITH months(year_month, next_month) AS (
 			/*	next month cannot be greater than @period_end	*/
 			IIF(DATEADD(MONTH, 1, next_month) > @period_end, @period_end, DATEADD(MONTH, 1, next_month))
 	FROM months
-	WHERE DATEADD(MONTH, 1, year_month) < @period_end
+	WHERE DATEADD(MONTH, 1, year_month) <= @period_end
 )
 
 SELECT	*
