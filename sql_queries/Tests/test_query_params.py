@@ -3,10 +3,7 @@ from os import getcwd
 import toolbox.sql.index as RootPath
 from sql_queries.index import remote_paths_index
 from pathlib import Path
-from sql_queries.meta import (
-    WF,
-    CostMetrics,
-)
+from sql_queries.meta import CostMetrics
 
 
 @pytest.mark.parametrize(
@@ -15,9 +12,7 @@ from sql_queries.meta import (
         (
             remote_paths_index.WF.upsert_wf_hours,
             {
-                'values': '(qwe, 2, 3)',
-                'target': 'target',
-                **WF.get_attrs(),
+                'json': 'qwe',
             },
         ),
         (

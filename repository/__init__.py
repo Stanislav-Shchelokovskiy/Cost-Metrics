@@ -8,7 +8,7 @@ from toolbox.sql_async import (
     AsyncRepositoryQueries,
     QueryDescriptor,
 )
-from repository.wf.work_hours import WorkOnHolidaysQueries, ProactiveHoursQueries
+from repository.wf.work_hours import WFHoursQueries
 from repository.metrics.remote.cost_metrics import CostMetricsQueries
 from repository.metrics.local.cost_metrics.repository import CostMetricsRepository
 import toolbox.sql.generators.sqlite.periods_generator as periods_generator
@@ -17,12 +17,7 @@ import repository.metrics.local.cost_metrics.aggs.help.index as help
 
 
 class WfRepository:
-    work_on_holidays = SqlServerNonQueryRepository(
-        queries=WorkOnHolidaysQueries()
-    )
-    proactive_hours = SqlServerNonQueryRepository(
-        queries=ProactiveHoursQueries()
-    )
+    wf_hours = SqlServerNonQueryRepository(queries=WFHoursQueries())
 
 
 class RemoteRepository:
