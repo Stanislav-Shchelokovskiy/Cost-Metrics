@@ -28,7 +28,6 @@ x-cost_metrics:
     - UPDATE_ON_STARTUP
     - RECALCULATE_FROM_THE_BEGINNING
     - RECALCULATE_FOR_LAST_MONTHS
-    - REDIS_ARGS="--save 10 10"
 
 services:
   cost_metrics_dashboard:
@@ -90,6 +89,8 @@ services:
       start_period: 5s
     volumes:
       - cost_metrics${VERSION}-volume:/data
+    environment:
+      - REDIS_ARGS=--save 600 10
 
 volumes:
   cost_metrics-volume:
