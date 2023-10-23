@@ -4,12 +4,6 @@ from toolbox.sql.meta_data import MetaData
 from toolbox.sql.field import Field, TEXT, NUMERIC, INTEGER
 
 
-class WF(MetaData):
-    crmid = Field(TEXT)
-    date = Field(TEXT)
-    hours = Field(NUMERIC)
-
-
 class Employees(MetaData):
     crmid = Field(TEXT)
     scid = Field(TEXT)
