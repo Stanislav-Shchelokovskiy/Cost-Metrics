@@ -151,10 +151,12 @@ emp_activity_reduced AS (
 					AND emps_transformed.year_month	= employees.year_month
 			) AS emps_activity_aggs
 			OUTER APPLY (
-				SELECT	SUM(hours) AS hours
-				FROM	DXStatisticsV2.dbo.EmployeesProactiveHours AS eph
-				WHERE	eph.crmid = employees.crmid
-					AND	eph.date >= year_month AND eph.date < DATEADD(MONTH, 1, year_month)
+				SELECT	SUM(proactive_hours) AS hours
+				FROM	(	SELECT	DISTINCT date, proactive_hours
+							FROM	DXStatisticsV2.dbo.EmployeesWFWorkHours AS eph
+							WHERE	eph.crmid = employees.crmid
+								AND	eph.date >= year_month AND eph.date < DATEADD(MONTH, 1, year_month)
+						) AS wf_proactive_inner
 			) AS wf_proactive
 			LEFT JOIN #Vacations AS v ON	v.crmid			= employees.crmid
 										AND	v.year_month	= employees.year_month
@@ -269,7 +271,6 @@ emp_activity AS (
 	SELECT	year_month,
 			emp_crmid,
 			emp_scid,
-			position_id,
 			--------------------------------------------------------------------------------------------------
 			IIF(emp_crmid = 'BE79612E-8677-4C33-923A-5F555AE12A77' /*Skorkin*/ AND year_month >= '2022-01-01', 
 				@devexpress_tribe_id,
@@ -284,6 +285,7 @@ emp_activity AS (
 				(SELECT TOP 1 Name FROM CRM.dbo.Tents WHERE Id = @devexpress_tent_id),
 				emp_tent_name)	AS emp_tent_name,
 			--------------------------------------------------------------------------------------------------
+			position_id,
 			emp_name,
 			position_name,
 			emp_level_name,
@@ -325,10 +327,11 @@ emp_activity AS (
 			------------------------------------------------------------------------------------------------------------------------------------------------
 	FROM	emp_activity_with_total_hours
 			OUTER APPLY (
-				SELECT	SUM(hours) AS hours
-				FROM	DXStatisticsV2.dbo.EmployeesWorkOnHolidays AS woh
+				SELECT	SUM(work_hours) AS hours
+				FROM	DXStatisticsV2.dbo.EmployeesWFWorkHours AS woh
 				WHERE	woh.crmid = emp_crmid
 					AND	woh.date >= year_month AND woh.date < DATEADD(MONTH, 1, year_month)
+					AND is_holiday = 1
 			) AS work_on_holidays
 )
 
