@@ -1,5 +1,3 @@
 [submodule "toolbox"]
 	path = toolbox
 	url = git@github.com:DevExpress/metric_toolbox.git
-[submodule "origin"]
-	url = git@github.com:DevExpress/metric_toolbox.git
