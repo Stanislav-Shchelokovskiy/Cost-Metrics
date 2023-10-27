@@ -14,6 +14,9 @@ x-cost_metrics:
     - WF_LOGIN
     - WF_PASSWORD
     - WF_ENDPOINT
+    - EMPS_ENDPOINT
+    - EMPS_APPID
+    - EMPS_USERID
     - CORS_ORIGINS
     - REDIS_SERVICE=cost_metrics_redis${VERSION}
     - REDIS_PORT=6379

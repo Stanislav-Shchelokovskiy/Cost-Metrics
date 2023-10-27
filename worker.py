@@ -6,6 +6,7 @@ from celery.signals import worker_ready
 
 import tasks.wf_tasks as wf_tasks
 import tasks.cost_metrics_tasks as cost_metrics_tasks
+import tasks.employees as employees
 import config as config
 
 
@@ -39,14 +40,25 @@ def setup_periodic_tasks(sender, **kwargs):
     )
 
 
+@app.task(name='get_employees_audit', bind=True)
+def get_employees_audit(self, **kwargs):
+    return run_retriable_task(
+        self,
+        employees.get_employees_audit,
+    )
+
+
 @app.task(name='update_cost_metrics')
 def update_cost_metrics(**kwargs):
-    chord([
-        chain(
-            upsert_wf_work_hours.si(),
-            upsert_cost_metrics.si(),
-        ),
-    ])(cost_metrics_process_staged_data.si())
+    chord(
+        [
+            chain(
+                upsert_wf_work_hours.si(),
+                get_employees_audit.si(),
+                upsert_cost_metrics.s(),
+            ),
+        ]
+    )(process_staged_data.si())
 
 
 @app.task(name='upsert_wf_work_hours', bind=True)
@@ -59,16 +71,17 @@ def upsert_wf_work_hours(self, **kwargs):
 
 
 @app.task(name='upsert_cost_metrics', bind=True)
-def upsert_cost_metrics(self, **kwargs):
+def upsert_cost_metrics(self, *args, **kwargs):
     return run_retriable_task(
         self,
-        cost_metrics_tasks.update_cost_metrics,
+        cost_metrics_tasks.upsert_cost_metrics,
         kwargs=config.get_cost_metrics_period(),
+        employees_audit_json=args[0],
     )
 
 
 @app.task(name='cost_metrics_process_staged_data', bind=True)
-def cost_metrics_process_staged_data(self, **kwargs):
+def process_staged_data(self, **kwargs):
     return run_retriable_task(
         self,
         cost_metrics_tasks.process_staged_data,

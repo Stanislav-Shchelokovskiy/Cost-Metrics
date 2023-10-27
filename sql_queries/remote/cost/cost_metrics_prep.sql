@@ -158,7 +158,7 @@ FROM	#Months AS months
 		) AS employees
 		OUTER APPLY (
 			SELECT	 MIN(emp_audit.HiredAt) AS hired_at
-			FROM	CRMAudit.dxcrm.Employees AS emp_audit 
+			FROM	#EmployeesAudit AS emp_audit 
 			WHERE	emp_audit.EntityOid = employees.crmid
 		)	AS emp_hired_audit
 		OUTER APPLY (
@@ -171,7 +171,7 @@ FROM	#Months AS months
 									IIF(LAG(emps_audit_inner.EntityModified) OVER (ORDER BY emps_audit_inner.EntityModified ASC) IS NULL, @null_date,
 											emps_audit_inner.EntityModified)	AS period_start,
 									emps_audit_inner.Tribe_Id
-							FROM	CRMAudit.dxcrm.Employees AS emps_audit_inner
+							FROM	#EmployeesAudit AS emps_audit_inner
 							WHERE	emps_audit_inner.EntityOid = employees.crmid
 								AND emps_audit_inner.ChangedProperties LIKE '%Tribe%'
 								AND emps_audit_inner.Tribe_Id IS NOT NULL
@@ -219,7 +219,7 @@ FROM	#Months AS months
 									IIF(LAG(emps_audit_inner.EntityModified) OVER (ORDER BY emps_audit_inner.EntityModified ASC) IS NULL, @null_date, 
 											emps_audit_inner.EntityModified)	AS period_start,
 									emps_audit_inner.EmployeePosition_Id		AS position_id
-							FROM	CRMAudit.dxcrm.Employees AS emps_audit_inner
+							FROM	#EmployeesAudit AS emps_audit_inner
 							WHERE	emps_audit_inner.EntityOid = employees.crmid
 								AND emps_audit_inner.ChangedProperties LIKE '%Position%'
 								AND emps_audit_inner.EmployeePosition_Id IS NOT NULL
@@ -237,7 +237,7 @@ FROM	#Months AS months
 									IIF(LAG(emps_audit_inner.EntityModified) OVER (ORDER BY emps_audit_inner.EntityModified ASC) IS NULL, @null_date, 
 											emps_audit_inner.EntityModified)	AS period_start,
 									emps_audit_inner.Chapter_Id					AS chapter_id
-							FROM	CRMAudit.dxcrm.Employees AS emps_audit_inner
+							FROM	#EmployeesAudit AS emps_audit_inner
 							WHERE	emps_audit_inner.EntityOid = employees.crmid
 								AND emps_audit_inner.ChangedProperties LIKE '%Chapter%'
 								AND emps_audit_inner.Chapter_Id IS NOT NULL
@@ -256,7 +256,7 @@ FROM	#Months AS months
 									IIF(LAG(emps_audit_inner.EntityModified) OVER (ORDER BY emps_audit_inner.EntityModified ASC) IS NULL, @null_date, 
 											emps_audit_inner.EntityModified)	AS period_start,
 									emps_audit_inner.EmployeeLocation_id		AS location_id
-							FROM	CRMAudit.dxcrm.Employees AS emps_audit_inner
+							FROM	#EmployeesAudit AS emps_audit_inner
 							WHERE	emps_audit_inner.EntityOid = employees.crmid
 								AND emps_audit_inner.ChangedProperties LIKE '%Location%'
 						)	AS emps_audit_outer
@@ -273,7 +273,7 @@ FROM	#Months AS months
 			/*	If level_id is null, then we calculate it using EmployeesSalaries below.	
 				Don't change just this part. Change also probable_level_num calculation below.	*/
 			SELECT	TOP 1 emps_audit.EmployeeLevel_Id AS level_id
-			FROM	CRMAudit.dxcrm.Employees AS emps_audit
+			FROM	#EmployeesAudit AS emps_audit
 			WHERE	emps_audit.EntityOid = employees.crmid
 				AND emps_audit.EntityModified < months.year_month
 				AND emps_audit.ChangedProperties LIKE '%Level%'

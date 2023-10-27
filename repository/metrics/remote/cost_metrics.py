@@ -10,6 +10,10 @@ class CostMetricsQueries(RepositoryAlchemyQueries):
     def get_prep_queries(self, **kwargs) -> Iterable[SqlAlchemyQuery]:
         return (
             SqlAlchemyQuery(
+                query_file_path=remote_paths_index.CostMetrics.employees_audit,
+                format_params=kwargs,
+            ),
+            SqlAlchemyQuery(
                 query_file_path=remote_paths_index.CostMetrics.cost_metrics_prep,
                 format_params=kwargs,
             ),
