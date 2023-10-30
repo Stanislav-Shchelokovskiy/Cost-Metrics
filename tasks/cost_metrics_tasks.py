@@ -27,8 +27,16 @@ def _save_tables(*queries: CRUDQuery):
 
 
 # yapf: disable
-def upsert_cost_metrics(kwargs: dict, employees_audit_json: str):
-    df = RemoteRepository.cost_metrics.get_data(**kwargs, employees_audit_json=employees_audit_json)
+def upsert_cost_metrics(
+    kwargs: dict,
+    employees_json: str,
+    employees_audit_json: str
+):
+    df = RemoteRepository.cost_metrics.get_data(
+        **kwargs,
+        employees_json=employees_json,
+        employees_audit_json=employees_audit_json,
+    )
     _save_tables(
         SqliteCreateTableQuery(
             target_table_name=local_names_index.CostMetrics.cost_metrics,

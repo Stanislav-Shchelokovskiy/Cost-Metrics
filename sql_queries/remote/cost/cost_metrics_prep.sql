@@ -154,7 +154,7 @@ FROM	#Months AS months
 		OUTER APPLY (
 			-- #Postulate: Trainees aren't thrown away
 			SELECT	e.*
-			FROM	DXStatisticsV2.dbo.support_analytics_employees() AS e
+			FROM	#EmployeesFromJson AS e
 		) AS employees
 		OUTER APPLY (
 			SELECT	 MIN(emp_audit.HiredAt) AS hired_at
@@ -432,13 +432,6 @@ FROM (	SELECT	psts.Created, psts.Owner, psts.Ticket_Id, psts.Id
 		WHERE	psts.Created BETWEEN DATEADD(WEEK, -1 , @period_start) AND @period_end
 			AND psts.Type  != @note
 	) AS posts
-	OUTER APPLY (
-		SELECT TOP 1 u.Id
-		FROM	crm.dbo.Employees  AS e
-				INNER JOIN CRM.dbo.Customers AS c ON c.Id  = e.Id
-				INNER JOIN SupportCenterPaid.[c1f0951c-3885-44cf-accb-1a390f34c342].Users AS u ON u.FriendlyId = c.FriendlyId
-		WHERE	e.IsServiceUser = 1 AND u.Id = posts.Owner
-	) AS serivce_users
 	CROSS APPLY (
 		SELECT	t.Id, CASE WHEN t.Owner = posts.Owner THEN 1 ELSE 0 END AS is_ticket_owner
 		FROM	SupportCenterPaid.[c1f0951c-3885-44cf-accb-1a390f34c342].Tickets AS t
@@ -459,8 +452,6 @@ FROM (	SELECT	psts.Created, psts.Owner, psts.Ticket_Id, psts.Id
 		SELECT	id, name
 		FROM	DXStatisticsV2.dbo.get_ticket_tent(tickets.Id)
 	) AS tents
-	/*	Post owner is not service user	*/
-	WHERE serivce_users.Id IS NULL
 
 CREATE CLUSTERED INDEX idx ON #Posts(tribe_id, tent_id, ticket_id, post_created)
 CREATE NONCLUSTERED INDEX idx_ ON #Posts(emp_crmid, year_month, tribe_id, tent_id) INCLUDE(post_id)

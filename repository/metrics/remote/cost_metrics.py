@@ -10,6 +10,10 @@ class CostMetricsQueries(RepositoryAlchemyQueries):
     def get_prep_queries(self, **kwargs) -> Iterable[SqlAlchemyQuery]:
         return (
             SqlAlchemyQuery(
+                query_file_path=remote_paths_index.CostMetrics.employees,
+                format_params=kwargs,
+            ),
+            SqlAlchemyQuery(
                 query_file_path=remote_paths_index.CostMetrics.employees_audit,
                 format_params=kwargs,
             ),
@@ -24,6 +28,3 @@ class CostMetricsQueries(RepositoryAlchemyQueries):
 
     def get_main_query_format_params(self, **kwargs) -> dict[str, str]:
         return CostMetrics.get_attrs()
-
-    def get_must_have_columns(self, **kwargs) -> Iterable[str]:
-        return []

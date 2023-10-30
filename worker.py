@@ -18,7 +18,7 @@ app.conf.setdefault('broker_connection_retry_on_startup', True)
 def on_startup(sender, **kwargs):
     if not int(os.environ['UPDATE_ON_STARTUP']):
         return
-        
+
     tasks = [
         'update_cost_metrics',
     ]
@@ -40,11 +40,20 @@ def setup_periodic_tasks(sender, **kwargs):
     )
 
 
+@app.task(name='get_employees', bind=True)
+def get_employees(self, **kwargs):
+    return run_retriable_task(
+        self,
+        employees.get_employees,
+    )
+
+
 @app.task(name='get_employees_audit', bind=True)
-def get_employees_audit(self, **kwargs):
+def get_employees_audit(self, *args, **kwargs):
     return run_retriable_task(
         self,
         employees.get_employees_audit,
+        employees_json=args[0],
     )
 
 
@@ -54,7 +63,8 @@ def update_cost_metrics(**kwargs):
         [
             chain(
                 upsert_wf_work_hours.si(),
-                get_employees_audit.si(),
+                get_employees.si(),
+                get_employees_audit.s(),
                 upsert_cost_metrics.s(),
             ),
         ]
@@ -72,11 +82,13 @@ def upsert_wf_work_hours(self, **kwargs):
 
 @app.task(name='upsert_cost_metrics', bind=True)
 def upsert_cost_metrics(self, *args, **kwargs):
+    employees_json, employees_audit_json = args[0]
     return run_retriable_task(
         self,
         cost_metrics_tasks.upsert_cost_metrics,
         kwargs=config.get_cost_metrics_period(),
-        employees_audit_json=args[0],
+        employees_json=employees_json,
+        employees_audit_json=employees_audit_json,
     )
 
 

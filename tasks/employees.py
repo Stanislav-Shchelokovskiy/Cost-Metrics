@@ -17,22 +17,27 @@ def _get_emps_response(
         params=params,
     ).replace('":', '": ')
 
-
-def get_employees_audit() -> str:
-    emps = _get_emps_response(
+def get_employees() -> str:
+    return _get_emps_response(
         method='employees',
         params={
             'expandDetails': True,
             'expandDataForAnalytics': True,
         },
     )
-    emps = JSON_to_object.convert(emps)
+
+def get_employees_audit(employees_json: str) -> tuple[str]:
+    emps = JSON_to_object.convert(employees_json)
     emps = emps['page']
     audit = []
+    i = 0
     for emp in emps:
         emp_audit = _get_emps_response(
             method='audit-employees',
             params={'email': emp['email']},
         )
         audit.extend(JSON_to_object.convert(emp_audit))
-    return Object_to_JSON.convert(audit)
+        i+=1
+        if i> 0:
+            break
+    return employees_json, Object_to_JSON.convert(audit)
