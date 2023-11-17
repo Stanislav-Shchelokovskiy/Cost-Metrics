@@ -181,14 +181,14 @@ advanced_metrics = {
 }
 
 admin_metrics = {
-    sc_work_cost_gross_withAOE.name: sc_work_cost_gross_withAOE,
-    sc_work_cost_gross_withAOE_incl_overtime.name: sc_work_cost_gross_withAOE_incl_overtime,
-    proactive_work_cost_gross_withAOE.name: proactive_work_cost_gross_withAOE,
-    ticket_cost_gross_withAOE.name: ticket_cost_gross_withAOE,
-    iteration_cost_gross_withAOE.name: iteration_cost_gross_withAOE,
-    work_hour_gross_withAOE.name: work_hour_gross_withAOE,
+    # sc_work_cost_gross_withAOE.name: sc_work_cost_gross_withAOE,
+    # sc_work_cost_gross_withAOE_incl_overtime.name: sc_work_cost_gross_withAOE_incl_overtime,
+    # proactive_work_cost_gross_withAOE.name: proactive_work_cost_gross_withAOE,
+    # ticket_cost_gross_withAOE.name: ticket_cost_gross_withAOE,
+    # iteration_cost_gross_withAOE.name: iteration_cost_gross_withAOE,
+    # work_hour_gross_withAOE.name: work_hour_gross_withAOE,
+    # support_service_cost_gross_withAOE.name: support_service_cost_gross_withAOE,
     support_service_cost_gross.name: support_service_cost_gross,
-    support_service_cost_gross_withAOE.name: support_service_cost_gross_withAOE,
     paid_leave_hours.name: paid_leave_hours,
     unpaid_leave_hours.name: unpaid_leave_hours,
     emp_availability.name: emp_availability,
