@@ -10,11 +10,6 @@ from sql_queries.meta import CostMetrics
             common.generate_year_month_filter,
             None,
         ),
-        (
-            CostMetrics.year_month,
-            common.generate_year_month_filter,
-            None,
-        ),
     ]
 )
 def test_generate_year_month_filter(
