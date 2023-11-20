@@ -175,8 +175,6 @@ advanced_metrics = {
     sc_proactive_work_ratio.name: sc_proactive_work_ratio,
     sc_work_cost_gross.name: sc_work_cost_gross,
     sc_work_cost_gross_incl_overtime.name: sc_work_cost_gross_incl_overtime,
-    proactive_work_cost_gross.name: proactive_work_cost_gross,
-    work_hour_cost_gross.name: work_hour_cost_gross,
     avg_emp_level.name: avg_emp_level,
 }
 
@@ -189,6 +187,8 @@ admin_metrics = {
     # work_hour_gross_withAOE.name: work_hour_gross_withAOE,
     # support_service_cost_gross_withAOE.name: support_service_cost_gross_withAOE,
     support_service_cost_gross.name: support_service_cost_gross,
+    proactive_work_cost_gross.name: proactive_work_cost_gross,
+    work_hour_cost_gross.name: work_hour_cost_gross,
     paid_leave_hours.name: paid_leave_hours,
     unpaid_leave_hours.name: unpaid_leave_hours,
     emp_availability.name: emp_availability,
