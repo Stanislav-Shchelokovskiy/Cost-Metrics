@@ -16,7 +16,6 @@ from repository.metrics.local.cost_metrics import (
 from toolbox.utils.converters import Object_to_JSON
 from toolbox.sql_async.repository_queries.async_query_descriptor import PeriodQueryDescriptor
 from sql_queries.meta import CostMetrics
-from sql_queries.index import local_names_index
 
 
 class CostMetricsRepository:
@@ -35,7 +34,7 @@ class CostMetricsRepository:
         self.period = create_repository(
             PeriodQueryDescriptor(
                 field=CostMetrics.year_month,
-                tbl=local_names_index.CostMetrics.cost_metrics
+                tbl=CostMetrics.get_name()
             )
         )
 

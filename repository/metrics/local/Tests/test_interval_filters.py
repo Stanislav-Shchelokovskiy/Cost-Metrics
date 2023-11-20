@@ -4,26 +4,24 @@ from sql_queries.meta import CostMetrics
 
 
 @pytest.mark.parametrize(
-    'kwargs, output', [
+    'field, generator, values_converter', [
         (
-            {
-                'range_start': 'qwe',
-                'range_end': 'asd',
-            },
-            f"WHERE 'qwe' <= {CostMetrics.year_month} AND {CostMetrics.year_month} < 'asd'",
+            CostMetrics.year_month,
+            common.generate_year_month_filter,
+            None,
         ),
         (
-            {
-                'range_start': 'qwe',
-                'range_end': 'asd',
-                'filter_prefix': 'AND',
-            },
-            f"AND 'qwe' <= {CostMetrics.year_month} AND {CostMetrics.year_month} < 'asd'",
+            CostMetrics.year_month,
+            common.generate_year_month_filter,
+            None,
         ),
     ]
 )
 def test_generate_year_month_filter(
-    kwargs: dict,
-    output,
+    field: str,
+    generator,
+    values_converter,
+    right_half_open_interval_filter_cases,
 ):
-    assert common.generate_year_month_filter(**kwargs) == output
+    for values, output in right_half_open_interval_filter_cases(values_converter, prefix='WHERE'):
+        assert generator(values) == output.format(field=field)

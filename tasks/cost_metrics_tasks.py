@@ -7,21 +7,24 @@ from toolbox.sql.crud_queries import (
     SqliteCreateTableFromTableQuery,
     SqliteCreateTableQuery,
 )
-from toolbox.sql.meta_data import KnotMeta
-from sql_queries.transform_load.table_defs import get_create_table_statements
-from sql_queries.transform_load.index_defs import get_create_index_statements
-from sql_queries.index import local_names_index
-from sql_queries.meta import CostMetrics, Employees
+from toolbox.sql import MetaData
+from sql_queries.meta import (
+    Employees,
+    Teams,
+    Tribes,
+    Tents,
+    Positions,
+    CostMetrics,
+)
 from repository import RemoteRepository
 
 
-def _save_tables(*queries: CRUDQuery):
+def _save_table(cls: MetaData = MetaData, *queries: CRUDQuery):
     [
         SaveTableOperation(
             conn=SqliteConnection(),
             query=query,
-            tables_defs=get_create_table_statements(),
-            create_index_statements=get_create_index_statements(),
+            create_index_statements=cls.get_indices(),
         )() for query in queries
     ]
 
@@ -37,15 +40,16 @@ def upsert_cost_metrics(
         employees_json=employees_json,
         employees_audit_json=employees_audit_json,
     )
-    _save_tables(
+    _save_table(
+        CostMetrics,
         SqliteCreateTableQuery(
-            target_table_name=local_names_index.CostMetrics.cost_metrics,
+            target_table_name=CostMetrics.get_name(),
             unique_key_fields=CostMetrics.get_key_fields(lambda x: x.as_query_field()),
             values_fields=CostMetrics.get_conflicting_fields(lambda x: x.as_query_field(), preserve_order=True),
             recreate=False,
         ),
         SqliteUpsertQuery(
-            table_name=local_names_index.CostMetrics.cost_metrics,
+            table_name=CostMetrics.get_name(),
             cols=df.columns,
             key_cols=CostMetrics.get_key_fields(),
             confilcting_cols=CostMetrics.get_conflicting_fields(),
@@ -55,39 +59,52 @@ def upsert_cost_metrics(
 
 
 def process_staged_data():
-    _save_tables(
+    _save_table(
+        Teams,
         SqliteCreateTableFromTableQuery(
-            source_table_or_subquery=local_names_index.CostMetrics.cost_metrics,
-            target_table_name=local_names_index.CostMetrics.teams,
-            unique_key_fields=(CostMetrics.team.as_query_field(KnotMeta.name),),
-        ),
+            source_table_or_subquery=CostMetrics.get_name(),
+            target_table_name=Teams.get_name(),
+            unique_key_fields=(CostMetrics.team.as_query_field(Teams.name),),
+        )
+    )
+    _save_table(
+        Tribes,
         SqliteCreateTableFromTableQuery(
-            source_table_or_subquery=local_names_index.CostMetrics.cost_metrics,
-            target_table_name=local_names_index.CostMetrics.tribes,
+            source_table_or_subquery=CostMetrics.get_name(),
+            target_table_name=Tribes.get_name(),
             unique_key_fields=(
-                CostMetrics.tribe_id.as_query_field(KnotMeta.id),
-                CostMetrics.tribe_name.as_query_field(KnotMeta.name),
+                CostMetrics.tribe_id.as_query_field(Tribes.id),
+                CostMetrics.tribe_name.as_query_field(Tribes.name),
             ),
-        ),
+        )
+    )
+    _save_table(
+        Tents,
         SqliteCreateTableFromTableQuery(
-            source_table_or_subquery=local_names_index.CostMetrics.cost_metrics,
-            target_table_name=local_names_index.CostMetrics.tents,
+            source_table_or_subquery=CostMetrics.get_name(),
+            target_table_name=Tents.get_name(),
             unique_key_fields=(
-                CostMetrics.tent_id.as_query_field(KnotMeta.id),
-                CostMetrics.tent_name.as_query_field(KnotMeta.name),
+                CostMetrics.tent_id.as_query_field(Tents.id),
+                CostMetrics.tent_name.as_query_field(Tents.name),
             ),
-        ),
+        )
+    )
+    _save_table(
+        Positions,
         SqliteCreateTableFromTableQuery(
-            source_table_or_subquery=local_names_index.CostMetrics.cost_metrics,
-            target_table_name=local_names_index.CostMetrics.positions,
+            source_table_or_subquery=CostMetrics.get_name(),
+            target_table_name=Positions.get_name(),
             unique_key_fields=(
-                CostMetrics.position_id.as_query_field(KnotMeta.id),
-                CostMetrics.position_name.as_query_field(KnotMeta.name),
+                CostMetrics.position_id.as_query_field(Positions.id),
+                CostMetrics.position_name.as_query_field(Positions.name),
             ),
-        ),
+        )
+    )
+    _save_table(
+        Employees,
         SqliteCreateTableFromTableQuery(
-            source_table_or_subquery=local_names_index.CostMetrics.cost_metrics,
-            target_table_name=local_names_index.CostMetrics.employees,
+            source_table_or_subquery=CostMetrics.get_name(),
+            target_table_name=Employees.get_name(),
             unique_key_fields=None,
             values_fields=(
                 CostMetrics.emp_crmid.as_query_field(Employees.crmid),
@@ -98,7 +115,7 @@ def process_staged_data():
                 CostMetrics.tent_id.as_query_field(Employees.tent_id),
                 CostMetrics.position_id.as_query_field(Employees.position_id),
             ),
-        ),
+        )
     )
     __post_process()
 

@@ -46,5 +46,4 @@ def test_single_in_filters(
     single_in_filter_cases,
 ):
     for values, output in single_in_filter_cases(values_converter, prefix='AND'):
-        print(values)
         assert generator(**{param_name: values}) == output.format(field=field)

@@ -3,7 +3,6 @@ from itertools import chain
 from toolbox.sql_async import GeneralSelectAsyncQueryDescriptor
 from toolbox.sql import MetaData
 from sql_queries.meta import CostMetrics
-from sql_queries.index import local_names_index
 from repository.metrics.local.cost_metrics.aggs.metric_aggs import (
     select_metrics,
     get_emp_metrics_names,
@@ -40,7 +39,7 @@ class CostMetricsRawQueryDescriptor(GeneralSelectAsyncQueryDescriptor):
     def get_format_params(self, kwargs: Mapping) -> Mapping[str, str]:
         return {
             'select': self.__get_cols(kwargs),
-            'from':  local_names_index.CostMetrics.cost_metrics,
+            'from':  CostMetrics.get_name(),
             'where_group_limit': cost_metrics.generate_filter(kwargs)
         }
 

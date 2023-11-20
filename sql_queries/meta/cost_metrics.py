@@ -2,31 +2,7 @@ from typing import Any
 from collections.abc import Sequence, Callable
 from toolbox.sql.meta_data import MetaData
 from toolbox.sql.field import Field, TEXT, NUMERIC, INTEGER
-
-
-class Employees(MetaData):
-    crmid = Field(TEXT)
-    scid = Field(TEXT)
-    name = Field(TEXT)
-    team = Field(TEXT)
-    tribe_id = Field(TEXT)
-    tent_id = Field(TEXT)
-    position_id = Field(TEXT)
-
-    @classmethod
-    def get_index_fields(
-        cls,
-        projector: Callable[[Field], Any] = str,
-        *exfields: Field,
-    ) -> Sequence[str]:
-        return (
-            cls.team,
-            cls.tribe_id,
-            cls.tent_id,
-            cls.position_id,
-            cls.name,
-            cls.scid,
-        )
+import toolbox.sql.generators.sqlite.statements as sqlite_index
 
 
 class CostMetrics(MetaData):
@@ -65,18 +41,20 @@ class CostMetrics(MetaData):
     sc_work_cost_gross_withAOE_incl_overtime = Field(NUMERIC)
 
     @classmethod
-    def get_index_fields(
-        cls,
-        projector: Callable[[Field], Any] = str,
-        *exfields: Field,
-    ) -> Sequence[str]:
+    def get_indices(cls) -> Sequence[str]:
+        tbl = cls.get_name()
         return (
-            cls.year_month,
-            cls.team,
-            cls.tribe_id,
-            cls.tent_id,
-            cls.position_id,
-            cls.emp_scid,
+            sqlite_index.create_index(
+                tbl=tbl,
+                cols=(
+                    cls.year_month,
+                    cls.team,
+                    cls.tribe_id,
+                    cls.tent_id,
+                    cls.position_id,
+                    cls.emp_scid,
+                ),
+            ),
         )
 
     @classmethod

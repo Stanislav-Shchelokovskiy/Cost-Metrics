@@ -1,8 +1,7 @@
 import toolbox.sql.generators.display_filter as DisplayFilterGenerator
 from toolbox.sql.generators.display_filter import QueryParams
 from toolbox.sql.generators.filter_clause_generator_factory import BaseNode
-from sql_queries.index import local_names_index
-from sql_queries.meta import Employees
+from sql_queries.meta import Employees, Tribes, Tents, Positions
 
 
 def custom_display_filter(
@@ -17,11 +16,11 @@ class DisplayValuesStore:
 
     # yapf: disable
     _query_params_store = {
-        'tribes': QueryParams(table=local_names_index.CostMetrics.tribes),
-        'tents': QueryParams(table=local_names_index.CostMetrics.tents),
-        'positions': QueryParams(table=local_names_index.CostMetrics.positions),
+        'tribes': QueryParams(table=Tribes.get_name()),
+        'tents': QueryParams(table=Tents.get_name()),
+        'positions': QueryParams(table=Positions.get_name()),
         'employees': QueryParams(
-            table=local_names_index.CostMetrics.employees,
+            table=Employees.get_name(),
             value_field=Employees.scid.name,
             display_field=Employees.name.name,
         )

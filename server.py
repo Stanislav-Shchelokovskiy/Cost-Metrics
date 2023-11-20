@@ -6,7 +6,7 @@ from fastapi.responses import Response
 from toolbox.utils.converters import JSON_to_object
 from toolbox.server_models import ViewState
 from repository import LocalRepository
-from server_models import CostMetricsParams, EmployeeParams
+from server_models import CostMetricsParams, EmployeeParams, Range
 from utils import authorize_state_access
 
 
@@ -98,8 +98,7 @@ async def get_cost_metrics_aggregates(
 ):
     return await LocalRepository.cost_metrics.aggregates.get_data(
         group_by_period=group_by_period,
-        range_start=range_start,
-        range_end=range_end,
+        range=Range(range_start, range_end),
         metric=metric,
         role=role,
         **body.get_field_values(),

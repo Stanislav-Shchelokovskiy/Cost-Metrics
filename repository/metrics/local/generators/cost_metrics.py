@@ -6,10 +6,7 @@ import repository.metrics.local.generators.common as common
 def generate_filter(kwargs: dict) -> str:
     return build_filter_string(
         (
-            common.generate_year_month_filter(
-                range_start=kwargs['range_start'],
-                range_end=kwargs['range_end']
-            ),
+            common.generate_year_month_filter(range=kwargs['range']),
             employees.generate_teams_filter(teams=kwargs['teams']),
             employees.generate_tribes_filter(tribes=kwargs['tribes']),
             employees.generate_tents_filter(tents=kwargs['tents']),

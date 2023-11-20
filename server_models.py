@@ -14,3 +14,10 @@ class EmployeeParams(ServerModel):
 
 class CostMetricsParams(EmployeeParams):
     employees: FilterParametersNode[str] | None = Field(alias='Employees')
+
+
+class Range:
+
+    def __init__(self, *values: str):
+        self.include = True
+        self.values = values
