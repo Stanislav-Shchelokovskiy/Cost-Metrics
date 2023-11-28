@@ -165,7 +165,7 @@ emp_activity_reduced AS (
 						audit_hired.HiredAt		AS retirement_end
 				FROM (	
 						SELECT	 TOP 1 emp_audit.RetiredAt
-						FROM    CRMAudit.dxcrm.Employees AS emp_audit
+						FROM    #EmployeesAudit AS emp_audit
 						WHERE	emp_audit.EntityOid = employees.crmid
 							AND	emp_audit.EntityModified < DATEADD(MONTH, 1, employees.year_month)
 							AND	emp_audit.RetiredAt IS NOT NULL
@@ -173,7 +173,7 @@ emp_activity_reduced AS (
 					) AS audit_retired
 					CROSS APPLY (
 						SELECT TOP 1 emp_audit.HiredAt
-						FROM CRMAudit.dxcrm.Employees AS emp_audit
+						FROM 	#EmployeesAudit AS emp_audit
 						WHERE	emp_audit.EntityOid = employees.crmid
 							AND emp_audit.EntityModified > audit_retired.RetiredAt
 							AND emp_audit.HiredAt > audit_retired.RetiredAt

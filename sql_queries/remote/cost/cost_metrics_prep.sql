@@ -211,7 +211,7 @@ FROM	#Months AS months
 			SELECT TOP 1 *
 			FROM (	SELECT	emps_audit_outer.position_id									AS position_id,
 							(	SELECT TOP 1 ep.Name 
-								FROM CRM.dbo.EmployeePositions AS ep 
+								FROM HR.dbo.EmployeePositions AS ep 
 								WHERE ep.Id = emps_audit_outer.position_id)					AS position_name,
 							emps_audit_outer.period_start									AS period_start,
 							LEAD(emps_audit_outer.period_end) OVER (ORDER BY period_end)	AS period_end
@@ -262,7 +262,7 @@ FROM	#Months AS months
 						)	AS emps_audit_outer
 						CROSS APPLY (
 							SELECT	Name, IsActive
-							FROM	CRM.dbo.EmployeeLocations AS l
+							FROM	HR.dbo.EmployeeLocations AS l
 							WHERE	l.Id = emps_audit_outer.location_id
 						) AS locations
 				) AS emps_audit
@@ -319,7 +319,7 @@ FROM	#Months AS months
 		) AS tax_coefficients
 		OUTER APPLY (
 			SELECT	TOP 1 el.Name AS level_name
-			FROM	CRM.dbo.EmployeeLevels AS el
+			FROM	HR.dbo.EmployeeLevels AS el
 			WHERE	el.Id = salaries.level_id
 		) AS emps_levels
 		/*	throw away never hired employees or employees after retirement	*/
