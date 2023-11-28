@@ -118,8 +118,7 @@ async def get_cost_metrics_raw(
     role: str | None = Cookie(None),
 ):
     return await LocalRepository.cost_metrics.raw.get_data(
-        range_start=range_start,
-        range_end=range_end,
+        range=Range(range_start, range_end),
         role=role,
         **body.get_field_values(),
     )
