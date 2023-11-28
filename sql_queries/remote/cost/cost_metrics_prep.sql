@@ -48,7 +48,7 @@ WITH vacations_start AS (
 			DayHalf,
 			StartDate,
 			IIF(EmployeeVacationSpecification_Id = @without_payment, 0, 1) AS is_paid
-	FROM	CRM.dbo.EmployeeVacations
+	FROM	HR.dbo.EmployeeVacations
 ),
 
 vacations_end AS (
