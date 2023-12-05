@@ -12,9 +12,11 @@ from toolbox.sql.aggs import (
 
 
 class MetricGroup:
+    employees = 'Employees'
     cost = 'Cost'
-    efficiency = 'Efficiency'
-    indepth = 'In-depth'
+    workflow = 'Workflow'
+    productivity = 'Productivity'
+    performance = 'Performance'
 
 
 # yapf: disable
@@ -29,12 +31,6 @@ sc_work_cost_gross_withAOE_incl_overtime = Metric(
     '',
     MetricGroup.cost,
     SUM(CostMetrics.sc_work_cost_gross_withAOE_incl_overtime),
-)
-total_work_hours_incl_overtime = Metric(
-    'Total Work Hours (incl overtime)',
-    '',
-    MetricGroup.efficiency,
-    SUM(CostMetrics.total_work_hours),
 )
 sc_work_cost_gross = Metric(
     'SC Work Cost (gross)',
@@ -84,74 +80,90 @@ iteration_cost_gross_withAOE = Metric(
     MetricGroup.cost,
     SUM(CostMetrics.sc_work_cost_gross_withAOE_incl_overtime) / SUM(CostMetrics.iterations),
 )
-iterations_per_hour = Metric(
-    'Iterations per Hour',
+
+total_work_hours_incl_overtime = Metric(
+    'Total Work Hours (incl overtime)',
     '',
-    MetricGroup.efficiency,
-    SUM(CostMetrics.iterations) / SUM(CostMetrics.sc_hours),
-)
-tickets_per_hour = Metric(
-    'Tickets per Hour',
-    '',
-    MetricGroup.efficiency,
-    SUM(CostMetrics.unique_tickets) / SUM(CostMetrics.sc_hours),
-)
-sc_proactive_work_ratio = Metric(
-    'SC to Proactive Work Ratio',
-    'SC/Proactive Work Ratio',
-    MetricGroup.indepth,
-    SUM(CostMetrics.sc_paidvacs_hours_incl_overtime) / SUM(CostMetrics.proactive_paidvacs_hours),
+    MetricGroup.workflow,
+    SUM(CostMetrics.total_work_hours),
 )
 sc_work_hours_incl_overtime = Metric(
     'SC Work Hours (incl overtime)',
     '',
-    MetricGroup.indepth,
+    MetricGroup.workflow,
     SUM(CostMetrics.sc_hours),
 )
 sc_work_hours_incl_leaves = Metric(
     'SC Work Hours (incl leaves)',
     '',
-    MetricGroup.indepth,
+    MetricGroup.workflow,
     SUM(CostMetrics.sc_paidvacs_hours),
 )
 sc_work_hours_incl_leaves_overtime = Metric(
     'SC Work Hours (incl leaves and overtime)',
     '',
-    MetricGroup.indepth,
+    MetricGroup.workflow,
     SUM(CostMetrics.sc_paidvacs_hours_incl_overtime),
 )
 proactive_work_hours_incl_leaves = Metric(
     'Proactive Work Hours (incl leaves)',
     '',
-    MetricGroup.indepth,
+    MetricGroup.workflow,
     SUM(CostMetrics.proactive_paidvacs_hours),
 )
 paid_leave_hours = Metric(
     'Paid Leave Hours',
     '',
-    MetricGroup.indepth,
+    MetricGroup.workflow,
     SUM(CostMetrics.paid_vacation_hours),
 )
 unpaid_leave_hours = Metric(
     'Unpaid Leave Hours',
     '',
-    MetricGroup.indepth,
+    MetricGroup.workflow,
     SUM(CostMetrics.free_vacation_hours),
 )
+overtime_sc_hours = Metric(
+    'Overtime',
+    '',
+    MetricGroup.workflow,
+    AVG(CostMetrics.overtime_sc_hours),
+)
+
+iterations_per_hour = Metric(
+    'Iterations per Hour',
+    '',
+    MetricGroup.performance,
+    SUM(CostMetrics.iterations) / SUM(CostMetrics.sc_hours),
+)
+
+tickets_per_hour = Metric(
+    'Tickets per Hour',
+    '',
+    MetricGroup.performance,
+    SUM(CostMetrics.unique_tickets) / SUM(CostMetrics.sc_hours),
+)
+sc_proactive_work_ratio = Metric(
+    'SC to Proactive Work Ratio',
+    'SC / Proactive Work Ratio',
+    MetricGroup.productivity,
+    SUM(CostMetrics.sc_paidvacs_hours_incl_overtime) / SUM(CostMetrics.proactive_paidvacs_hours),
+)
+
 emp_availability = Metric(
     'Employee Availability',
-    '',
-    MetricGroup.indepth,
+    'Availability',
+    MetricGroup.employees,
     COUNT_DISTINCT(CostMetrics.emp_crmid),
 )
-avg_emp_level = Metric(
+emp_level = Metric(
     'Employee Level',
-    '',
-    MetricGroup.indepth,
+    'Level',
+    MetricGroup.employees,
     AVG(CostMetrics.level_value),
 )
 
-# yapf: disable
+
 support_service_cost_gross = Metric.from_metric('Support Service Cost (gross)', '', MetricGroup.cost, sc_work_cost_gross + proactive_work_cost_gross)
 support_service_cost_gross_withAOE = Metric.from_metric('Support Service Cost (gross with AOE)', '', MetricGroup.cost, sc_work_cost_gross_withAOE + proactive_work_cost_gross_withAOE)
 
@@ -167,15 +179,14 @@ basic_metrics = {
 }
 
 advanced_metrics = {
-    sc_work_hours_incl_overtime.name: sc_work_hours_incl_overtime,
+    # sc_work_hours_incl_overtime.name: sc_work_hours_incl_overtime,
     sc_work_hours_incl_leaves.name: sc_work_hours_incl_leaves,
-    sc_work_hours_incl_leaves_overtime.name: sc_work_hours_incl_leaves_overtime,
+    # sc_work_hours_incl_leaves_overtime.name: sc_work_hours_incl_leaves_overtime,
     proactive_work_hours_incl_leaves.name: proactive_work_hours_incl_leaves,
     total_work_hours_incl_overtime.name: total_work_hours_incl_overtime,
     sc_proactive_work_ratio.name: sc_proactive_work_ratio,
-    sc_work_cost_gross.name: sc_work_cost_gross,
-    sc_work_cost_gross_incl_overtime.name: sc_work_cost_gross_incl_overtime,
-    avg_emp_level.name: avg_emp_level,
+    overtime_sc_hours.name: overtime_sc_hours,
+    # sc_work_cost_gross_incl_overtime.name: sc_work_cost_gross_incl_overtime,
 }
 
 admin_metrics = {
@@ -192,6 +203,8 @@ admin_metrics = {
     paid_leave_hours.name: paid_leave_hours,
     unpaid_leave_hours.name: unpaid_leave_hours,
     emp_availability.name: emp_availability,
+    emp_level.name: emp_level,
+    sc_work_cost_gross.name: sc_work_cost_gross,
 }
 # yapf: enable
 
