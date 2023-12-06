@@ -17,14 +17,17 @@ def _get_emps_response(
         params=params,
     ).replace('":', '": ')
 
+
 def get_employees() -> str:
     return _get_emps_response(
         method='employees',
         params={
             'expandDetails': True,
             'expandDataForAnalytics': True,
+            'type': 'ActiveOrRetired',
         },
     )
+
 
 def get_employees_audit(employees_json: str) -> tuple[str]:
     emps = JSON_to_object.convert(employees_json)
