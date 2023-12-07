@@ -179,8 +179,8 @@ basic_metrics = {
 }
 
 advanced_metrics = {
-    # sc_work_hours_incl_overtime.name: sc_work_hours_incl_overtime,
-    sc_work_hours_incl_leaves.name: sc_work_hours_incl_leaves,
+    sc_work_hours_incl_overtime.name: sc_work_hours_incl_overtime,
+    # sc_work_hours_incl_leaves.name: sc_work_hours_incl_leaves,
     # sc_work_hours_incl_leaves_overtime.name: sc_work_hours_incl_leaves_overtime,
     proactive_work_hours_incl_leaves.name: proactive_work_hours_incl_leaves,
     total_work_hours_incl_overtime.name: total_work_hours_incl_overtime,
