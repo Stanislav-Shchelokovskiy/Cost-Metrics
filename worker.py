@@ -45,6 +45,7 @@ def get_employees(self, **kwargs):
     return run_retriable_task(
         self,
         employees.get_employees,
+        **config.get_cost_metrics_period(),
     )
 
 

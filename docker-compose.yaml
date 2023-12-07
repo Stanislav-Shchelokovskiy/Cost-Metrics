@@ -15,6 +15,7 @@ x-cost_metrics:
     - WF_PASSWORD
     - WF_ENDPOINT
     - EMPS_ENDPOINT
+    - EMPS_AUDIT_ENDPOINT
     - EMPS_APPID
     - EMPS_USERID
     - CORS_ORIGINS
