@@ -6,7 +6,7 @@ from toolbox.utils.converters import JSON_to_object, Object_to_JSON
 
 def _get_emps_response(
     end_point: str,
-    params: dict[str, str],
+    params: dict[str, str] = {},
 ) -> str:
     return network.get_data(
         end_point=end_point,
