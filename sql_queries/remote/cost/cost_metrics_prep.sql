@@ -373,7 +373,7 @@ FROM (	SELECT	psts.Created, psts.Owner, psts.Ticket_Id, psts.Id
 		SELECT	t.Id, CASE WHEN t.Owner = posts.Owner THEN 1 ELSE 0 END AS is_ticket_owner
 		FROM	SupportCenterPaid.[c1f0951c-3885-44cf-accb-1a390f34c342].Tickets AS t
 		WHERE	t.Id = posts.Ticket_Id
-			AND t.EntityType IN (@question, @bug, @suggestion) -- #Postulate: Take into account only questions, suggestions, bugs.
+			AND t.EntityType IN (1 /* Question */, 2 /* Bug */, 3 /* Suggestion */) -- #Postulate: Take into account only questions, suggestions, bugs.
 	) AS tickets
 	OUTER APPLY (
 		SELECT	e.*
