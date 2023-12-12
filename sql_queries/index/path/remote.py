@@ -14,6 +14,7 @@ def _get_wf_path() -> str:
 
 
 class CostMetrics:
+    sc_work_hours = _get_cost_path() + '/sc_work_hours.sql'
     employees = _get_cost_path() + '/employees.sql'
     employees_audit = _get_cost_path() + '/employees_audit.sql'
     cost_metrics_prep = _get_cost_path() + '/cost_metrics_prep.sql'

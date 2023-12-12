@@ -3,11 +3,9 @@ SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 /*******************
 	Params
 ********************/
+DECLARE @start	DATE = '{start}'
+DECLARE @end	DATE = '{end}'
 DECLARE @new_life_start DATE = '2022-10-01'
-
-DECLARE @period_start	DATE = '{start}'
-DECLARE @period_end		DATE = '{end}'
-
 DECLARE @working_hours_per_month TINYINT = 168
 
 
@@ -16,14 +14,14 @@ DECLARE @working_hours_per_month TINYINT = 168
 ********************/
 DROP TABLE IF EXISTS #Months;
 WITH months(year_month, next_month) AS (
-	SELECT	DATEFROMPARTS(YEAR(@period_start), MONTH(@period_start), 1),
-			DATEADD(MONTH, 1, DATEFROMPARTS(YEAR(@period_start), MONTH(@period_start), 1))
+	SELECT	DATEFROMPARTS(YEAR(@start), MONTH(@start), 1),
+			DATEADD(MONTH, 1, DATEFROMPARTS(YEAR(@start), MONTH(@start), 1))
 	UNION ALL
 	SELECT	DATEADD(MONTH, 1, year_month),
-			/*	next month cannot be greater than @period_end	*/
-			IIF(DATEADD(MONTH, 1, next_month) > @period_end, @period_end, DATEADD(MONTH, 1, next_month))
-	FROM months
-	WHERE DATEADD(MONTH, 1, year_month) <= @period_end
+			/*	next month cannot be greater than @end	*/
+			IIF(DATEADD(MONTH, 1, next_month) > @end, @end, DATEADD(MONTH, 1, next_month))
+	FROM 	months
+	WHERE 	DATEADD(MONTH, 1, year_month) <= @end
 )
 
 SELECT	*
@@ -55,7 +53,7 @@ vacations_end AS (
 	SELECT	*,
 			DATEADD(HOUR, 24 * Days, vac_start) AS vac_end
 	FROM	vacations_start
-	WHERE	DATEADD(HOUR, 24 * Days, vac_start) > @period_start
+	WHERE	DATEADD(HOUR, 24 * Days, vac_start) > @start
 ),
 
 vacations_raw AS (
@@ -339,67 +337,6 @@ CREATE NONCLUSTERED INDEX idx_ ON #Employees(position_id, chapter_id, has_suppor
 INCLUDE(year_month, crmid, name, level_name, hourly_pay_net, hourly_pay_gross, hourly_pay_gross_withAOE, retired, retired_at, tribe_id, tribe_name, tent_id, tent_name)
 
 
-/*************************
-	SC WORK HOURS
-*************************/
-DECLARE @question		TINYINT = 1
-DECLARE @bug			TINYINT = 2
-DECLARE @suggestion		TINYINT = 3
-
-DROP TABLE IF EXISTS #SCWorkHours
-SELECT	tc.emp_scid						AS emp_scid,
-		year_month						AS year_month,
-		COUNT(DISTINCT tc.time_stamp)	AS hours_worked
-INTO #SCWorkHours
-FROM (
-		SELECT	EntityOid						AS ticket_id,
-				AuditOwner						AS emp_scid,	
-				DATETIMEFROMPARTS(
-					DATEPART(YEAR,	EntityModified),
-					DATEPART(MONTH, EntityModified),
-					DATEPART(DAY,	EntityModified),
-					DATEPART(HOUR,	EntityModified),
-					0, 0, 0 )					AS time_stamp,
-				DATEFROMPARTS(
-					YEAR(EntityModified),
-					MONTH(EntityModified), 1)	AS year_month
-		FROM	scpaid_audit.[c1f0951c-3885-44cf-accb-1a390f34c342].scworkflow_Tickets AS audit_tickets
-		WHERE	EntityModified BETWEEN @period_start AND @period_end
-		UNION
-		SELECT	Ticket_Id,
-				AuditOwner,	
-				DATETIMEFROMPARTS(
-					DATEPART(YEAR,	EntityModified),
-					DATEPART(MONTH, EntityModified),
-					DATEPART(DAY,	EntityModified),
-					DATEPART(HOUR,	EntityModified),
-					0, 0, 0 ),
-				DATEFROMPARTS(
-					YEAR(EntityModified),
-					MONTH(EntityModified), 1)							
-		FROM	scpaid_audit.[c1f0951c-3885-44cf-accb-1a390f34c342].scworkflow_TicketProperties AS audit_ticket_propertiess
-		WHERE	EntityModified BETWEEN @period_start AND @period_end
-	) AS tc
-	CROSS APPLY (
-		SELECT  Id
-		FROM	SupportCenterPaid.[c1f0951c-3885-44cf-accb-1a390f34c342].Tickets AS t
-				LEFT JOIN #Employees AS e ON e.scid = t.Owner
-		WHERE	Id = tc.ticket_id
-			AND e.scid IS NULL									-- #Postulate: We take into account only tickets created by users.
-			AND EntityType IN (@question, @bug, @suggestion)	-- #Postulate: and tickets of type (question, suggestion, bug).
-	) AS users_tickets_only
-	WHERE 	tc.ticket_id IS NOT NULL
-		/*	Throw away weekends work hours.	*/
-		AND	DATEPART(DW, time_stamp) NOT IN (7 /*saturday*/ , 1/*sunday*/)
-	/*	#Postulate: All replies and work hours in non primary tribe are moved (as is) as replies and work hours in the primary tribe.
-		The move is per month.	*/
-	/*	Don't group by anything else here. Otherwise make sure to filter result further by the new group field.*/
-GROUP BY	tc.emp_scid,
-			year_month
-
-CREATE CLUSTERED INDEX idx ON #SCWorkHours(emp_scid, year_month)
-
-
 /*******************
 	Posts
 ********************/
@@ -427,9 +364,9 @@ SELECT	posts.Ticket_Id							AS ticket_id,
 INTO	#Posts
 FROM (	SELECT	psts.Created, psts.Owner, psts.Ticket_Id, psts.Id
 		FROM	SupportCenterPaid.[c1f0951c-3885-44cf-accb-1a390f34c342].Posts AS psts
-		/*	we offset start by a week in order to include iterations started erlier than @period_start.
+		/*	we offset start by a week in order to include iterations started erlier than @start.
 			otherwise we miss such iterations.	[1] */
-		WHERE	psts.Created BETWEEN DATEADD(WEEK, -1 , @period_start) AND @period_end
+		WHERE	psts.Created BETWEEN DATEADD(WEEK, -1 , @start) AND @end
 			AND psts.Type  != @note
 	) AS posts
 	CROSS APPLY (
@@ -504,7 +441,7 @@ iterations AS (
 	WHERE	is_iteration = 1 
 		AND	emp_crmid IS NOT NULL
 		/*	we restore previously extended period period here. see [1] above.	*/
-		AND post_created >= @period_start
+		AND post_created >= @start
 		/*	Sequential answers are considered to be different iterations. ex T1161862, T1163662.
 			This is because is_iteration is set to 1 from the very start to the very end of the iteration.
 			We may want add additional conditions to recognize such cases and collapse them.*/
@@ -567,7 +504,7 @@ iterations_reduced AS (
 )
 
 SELECT	i.*,
-		wh.hours_worked AS sc_hours
+		wh.work_hours AS sc_hours
 INTO	#Iterations
 FROM	iterations_reduced AS i
 		INNER JOIN #SCWorkHours AS wh ON	wh.emp_scid		= i.emp_scid 
