@@ -45,7 +45,7 @@ def get_employees(self, **kwargs):
     return run_retriable_task(
         self,
         employees.get_employees,
-        **config.get_cost_metrics_period(),
+        **config.get_period(config.Format.COSTMETRICS),
     )
 
 
@@ -77,7 +77,7 @@ def upsert_wf_work_hours(self, **kwargs):
     return run_retriable_task(
         self,
         wf_tasks.upsert_work_hours,
-        **config.get_work_on_holidays_period(),
+        **config.get_period(config.Format.WORKFLOW),
     )
 
 
@@ -87,7 +87,7 @@ def upsert_cost_metrics(self, *args, **kwargs):
     return run_retriable_task(
         self,
         cost_metrics_tasks.upsert_cost_metrics,
-        kwargs=config.get_cost_metrics_period(),
+        kwargs=config.get_period(config.Format.COSTMETRICS),
         employees_json=employees_json,
         employees_audit_json=employees_audit_json,
     )
