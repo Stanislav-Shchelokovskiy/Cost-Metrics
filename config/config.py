@@ -13,7 +13,6 @@ class Format(Enum):
 
 def get_period(format: Format) -> dict[str, str]:
     separator = '' if format == Format.WORKFLOW else '-'
-
     return {
         'start': DateTimeToSqlString.convert(get_start(), separator),
         'end': DateTimeToSqlString.convert(get_end(), separator),
