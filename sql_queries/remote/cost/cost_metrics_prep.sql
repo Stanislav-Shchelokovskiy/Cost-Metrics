@@ -354,7 +354,6 @@ SELECT	posts.Ticket_Id							AS ticket_id,
 		tents.id								AS tent_id,
 		tents.name								AS tent_name,
 		posts.Owner								AS user_scid,
-		tickets.is_ticket_owner					AS is_ticket_owner,
 		employees.crmid							AS emp_crmid,
 		employees.position_id					AS emp_position_id,
 		employees.name							AS emp_name,
@@ -370,10 +369,13 @@ FROM (	SELECT	psts.Created, psts.Owner, psts.Ticket_Id, psts.Id
 			AND psts.Type  != @note
 	) AS posts
 	CROSS APPLY (
-		SELECT	t.Id, CASE WHEN t.Owner = posts.Owner THEN 1 ELSE 0 END AS is_ticket_owner
+		SELECT	t.Id
 		FROM	SupportCenterPaid.[c1f0951c-3885-44cf-accb-1a390f34c342].Tickets AS t
-		WHERE	t.Id = posts.Ticket_Id
-			AND t.EntityType IN (1 /* Question */, 2 /* Bug */, 3 /* Suggestion */) -- #Postulate: Take into account only questions, suggestions, bugs.
+				INNER JOIN SupportCenterPaid.[c1f0951c-3885-44cf-accb-1a390f34c342].Users AS u ON u.Id = t.Owner AND u.FriendlyId != 'A2151720'
+		WHERE	t.Id = tr.ticket_id
+			-- #Postulate: Take into account only customer's questions, suggestions, bugs.
+			AND u.IsEmployee = 0
+			AND t.EntityType IN (1 /* Question */, 2 /* Bug */, 3 /* Suggestion */)
 	) AS tickets
 	OUTER APPLY (
 		SELECT	e.*
@@ -422,7 +424,6 @@ iterations AS (
 	SELECT	ticket_id,
 			post_id,
 			post_created,
-			is_ticket_owner,
 			iteration_no,
 			iteration_start,
 			iteration_end,

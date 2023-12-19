@@ -13,7 +13,7 @@ from toolbox.utils.converters import DateTimeToSqlString
             1,
             3,
             {
-                'start': '2018-01-01',
+                'start': DateTimeToSqlString.convert(date.today() - relativedelta(days=365 * 5), '-'),
                 'end': DateTimeToSqlString.convert(date.today(), '-'),
             },
             config.Format.COSTMETRICS,
@@ -40,7 +40,7 @@ from toolbox.utils.converters import DateTimeToSqlString
             1,
             3,
             {
-                'start': '20180101',
+                'start':  DateTimeToSqlString.convert(date.today() - relativedelta(days=365 * 5)),
                 'end': DateTimeToSqlString.convert(date.today()),
             },
             config.Format.WORKFLOW,
@@ -76,3 +76,7 @@ def test_get_cost_metrics_period(
         monkeypatch.setenv('RECALCULATE_FROM_THE_BEGINNING', from_beginning)
         monkeypatch.setenv('RECALCULATE_FOR_LAST_MONTHS', last_months)
         assert config.get_period(format) == res
+
+
+def test_years_of_history():
+    assert config.years_of_history(config.Format.SQLITE) == '5 YEARS'

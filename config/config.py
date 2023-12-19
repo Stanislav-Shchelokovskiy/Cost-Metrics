@@ -9,6 +9,7 @@ from toolbox.utils.env import recalculate_from_beginning, recalculate_for_last_n
 class Format(Enum):
     WORKFLOW = 'workflow'
     COSTMETRICS = 'costmetrics'
+    SQLITE = 'sqlite'
 
 
 def get_period(format: Format) -> dict[str, str]:
@@ -25,13 +26,19 @@ def get_end():
 
 def get_start():
     if recalculate_from_beginning():
-        return date(2018, 1, 1)
+        return get_end() - relativedelta(days=365 * 5)
     return get_end() - offset_in_months()
 
 
 def offset_in_months():
     months = recalculate_for_last_n_months()
     return relativedelta(day=1, months=months)
+
+
+def years_of_history(format: str):
+    return {
+        Format.SQLITE: '5 YEARS',
+    }[format]
 
 
 def get_schedule():
