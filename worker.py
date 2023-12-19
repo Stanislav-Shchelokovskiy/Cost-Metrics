@@ -98,6 +98,7 @@ def process_staged_data(self, **kwargs):
     return run_retriable_task(
         self,
         cost_metrics_tasks.process_staged_data,
+        years_of_history=config.years_of_history(config.Format.SQLITE)
     )
 
 

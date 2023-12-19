@@ -6,6 +6,7 @@ from toolbox.sql.crud_queries import (
     SqliteUpsertQuery,
     SqliteCreateTableFromTableQuery,
     SqliteCreateTableQuery,
+    DeleteRowsOlderThanQuery,
 )
 from toolbox.sql import MetaData
 from sql_queries.meta import (
@@ -25,7 +26,8 @@ def _save_table(cls: MetaData = MetaData, *queries: CRUDQuery):
             conn=SqliteConnection(),
             query=query,
             create_index_statements=cls.get_indices(),
-        )() for query in queries
+        )()
+        for query in queries
     ]
 
 
@@ -58,7 +60,7 @@ def upsert_cost_metrics(
     )
 
 
-def process_staged_data():
+def process_staged_data(years_of_history: str):
     _save_table(
         Teams,
         SqliteCreateTableFromTableQuery(
@@ -117,6 +119,13 @@ def process_staged_data():
             ),
         )
     )
+    __execute(
+        DeleteRowsOlderThanQuery(
+            tbl=CostMetrics.get_name(),
+            date_field=CostMetrics.year_month,
+            modifier=years_of_history,
+        )
+    )
     __post_process()
 
 
@@ -126,6 +135,7 @@ def __post_process():
         reset_recalculate_from_beginning,
         reset_recalculate_for_last_n_months,
     )
+
     reset_recalculate_from_beginning()
     reset_recalculate_for_last_n_months()
 
