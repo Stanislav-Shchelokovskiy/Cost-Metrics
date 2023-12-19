@@ -26,8 +26,7 @@ def _save_table(cls: MetaData = MetaData, *queries: CRUDQuery):
             conn=SqliteConnection(),
             query=query,
             create_index_statements=cls.get_indices(),
-        )()
-        for query in queries
+        )() for query in queries
     ]
 
 
@@ -135,7 +134,6 @@ def __post_process():
         reset_recalculate_from_beginning,
         reset_recalculate_for_last_n_months,
     )
-
     reset_recalculate_from_beginning()
     reset_recalculate_for_last_n_months()
 
