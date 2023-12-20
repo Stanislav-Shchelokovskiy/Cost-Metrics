@@ -372,7 +372,7 @@ FROM (	SELECT	psts.Created, psts.Owner, psts.Ticket_Id, psts.Id
 		SELECT	t.Id
 		FROM	SupportCenterPaid.[c1f0951c-3885-44cf-accb-1a390f34c342].Tickets AS t
 				INNER JOIN SupportCenterPaid.[c1f0951c-3885-44cf-accb-1a390f34c342].Users AS u ON u.Id = t.Owner AND u.FriendlyId != 'A2151720'
-		WHERE	t.Id = tr.ticket_id
+		WHERE	t.Id = posts.Ticket_Id
 			-- #Postulate: Take into account only customer's questions, suggestions, bugs.
 			AND u.IsEmployee = 0
 			AND t.EntityType IN (1 /* Question */, 2 /* Bug */, 3 /* Suggestion */)
