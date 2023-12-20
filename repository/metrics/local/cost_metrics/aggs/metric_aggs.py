@@ -145,7 +145,7 @@ tickets_per_hour = Metric(
 )
 sc_proactive_work_ratio = Metric(
     'SC to Proactive Work Ratio',
-    'SC / Proactive Work Ratio',
+    'SC / Proactive Work Rate',
     MetricGroup.productivity,
     SUM(CostMetrics.sc_paidvacs_hours_incl_overtime) / SUM(CostMetrics.proactive_paidvacs_hours),
 )

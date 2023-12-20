@@ -1,0 +1,1 @@
+An excess (in hours) of calculated Support Center work hours beyond the standard 8-hour day for the selected period.
