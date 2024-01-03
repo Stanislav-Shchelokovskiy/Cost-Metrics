@@ -144,6 +144,7 @@ SELECT	months.year_month														AS year_month,
 		ISNULL(emp_position_audit.position_name, employees.position_name)		AS position_name,
 		ISNULL(emp_chapter_audit.chapter_id, employees.chapter_id)				AS chapter_id,
 		employees.has_support_processing_role									AS has_support_processing_role,
+		employees.is_service_user												AS is_service_user,
 		emp_location_audit.location_id											AS audit_location_id,
 		emp_location_audit.location_name										AS audit_location_name,
 		employees.location_id													AS actual_location_id
