@@ -391,6 +391,8 @@ FROM (	SELECT	psts.Created, psts.Owner, psts.Ticket_Id, psts.Id
 		SELECT	id, name
 		FROM	DXStatisticsV2.dbo.get_ticket_tent(tickets.Id)
 	) AS tents
+-- Drop posts from service users
+WHERE employees.crmid IS NULL OR employees.is_service_user = 0
 
 CREATE CLUSTERED INDEX idx ON #Posts(tribe_id, tent_id, ticket_id, post_created)
 CREATE NONCLUSTERED INDEX idx_ ON #Posts(emp_crmid, year_month, tribe_id, tent_id) INCLUDE(post_id)
