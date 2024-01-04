@@ -144,7 +144,6 @@ SELECT	months.year_month														AS year_month,
 		ISNULL(emp_position_audit.position_name, employees.position_name)		AS position_name,
 		ISNULL(emp_chapter_audit.chapter_id, employees.chapter_id)				AS chapter_id,
 		employees.has_support_processing_role									AS has_support_processing_role,
-		employees.is_service_user												AS is_service_user,
 		emp_location_audit.location_id											AS audit_location_id,
 		emp_location_audit.location_name										AS audit_location_name,
 		employees.location_id													AS actual_location_id
@@ -154,6 +153,7 @@ FROM	#Months AS months
 			-- #Postulate: Trainees aren't thrown away
 			SELECT	e.*
 			FROM	#EmployeesFromJson AS e
+			WHERE	e.is_service_user = 0
 		) AS employees
 		OUTER APPLY (
 			SELECT	 MIN(emp_audit.HiredAt) AS hired_at
@@ -385,6 +385,12 @@ FROM (	SELECT	psts.Created, psts.Owner, psts.Ticket_Id, psts.Id
 			AND posts.Created BETWEEN e.year_month AND e.next_year_month
 	) AS employees
 	OUTER APPLY (
+        SELECT	e.crmid
+        FROM	#EmployeesFromJson AS e
+        WHERE   e.scid = posts.Owner
+            AND e.is_service_user = 1
+    ) AS service_users
+	OUTER APPLY (
 		SELECT	id, name
 		FROM	DXStatisticsV2.dbo.get_ticket_tribes(tickets.Id, DEFAULT, employees.tribe_id)
 	) AS tribes
@@ -393,7 +399,7 @@ FROM (	SELECT	psts.Created, psts.Owner, psts.Ticket_Id, psts.Id
 		FROM	DXStatisticsV2.dbo.get_ticket_tent(tickets.Id)
 	) AS tents
 -- Drop posts from service users
-WHERE employees.crmid IS NULL OR employees.is_service_user = 0
+WHERE service_users.crmid IS NULL
 
 CREATE CLUSTERED INDEX idx ON #Posts(tribe_id, tent_id, ticket_id, post_created)
 CREATE NONCLUSTERED INDEX idx_ ON #Posts(emp_crmid, year_month, tribe_id, tent_id) INCLUDE(post_id)
