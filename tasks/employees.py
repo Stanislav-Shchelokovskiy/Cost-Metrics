@@ -13,6 +13,7 @@ def _get_emps_response(
         headers={
             'X-ApplicationId': os.environ['EMPS_APPID'],
             'X-UserId': os.environ['EMPS_USERID'],
+            'X-API-Key': os.environ['EMPS_APIKEY'],
             'User-Agent': 'CostMetrics',
         },
         params=params,
@@ -34,3 +35,14 @@ def get_employees_audit(employees_json: str) -> tuple[str]:
         )
         audit.extend(JSON_to_object.convert(emp_audit))
     return employees_json, Object_to_JSON.convert(audit)
+
+
+def get_vacations(*args, start: str, **kwargs) -> tuple[str]:
+    vacations_json = _get_emps_response(
+        end_point=os.environ['EMPS_VACATIONS_ENDPOINT'],
+        params={
+            'IncludePartial': True,
+            'StartAfter': start,
+        },
+    )
+    return *args, vacations_json

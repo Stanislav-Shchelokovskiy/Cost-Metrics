@@ -16,6 +16,24 @@ from sql_queries.meta import CostMetrics
             },
         ),
         (
+            remote_paths_index.CostMetrics.employees,
+            {
+                'employees_json': 'qwe',
+            },
+        ),
+        (
+            remote_paths_index.CostMetrics.employees_audit,
+            {
+                'employees_audit_json': 'qwe',
+            },
+        ),
+        (
+            remote_paths_index.CostMetrics.vacations,
+            {
+                'vacations_json': 'qwe',
+            },
+        ),
+        (
             remote_paths_index.CostMetrics.cost_metrics_prep,
             {
                 'start': 'start',
