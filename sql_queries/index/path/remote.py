@@ -1,25 +1,19 @@
 import toolbox.sql.index as RootPath
 
 
-def _get_root_path() -> str:
-    return RootPath.get_cwd() + '/remote'
-
-
-def _get_cost_path() -> str:
-    return _get_root_path() + '/cost'
-
-
-def _get_wf_path() -> str:
-    return _get_root_path() + '/wf'
+_root_path = RootPath.get_cwd() + '/remote'
+_cost_path = _root_path + '/cost'
+_wf_path = _root_path + '/wf'
 
 
 class CostMetrics:
-    sc_work_hours = _get_cost_path() + '/sc_work_hours.sql'
-    employees = _get_cost_path() + '/employees.sql'
-    employees_audit = _get_cost_path() + '/employees_audit.sql'
-    cost_metrics_prep = _get_cost_path() + '/cost_metrics_prep.sql'
-    cost_metrics = _get_cost_path() + '/cost_metrics.sql'
+    sc_work_hours = _cost_path + '/sc_work_hours.sql'
+    employees = _cost_path + '/employees.sql'
+    employees_audit = _cost_path + '/employees_audit.sql'
+    vacations = _cost_path + '/vacations.sql'
+    cost_metrics_prep = _cost_path + '/cost_metrics_prep.sql'
+    cost_metrics = _cost_path + '/cost_metrics.sql'
 
 
 class WF:
-    upsert_wf_hours = _get_wf_path() + '/upsert_wf_hours.sql'
+    upsert_wf_hours = _wf_path + '/upsert_wf_hours.sql'

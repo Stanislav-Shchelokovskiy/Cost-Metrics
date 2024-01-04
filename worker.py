@@ -57,6 +57,15 @@ def get_employees_audit(self, *args, **kwargs):
         employees_json=args[0],
     )
 
+@app.task(name='get_vacations', bind=True)
+def get_vacations(self, *args, **kwargs):
+    return run_retriable_task(
+        self,
+        employees.get_vacations,
+        *args[0],
+        **config.get_period(config.Format.COSTMETRICS),
+    )
+
 
 @app.task(name='update_cost_metrics')
 def update_cost_metrics(**kwargs):
@@ -66,6 +75,7 @@ def update_cost_metrics(**kwargs):
                 upsert_wf_work_hours.si(),
                 get_employees.si(),
                 get_employees_audit.s(),
+                get_vacations.s(),
                 upsert_cost_metrics.s(),
             ),
         ]
@@ -83,13 +93,14 @@ def upsert_wf_work_hours(self, **kwargs):
 
 @app.task(name='upsert_cost_metrics', bind=True)
 def upsert_cost_metrics(self, *args, **kwargs):
-    employees_json, employees_audit_json = args[0]
+    employees_json, employees_audit_json, vacations_json = args[0]
     return run_retriable_task(
         self,
         cost_metrics_tasks.upsert_cost_metrics,
         kwargs=config.get_period(config.Format.COSTMETRICS),
         employees_json=employees_json,
         employees_audit_json=employees_audit_json,
+        vacations_json=vacations_json,
     )
 
 

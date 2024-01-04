@@ -14,8 +14,10 @@ Add **.env** file containing the following env vars:
 - WF_ENDPOINT=https://int.devexpress.com/wf/data/GetDayAppointmentAnalysis
 - EMPS_ENDPOINT=https://hr-employee.devexpress.devx/api/v1/employees?expandDetails=True&expandDataForAnalytics=True&type=ActiveOrRetired&IncludeServiceUsers=True
 - EMPS_AUDIT_ENDPOINT=https://hr-employee.devexpress.devx/api/v1/audit-employees
+- EMPS_VACATIONS_ENDPOINT=https://int.devexpress.com/employees/api/v1/vacations/getVacations
 - EMPS_APPID=...
 - EMPS_USERID=...
+- EMPS_APIKEY=...
 - CORS_ORIGINS=["https://ubuntu-support.corp.devexpress.com","http://localhost:3000"]
 - ADMIN_ROLE=Admin
 - ADVANCED_ROLE=Advanced
