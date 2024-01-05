@@ -34,6 +34,24 @@ from sql_queries.meta import CostMetrics
             },
         ),
         (
+            remote_paths_index.CostMetrics.positions,
+            {
+                'positions_json': 'qwe',
+            },
+        ),
+        (
+            remote_paths_index.CostMetrics.locations,
+            {
+                'locations_json': 'qwe',
+            },
+        ),
+        (
+            remote_paths_index.CostMetrics.levels,
+            {
+                'levels_json': 'qwe',
+            },
+        ),
+        (
             remote_paths_index.CostMetrics.cost_metrics_prep,
             {
                 'start': 'start',

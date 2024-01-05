@@ -36,12 +36,18 @@ def upsert_cost_metrics(
     employees_json: str,
     employees_audit_json: str,
     vacations_json: str,
+    positions_json: str,
+    locations_json: str,
+    levels_json: str,
 ):
     df = RemoteRepository.cost_metrics.get_data(
         **kwargs,
         employees_json=employees_json,
         employees_audit_json=employees_audit_json,
         vacations_json=vacations_json,
+        positions_json=positions_json,
+        locations_json=locations_json,
+        levels_json=levels_json,
     )
     _save_table(
         CostMetrics,

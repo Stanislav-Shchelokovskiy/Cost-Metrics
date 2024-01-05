@@ -26,6 +26,18 @@ class CostMetricsQueries(RepositoryAlchemyQueries):
                 format_params=kwargs,
             ),
             SqlAlchemyQuery(
+                query_file_path=remote_paths_index.CostMetrics.positions,
+                format_params=kwargs,
+            ),
+            SqlAlchemyQuery(
+                query_file_path=remote_paths_index.CostMetrics.locations,
+                format_params=kwargs,
+            ),
+            SqlAlchemyQuery(
+                query_file_path=remote_paths_index.CostMetrics.levels,
+                format_params=kwargs,
+            ),
+            SqlAlchemyQuery(
                 query_file_path=remote_paths_index.CostMetrics.cost_metrics_prep,
                 format_params=kwargs,
             ),

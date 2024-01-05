@@ -191,9 +191,9 @@ FROM	#Months AS months
 		OUTER APPLY (
 			SELECT TOP 1 *
 			FROM (	SELECT	emps_audit_outer.position_id									AS position_id,
-							(	SELECT TOP 1 ep.Name 
-								FROM HR.dbo.EmployeePositions AS ep 
-								WHERE ep.Id = emps_audit_outer.position_id)					AS position_name,
+							(	SELECT TOP 1 ep.name 
+								FROM #EmployeePositions AS ep 
+								WHERE ep.id = emps_audit_outer.position_id)					AS position_name,
 							emps_audit_outer.period_start									AS period_start,
 							LEAD(emps_audit_outer.period_end) OVER (ORDER BY period_end)	AS period_end
 					FROM (	SELECT	emps_audit_inner.EntityModified				AS period_end,
@@ -229,10 +229,10 @@ FROM	#Months AS months
 		)	AS emp_chapter_audit
 		OUTER APPLY (
 			SELECT TOP 1 *
-			FROM (	SELECT	IIF(locations.IsActive = 0, NULL, emps_audit_outer.location_id)	AS location_id,
-							IIF(locations.IsActive = 0, NULL, locations.Name)				AS location_name,
-							emps_audit_outer.period_start									AS period_start,
-							LEAD(emps_audit_outer.period_end) OVER (ORDER BY period_end)	AS period_end
+			FROM (	SELECT	IIF(locations.is_active = 0, NULL, emps_audit_outer.location_id)	AS location_id,
+							IIF(locations.is_active = 0, NULL, locations.name)					AS location_name,
+							emps_audit_outer.period_start										AS period_start,
+							LEAD(emps_audit_outer.period_end) OVER (ORDER BY period_end)		AS period_end
 					FROM (	SELECT	emps_audit_inner.EntityModified				AS period_end,
 									IIF(LAG(emps_audit_inner.EntityModified) OVER (ORDER BY emps_audit_inner.EntityModified ASC) IS NULL, @null_date, 
 											emps_audit_inner.EntityModified)	AS period_start,
@@ -242,9 +242,9 @@ FROM	#Months AS months
 								AND emps_audit_inner.ChangedProperties LIKE '%Location%'
 						)	AS emps_audit_outer
 						CROSS APPLY (
-							SELECT	Name, IsActive
-							FROM	HR.dbo.EmployeeLocations AS l
-							WHERE	l.Id = emps_audit_outer.location_id
+							SELECT	name, is_active
+							FROM	#EmployeeLocations AS l
+							WHERE	l.id = emps_audit_outer.location_id
 						) AS locations
 				) AS emps_audit
 			WHERE	emps_audit.period_start <= months.year_month 
@@ -299,9 +299,9 @@ FROM	#Months AS months
 			ORDER BY etc.actual_since DESC
 		) AS tax_coefficients
 		OUTER APPLY (
-			SELECT	TOP 1 el.Name AS level_name
-			FROM	HR.dbo.EmployeeLevels AS el
-			WHERE	el.Id = salaries.level_id
+			SELECT	TOP 1 el.name AS level_name
+			FROM	#EmployeeLevels AS el
+			WHERE	el.id = salaries.level_id
 		) AS emps_levels
 		/*	throw away never hired employees or employees after retirement	*/
 WHERE	(emp_position_audit.position_id IS NOT NULL OR employees.position_id IS NOT NULL)
