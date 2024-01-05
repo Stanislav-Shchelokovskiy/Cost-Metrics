@@ -3,6 +3,7 @@ DECLARE @json VARCHAR(MAX) = N'{locations_json}'
 DROP TABLE IF EXISTS #EmployeeLocations;
 
 SELECT  *
+INTO    #EmployeeLocations
 FROM    OPENJSON(@json, '$.page') WITH (
             id			UNIQUEIDENTIFIER	'strict $.id',
             name		NVARCHAR(250)		'strict $.name',
