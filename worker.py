@@ -57,6 +57,7 @@ def get_employees_audit(self, *args, **kwargs):
         employees_json=args[0],
     )
 
+
 @app.task(name='get_vacations', bind=True)
 def get_vacations(self, *args, **kwargs):
     return run_retriable_task(
@@ -64,6 +65,33 @@ def get_vacations(self, *args, **kwargs):
         employees.get_vacations,
         *args[0],
         **config.get_period(config.Format.COSTMETRICS),
+    )
+
+
+@app.task(name='get_positions', bind=True)
+def get_positions(self, *args, **kwargs):
+    return run_retriable_task(
+        self,
+        employees.get_positions,
+        *args[0],
+    )
+
+
+@app.task(name='get_locations', bind=True)
+def get_locations(self, *args, **kwargs):
+    return run_retriable_task(
+        self,
+        employees.get_locations,
+        *args[0],
+    )
+
+
+@app.task(name='get_levels', bind=True)
+def get_levels(self, *args, **kwargs):
+    return run_retriable_task(
+        self,
+        employees.get_levels,
+        *args[0],
     )
 
 
@@ -76,6 +104,9 @@ def update_cost_metrics(**kwargs):
                 get_employees.si(),
                 get_employees_audit.s(),
                 get_vacations.s(),
+                get_positions.s(),
+                get_locations.s(),
+                get_levels.s(),
                 upsert_cost_metrics.s(),
             ),
         ]
@@ -93,14 +124,24 @@ def upsert_wf_work_hours(self, **kwargs):
 
 @app.task(name='upsert_cost_metrics', bind=True)
 def upsert_cost_metrics(self, *args, **kwargs):
-    employees_json, employees_audit_json, vacations_json = args[0]
+    (
+        employees,
+        employees_audit,
+        vacations,
+        positions,
+        locations,
+        levels,
+    ) = args[0]
     return run_retriable_task(
         self,
         cost_metrics_tasks.upsert_cost_metrics,
         kwargs=config.get_period(config.Format.COSTMETRICS),
-        employees_json=employees_json,
-        employees_audit_json=employees_audit_json,
-        vacations_json=vacations_json,
+        employees_json=employees,
+        employees_audit_json=employees_audit,
+        vacations_json=vacations,
+        positions_json=positions,
+        locations_json=locations,
+        levels_json=levels,
     )
 
 
@@ -109,7 +150,7 @@ def process_staged_data(self, **kwargs):
     return run_retriable_task(
         self,
         cost_metrics_tasks.process_staged_data,
-        years_of_history=config.years_of_history(config.Format.SQLITE)
+        years_of_history=config.years_of_history(config.Format.SQLITE),
     )
 
 

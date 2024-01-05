@@ -15,6 +15,9 @@ Add **.env** file containing the following env vars:
 - EMPS_ENDPOINT=https://hr-employee.devexpress.devx/api/v1/employees?expandDetails=True&expandDataForAnalytics=True&type=ActiveOrRetired&IncludeServiceUsers=True
 - EMPS_AUDIT_ENDPOINT=https://hr-employee.devexpress.devx/api/v1/audit-employees
 - EMPS_VACATIONS_ENDPOINT=https://int.devexpress.com/employees/api/v1/vacations/getVacations
+- EMPS_POSITIONS_ENDPOINT=https://hr-employee.hosting.devexpress.com/api/v1/employeePositions
+- EMPS_LOCATIONS_ENDPOINT=https://hr-employee.hosting.devexpress.com/api/v1/employeeLocations
+- EMPS_LEVELS_ENDPOINT=https://hr-employee.hosting.devexpress.com/api/v1/employeeLevels
 - EMPS_APPID=...
 - EMPS_USERID=...
 - EMPS_APIKEY=...

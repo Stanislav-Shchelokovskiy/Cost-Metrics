@@ -20,7 +20,7 @@ def _get_emps_response(
     )
 
 
-def get_employees(start: str, **kwargs) -> str:
+def get_employees(start: str, **_) -> str:
     emps_json = _get_emps_response(end_point=os.environ['EMPS_ENDPOINT'])
     return employees.select(emps_json=emps_json, start=start)
 
@@ -37,7 +37,7 @@ def get_employees_audit(employees_json: str) -> tuple[str]:
     return employees_json, Object_to_JSON.convert(audit)
 
 
-def get_vacations(*args, start: str, **kwargs) -> tuple[str]:
+def get_vacations(*passthrough, start: str, **_) -> tuple[str]:
     vacations_json = _get_emps_response(
         end_point=os.environ['EMPS_VACATIONS_ENDPOINT'],
         params={
@@ -45,4 +45,25 @@ def get_vacations(*args, start: str, **kwargs) -> tuple[str]:
             'StartAfter': start,
         },
     )
-    return *args, vacations_json
+    return *passthrough, vacations_json
+
+
+def get_positions(*passthrough) -> tuple[str]:
+    positions_json = _get_emps_response(
+        end_point=os.environ['EMPS_POSITIONS_ENDPOINT'],
+    )
+    return *passthrough, positions_json
+
+
+def get_locations(*passthrough) -> tuple[str]:
+    locations_json = _get_emps_response(
+        end_point=os.environ['EMPS_LOCATIONS_ENDPOINT'],
+    )
+    return *passthrough, locations_json
+
+
+def get_levels(*passthrough) -> tuple[str]:
+    levels_json = _get_emps_response(
+        end_point=os.environ['EMPS_LEVELS_ENDPOINT'],
+    )
+    return *passthrough, levels_json
