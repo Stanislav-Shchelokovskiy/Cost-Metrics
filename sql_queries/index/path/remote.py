@@ -8,6 +8,7 @@ _wf_path = _root_path + '/wf'
 
 class CostMetrics:
     sc_work_hours = _cost_path + '/sc_work_hours.sql'
+    iterations = _cost_path + '/iterations.sql'
     employees = _cost_path + '/employees.sql'
     employees_audit = _cost_path + '/employees_audit.sql'
     vacations = _cost_path + '/vacations.sql'

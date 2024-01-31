@@ -52,6 +52,14 @@ from sql_queries.meta import CostMetrics
             },
         ),
         (
+            remote_paths_index.CostMetrics.iterations,
+            {
+                'employees_json': 'qwe',
+                'start': 'start',
+                'end': 'end',
+            },
+        ),
+        (
             remote_paths_index.CostMetrics.cost_metrics_prep,
             {
                 'start': 'start',
