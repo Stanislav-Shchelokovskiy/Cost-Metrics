@@ -321,128 +321,30 @@ INCLUDE(year_month, crmid, name, level_name, hourly_pay_net, hourly_pay_gross, h
 
 
 /*******************
-	Posts
-********************/
-DECLARE @note			TINYINT = 3
-
-DROP TABLE IF EXISTS #Posts
-SELECT	posts.Ticket_Id							AS ticket_id,
-		posts.Id								AS post_id,
-		posts.Created							AS post_created,
-		DATEFROMPARTS(
-			YEAR(posts.Created),
-			MONTH(posts.Created),1)				AS year_month,
-		tribes.id								AS tribe_id,
-		tribes.name								AS tribe_name,
-		tents.id								AS tent_id,
-		tents.name								AS tent_name,
-		posts.Owner								AS user_scid,
-		employees.crmid							AS emp_crmid,
-		employees.position_id					AS emp_position_id,
-		employees.name							AS emp_name,
-		employees.position_name					AS emp_position_name,
-		employees.chapter_id					AS emp_chapter_id,
-		employees.has_support_processing_role	AS has_support_processing_role
-INTO	#Posts
-FROM (	SELECT	psts.Created, psts.Owner, psts.Ticket_Id, psts.Id
-		FROM	SupportCenterPaid.[c1f0951c-3885-44cf-accb-1a390f34c342].Posts AS psts
-		/*	we offset start by a week in order to include iterations started erlier than @start.
-			otherwise we miss such iterations.	[1] */
-		WHERE	psts.Created BETWEEN DATEADD(WEEK, -1 , @start) AND @end
-			AND psts.Type  != @note
-	) AS posts
-	CROSS APPLY (
-		SELECT	t.Id
-		FROM	SupportCenterPaid.[c1f0951c-3885-44cf-accb-1a390f34c342].Tickets AS t
-				INNER JOIN SupportCenterPaid.[c1f0951c-3885-44cf-accb-1a390f34c342].Users AS u ON u.Id = t.Owner AND u.FriendlyId != 'A2151720'
-		WHERE	t.Id = posts.Ticket_Id
-			-- #Postulate: Take into account only customer's questions, suggestions, bugs.
-			AND u.IsEmployee = 0
-			AND t.EntityType IN (1 /* Question */, 2 /* Bug */, 3 /* Suggestion */)
-	) AS tickets
-	OUTER APPLY (
-		SELECT	e.*
-		FROM	#Employees AS e
-		WHERE	e.scid = posts.Owner 
-			AND posts.Created BETWEEN e.year_month AND e.next_year_month
-	) AS employees
-	OUTER APPLY (
-        SELECT	e.crmid
-        FROM	#EmployeesFromJson AS e
-        WHERE   e.scid = posts.Owner
-            AND e.is_service_user = 1
-    ) AS service_users
-	OUTER APPLY (
-		SELECT	id, name
-		FROM	DXStatisticsV2.dbo.get_ticket_tribes(tickets.Id, DEFAULT, employees.tribe_id)
-	) AS tribes
-	OUTER APPLY (
-		SELECT	id, name
-		FROM	DXStatisticsV2.dbo.get_ticket_tent(tickets.Id)
-	) AS tents
--- Drop posts from service users
-WHERE service_users.crmid IS NULL
-
-CREATE CLUSTERED INDEX idx ON #Posts(tribe_id, tent_id, ticket_id, post_created)
-CREATE NONCLUSTERED INDEX idx_ ON #Posts(emp_crmid, year_month, tribe_id, tent_id) INCLUDE(post_id)
-
-
-/*******************
 	Iterations
 ********************/
 DROP TABLE IF EXISTS #Iterations;
-WITH posts_with_prev_emp_crmid AS (
-	SELECT	*, LAG(emp_crmid) OVER (PARTITION BY tribe_id, tent_id, ticket_id ORDER BY post_created) AS prev_emp_crmid
-	FROM	#Posts
-),
-
-posts_split_into_iterations AS (
-	SELECT	*, SUM(IIF(prev_emp_crmid IS NOT NULL AND emp_crmid IS NULL, 1, 0)) OVER (PARTITION BY tribe_id, tent_id, ticket_id ORDER BY post_created) AS iteration_no
-	FROM posts_with_prev_emp_crmid
-),
-
-iterations_raw AS (
-	SELECT	*,
-			MIN(post_created) OVER (PARTITION BY tribe_id, tent_id, ticket_id, iteration_no) AS iteration_start,
-			MAX(post_created) OVER (PARTITION BY tribe_id, tent_id, ticket_id, iteration_no) AS iteration_end,
-			IIF(MIN(CASE WHEN emp_crmid IS NULL		THEN 0 ELSE 1 END) OVER (PARTITION BY tribe_id, tent_id, ticket_id, iteration_no) = 0 AND 
-				MAX(CASE WHEN emp_crmid IS NOT NULL THEN 1 ELSE 0 END) OVER (PARTITION BY tribe_id, tent_id, ticket_id, iteration_no) = 1,
-				1, 0 ) AS is_iteration
-	FROM	posts_split_into_iterations
-),
-
-iterations AS (
-	SELECT	ticket_id,
-			post_id,
-			post_created,
-			iteration_no,
-			iteration_start,
-			iteration_end,
-			emp_crmid,
-			emp_name,
-			user_scid,
-			tribe_name,
-			tent_name,
-			tribe_id,
-			tent_id,
-			DATEFROMPARTS(YEAR(post_created), MONTH(post_created), 1) AS year_month,
-			emp_position_id,
-			emp_chapter_id,
-			has_support_processing_role
-	FROM	iterations_raw
-	WHERE	is_iteration = 1 
-		AND	emp_crmid IS NOT NULL
-		/*	we restore previously extended period period here. see [1] above.	*/
-		AND post_created >= @start
-		/*	Sequential answers are considered to be different iterations. ex T1161862, T1163662.
-			This is because is_iteration is set to 1 from the very start to the very end of the iteration.
-			We may want add additional conditions to recognize such cases and collapse them.*/
-		--AND post_created = iteration_end
+WITH iterations AS (
+	SELECT 	e.crmid							AS emp_crmid,
+			e.scid							AS emp_scid,
+			i.tribe_id						AS tribe_id,
+			i.tent_id						AS tent_id,
+			e.name							AS emp_name,
+			i.tribe_name					AS tribe_name,
+			i.tent_name						AS tent_name,
+			e.year_month					AS year_month,
+			e.position_id					AS emp_position_id,
+			e.chapter_id					AS emp_chapter_id,
+			e.has_support_processing_role	AS has_support_processing_role,
+			i.ticket_scid					AS ticket_scid,
+			i.post_id						AS post_id
+	FROM	#Employees AS e
+			LEFT JOIN #IterationsRaw AS i ON i.scid = e.scid AND i.year_month = e.year_month
 ),
 
 iterations_reduced AS (
 	SELECT	i.emp_crmid						AS emp_crmid,
-			i.user_scid						AS emp_scid,
+			i.emp_scid						AS emp_scid,
 			i.tribe_id						AS tribe_id,
 			emp_main_tribe_tent.tribe_id	AS emp_tribe_id,
 			emp_main_tribe_tent.tent_id		AS emp_tent_id,
@@ -451,11 +353,11 @@ iterations_reduced AS (
 			emp_main_tribe_tent.tent_name	AS emp_tent_name,
 			i.tribe_name					AS tribe_name,
 			i.year_month					AS year_month,
-			emp_position_id					AS emp_position_id,
-			emp_chapter_id					AS emp_chapter_id,
-			has_support_processing_role		AS has_support_processing_role,
+			i.emp_position_id				AS emp_position_id,
+			i.emp_chapter_id				AS emp_chapter_id,
+			i.has_support_processing_role	AS has_support_processing_role,
 			-------------------------------------------------------
-			COUNT(DISTINCT i.ticket_id)		AS unique_tickets,
+			COUNT(DISTINCT i.ticket_scid)	AS unique_tickets,
 			COUNT(i.post_id)				AS iterations
 			-------------------------------------------------------
 	FROM	iterations AS i
@@ -464,28 +366,28 @@ iterations_reduced AS (
 					Emp main tribe is the tribe which emp has most posts in.	*/
 				SELECT TOP 1 tribe_id,
 							 tent_id,
-							 tribe_name,
-							 tent_name
-				FROM	 #Posts AS psts
-				WHERE	 psts.emp_crmid		= i.emp_crmid
-					 AND psts.year_month	= i.year_month
-				GROUP BY psts.emp_crmid, psts.year_month, psts.tribe_id, psts.tribe_name, psts.tent_id, psts.tent_name
-				HAVING	 COUNT(psts.post_id) = (	SELECT MAX(psts_outer.posts)
-													FROM (	SELECT	COUNT(psts_inner.post_id) AS posts
-															FROM	#Posts AS psts_inner
-															WHERE	psts_inner.emp_crmid	= psts.emp_crmid
-																AND psts_inner.year_month	= psts.year_month
-															GROUP BY emp_crmid, year_month, tribe_id, tent_id) AS psts_outer)
+							 MIN(tribe_name) 	AS tribe_name,
+							 MIN(tent_name)		AS tent_name
+				FROM	 #IterationsRaw AS ir
+				WHERE	 ir.emp_scid	= i.emp_scid
+					 AND ir.year_month	= i.year_month
+				GROUP BY ir.emp_scid, ir.year_month, ir.tribe_id, ir.tent_id
+				HAVING	 COUNT(ir.post_id) = (	SELECT MAX(ir_outer.posts)
+													FROM (	SELECT	COUNT(ir_inner.post_id) AS posts
+															FROM	#IterationsRaw AS ir_inner
+															WHERE	ir_inner.emp_scid	= ir.emp_scid
+																AND ir_inner.year_month	= ir.year_month
+															GROUP BY emp_scid, year_month, tribe_id, tent_id) AS ir_outer)
 			) AS emp_main_tribe_tent
 	/*	#Postulate: All replies and work hours in non primary tribe are moved (as is) as replies and work hours in the primary tribe.
 		The move is per month.	*/
 	GROUP BY	i.emp_crmid, 
-				i.user_scid,
+				i.emp_scid,
 				i.year_month,
 				emp_main_tribe_tent.tribe_id, 
 				emp_main_tribe_tent.tribe_name, 
 				emp_main_tribe_tent.tent_id, 
-				emp_main_tribe_tent.tent_name, 
+				emp_main_tribe_tent.tent_name,
 				i.tribe_id, 
 				i.tribe_name,
 				i.tent_id,
