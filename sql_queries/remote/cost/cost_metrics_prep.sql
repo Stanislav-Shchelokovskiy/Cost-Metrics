@@ -339,7 +339,7 @@ WITH iterations AS (
 			i.ticket_scid					AS ticket_scid,
 			i.post_id						AS post_id
 	FROM	#Employees AS e
-			LEFT JOIN #IterationsRaw AS i ON i.scid = e.scid AND i.year_month = e.year_month
+			LEFT JOIN #IterationsRaw AS i ON i.emp_scid = e.scid AND i.year_month = e.year_month
 ),
 
 iterations_reduced AS (
