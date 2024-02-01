@@ -1,6 +1,6 @@
-DECLARE @json   VARCHAR(MAX) = N'{employees_json}'
-DECLARE @start	DATE = '{start}'
-DECLARE @end	DATE = '{end}'
+DECLARE @employees      VARCHAR(MAX) = N'{employees_json}'
+DECLARE @start	        DATE = '{start}'
+DECLARE @end	        DATE = '{end}'
 
 DROP TABLE IF EXISTS #IterationsRaw;
 
