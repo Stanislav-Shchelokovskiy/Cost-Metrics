@@ -206,8 +206,9 @@ FROM	#Months AS months
 								AND emps_audit_inner.EmployeePosition_Id IS NOT NULL
 						)	AS emps_audit_outer
 				) AS emps_audit
-			WHERE	emps_audit.period_start <= months.year_month 
+			WHERE	DATEFROMPARTS(YEAR(emps_audit.period_start), MONTH(emps_audit.period_start), 1)  <= months.year_month 
 				AND (emps_audit.period_end IS NULL OR months.year_month < emps_audit.period_end)
+            ORDER BY emps_audit.period_start DESC
 		)	AS emp_position_audit
 		OUTER APPLY (
 			SELECT TOP 1 *
@@ -256,7 +257,7 @@ FROM	#Months AS months
 			SELECT	TOP 1 emps_audit.EmployeeLevel_Id AS level_id
 			FROM	#EmployeesAudit AS emps_audit
 			WHERE	emps_audit.EntityOid = employees.crmid
-				AND emps_audit.EntityModified < months.year_month
+				AND DATEFROMPARTS(YEAR(emps_audit.EntityModified), MONTH(emps_audit.EntityModified), 1) <= months.year_month
 				AND emps_audit.ChangedProperties LIKE '%Level%'
 			ORDER BY emps_audit.EntityModified DESC
 		) AS emp_level_audit
