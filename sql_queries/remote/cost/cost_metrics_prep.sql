@@ -144,123 +144,136 @@ FROM	#Months AS months
 		)	AS emp_hired_audit
 		OUTER APPLY (
 			SELECT TOP 1 *
-			FROM (	SELECT	emps_audit_outer.Tribe_Id														AS tribe_id,
-							tribe.Name																		AS tribe_name,
-							emps_audit_outer.period_start													AS period_start,
-							LEAD(emps_audit_outer.period_end) OVER (ORDER BY emps_audit_outer.period_end)	AS period_end
-					FROM (	SELECT	emps_audit_inner.EntityModified				AS period_end,
-									IIF(LAG(emps_audit_inner.EntityModified) OVER (ORDER BY emps_audit_inner.EntityModified ASC) IS NULL, @null_date,
-											emps_audit_inner.EntityModified)	AS period_start,
-									emps_audit_inner.Tribe_Id
-							FROM	#EmployeesAudit AS emps_audit_inner
-							WHERE	emps_audit_inner.EntityOid = employees.crmid
-								AND emps_audit_inner.ChangedProperties LIKE '%Tribe%'
-								AND emps_audit_inner.Tribe_Id IS NOT NULL
-						)	AS emps_audit_outer
-						CROSS APPLY (
-							SELECT TOP 1 Name 
-							FROM crm.dbo.Tribes 
-							WHERE Id = emps_audit_outer.Tribe_Id
-						) AS tribe
-				) AS emps_audit
-			WHERE	emps_audit.period_start <= months.year_month 
-				AND (emps_audit.period_end IS NULL OR months.year_month < emps_audit.period_end)
+			FROM (	SELECT	ea.chapter_id								AS chapter_id,
+							ea.period_start								AS period_start,
+							LEAD(period_end) OVER (ORDER BY period_end)	AS period_end,
+							modified									AS modified
+					FROM (	SELECT	IIF(LAG(EntityModified) OVER (ORDER BY EntityModified ASC) IS NULL,
+										@null_date,
+										DXStatisticsV2.dbo.round_to_nearest_month(EntityModified))	AS period_start,
+									DXStatisticsV2.dbo.round_to_nearest_month(EntityModified)		AS period_end,
+									Chapter_Id														AS chapter_id,
+									EntityModified													AS modified
+							FROM	#EmployeesAudit
+							WHERE	EntityOid = employees.crmid
+								AND ChangedProperties LIKE '%Chapter%'
+								AND Chapter_Id IS NOT NULL
+						) AS ea
+				) AS ea_outer
+			WHERE	ea_outer.period_start <= months.year_month 
+				AND (ea_outer.period_end IS NULL OR ea_outer.period_end > months.year_month)
+			ORDER BY ea_outer.modified DESC
+		)	AS emp_chapter_audit
+		OUTER APPLY (
+			SELECT TOP 1 *
+			FROM (	SELECT	ea.tribe_id											AS tribe_id,
+							tribe.Name											AS tribe_name,
+							ea.period_start										AS period_start,
+							LEAD(ea.period_end) OVER (ORDER BY ea.period_end)	AS period_end,
+							modified											AS modified
+					FROM (	SELECT	IIF(LAG(EntityModified) OVER (ORDER BY EntityModified ASC) IS NULL,
+										@null_date,
+										DXStatisticsV2.dbo.round_to_nearest_month(EntityModified))	AS period_start,
+									DXStatisticsV2.dbo.round_to_nearest_month(EntityModified)		AS period_end,
+									Tribe_Id														AS tribe_id,
+									EntityModified													AS modified
+							FROM	#EmployeesAudit
+							WHERE	EntityOid = employees.crmid
+								AND ChangedProperties LIKE '%Tribe%'
+								AND Tribe_Id IS NOT NULL
+						)	AS ea
+						LEFT JOIN CRM.dbo.Tribes AS tribe ON tribe.Id = ea.tribe_id
+				) AS ea_outer
+			WHERE	ea_outer.period_start <= months.year_month 
+				AND (ea_outer.period_end IS NULL OR ea_outer.period_end > months.year_month)
+			ORDER BY ea_outer.modified DESC
 		) AS emp_tribe_audit
 		OUTER APPLY (
 			SELECT TOP 1 *
-			FROM (	SELECT	tent_id,
-							tent_name,
-							LAG(removed_at, 1, @null_date) OVER (ORDER BY removed_at) AS period_start,
-							removed_at	AS period_end
+			FROM (	SELECT	tent_id																									AS tent_id,
+							tent_name																								AS tent_name,
+							LAG(DXStatisticsV2.dbo.round_to_nearest_month(removed_at), 1, @null_date) OVER (ORDER BY removed_at) 	AS period_start,
+							DXStatisticsV2.dbo.round_to_nearest_month(removed_at)													AS period_end,
+							removed_at																								AS modified
 					FROM (	SELECT	*,
 									IIF(added_at != removed_at, DATEDIFF(DAY, added_at, removed_at), NULL) AS days_in_tent
-							FROM (	SELECT	Tent_Id		AS tent_id,
-											t.Name		AS tent_name,
+							FROM (	SELECT	Tent_Id											AS tent_id,
+											t.Name											AS tent_name,
 											MIN(EntityModified) OVER (PARTITION BY Tent_Id) AS added_at,
 											MAX(EntityModified) OVER (PARTITION BY Tent_Id) AS removed_at,
 											AuditAction
 									FROM	CRMAudit.dxcrm.Tent_Employee AS te
 											LEFT JOIN CRM.dbo.Tents AS t ON t.Id = te.Tent_Id
 									WHERE	Employee_Id = employees.crmid
-								) AS au_inner
-						) AS au_outer
+								) AS ea_inner
+						) AS ea
 					WHERE	AuditAction = 2 /* DELETED */
 						AND	(days_in_tent IS NULL OR days_in_tent > 1)
-			) AS emp_tent_audit_inner
+			) AS ea_outer
+			WHERE	ea_outer.period_start <= months.year_month 
+				AND (ea_outer.period_end IS NULL OR ea_outer.period_end > months.year_month)
+			ORDER BY ea_outer.modified DESC
 		) AS emp_tent_audit
 		OUTER APPLY (
 			SELECT TOP 1 *
-			FROM (	SELECT	emps_audit_outer.position_id									AS position_id,
+			FROM (	SELECT	ea.position_id									AS position_id,
 							(	SELECT TOP 1 ep.name 
 								FROM #EmployeePositions AS ep 
-								WHERE ep.id = emps_audit_outer.position_id)					AS position_name,
-							emps_audit_outer.period_start									AS period_start,
-							LEAD(emps_audit_outer.period_end) OVER (ORDER BY period_end)	AS period_end
-					FROM (	SELECT	emps_audit_inner.EntityModified				AS period_end,
-									IIF(LAG(emps_audit_inner.EntityModified) OVER (ORDER BY emps_audit_inner.EntityModified ASC) IS NULL, @null_date, 
-											emps_audit_inner.EntityModified)	AS period_start,
-									emps_audit_inner.EmployeePosition_Id		AS position_id
-							FROM	#EmployeesAudit AS emps_audit_inner
-							WHERE	emps_audit_inner.EntityOid = employees.crmid
-								AND emps_audit_inner.ChangedProperties LIKE '%Position%'
-								AND emps_audit_inner.EmployeePosition_Id IS NOT NULL
-						)	AS emps_audit_outer
-				) AS emps_audit
-			WHERE	DATEFROMPARTS(YEAR(emps_audit.period_start), MONTH(emps_audit.period_start), 1)  <= months.year_month 
-				AND (emps_audit.period_end IS NULL OR months.year_month < emps_audit.period_end)
-            ORDER BY emps_audit.period_start DESC
-		)	AS emp_position_audit
-		OUTER APPLY (
-			SELECT TOP 1 *
-			FROM (	SELECT	emps_audit_outer.chapter_id										AS chapter_id,
-							emps_audit_outer.period_start									AS period_start,
-							LEAD(emps_audit_outer.period_end) OVER (ORDER BY period_end)	AS period_end
-					FROM (	SELECT	emps_audit_inner.EntityModified				AS period_end,
-									IIF(LAG(emps_audit_inner.EntityModified) OVER (ORDER BY emps_audit_inner.EntityModified ASC) IS NULL, @null_date, 
-											emps_audit_inner.EntityModified)	AS period_start,
-									emps_audit_inner.Chapter_Id					AS chapter_id
-							FROM	#EmployeesAudit AS emps_audit_inner
-							WHERE	emps_audit_inner.EntityOid = employees.crmid
-								AND emps_audit_inner.ChangedProperties LIKE '%Chapter%'
-								AND emps_audit_inner.Chapter_Id IS NOT NULL
-						)	AS emps_audit_outer
-				) AS emps_audit
-			WHERE	emps_audit.period_start <= months.year_month 
-				AND (emps_audit.period_end IS NULL OR months.year_month < emps_audit.period_end)
-		)	AS emp_chapter_audit
-		OUTER APPLY (
-			SELECT TOP 1 *
-			FROM (	SELECT	IIF(locations.is_active = 0, NULL, emps_audit_outer.location_id)	AS location_id,
-							IIF(locations.is_active = 0, NULL, locations.name)					AS location_name,
-							emps_audit_outer.period_start										AS period_start,
-							LEAD(emps_audit_outer.period_end) OVER (ORDER BY period_end)		AS period_end
-					FROM (	SELECT	emps_audit_inner.EntityModified				AS period_end,
-									IIF(LAG(emps_audit_inner.EntityModified) OVER (ORDER BY emps_audit_inner.EntityModified ASC) IS NULL, @null_date, 
-											emps_audit_inner.EntityModified)	AS period_start,
-									emps_audit_inner.EmployeeLocation_id		AS location_id
-							FROM	#EmployeesAudit AS emps_audit_inner
-							WHERE	emps_audit_inner.EntityOid = employees.crmid
-								AND emps_audit_inner.ChangedProperties LIKE '%Location%'
-						)	AS emps_audit_outer
-						CROSS APPLY (
-							SELECT	name, is_active
-							FROM	#EmployeeLocations AS l
-							WHERE	l.id = emps_audit_outer.location_id
-						) AS locations
-				) AS emps_audit
-			WHERE	emps_audit.period_start <= months.year_month 
-				AND (emps_audit.period_end IS NULL OR months.year_month < emps_audit.period_end)
-		)	AS emp_location_audit
+								WHERE ep.id = ea.position_id)				AS position_name,
+							ea.period_start									AS period_start,
+							LEAD(ea.period_end) OVER (ORDER BY period_end)	AS period_end
+					FROM (	SELECT	IIF(LAG(EntityModified) OVER (ORDER BY EntityModified ASC) IS NULL,
+										@null_date, 
+										EntityModified)	AS period_start,
+									EntityModified		AS period_end,
+									EmployeePosition_Id	AS position_id
+							FROM	#EmployeesAudit
+							WHERE	EntityOid = employees.crmid
+								AND ChangedProperties LIKE '%Position%'
+								AND EmployeePosition_Id IS NOT NULL
+						)	AS ea
+				) AS ea_outer
+			WHERE	DATEFROMPARTS(YEAR(ea_outer.period_start), MONTH(ea_outer.period_start), 1)  <= months.year_month 
+				AND (ea_outer.period_end IS NULL OR ea_outer.period_end > months.year_month)
+            ORDER BY ea_outer.period_start DESC
+		) AS emp_position_audit
 		OUTER APPLY (
 			/*	If level_id is null, then we calculate it using EmployeesSalaries below.	
 				Don't change just this part. Change also probable_level_num calculation below.	*/
-			SELECT	TOP 1 emps_audit.EmployeeLevel_Id AS level_id
-			FROM	#EmployeesAudit AS emps_audit
-			WHERE	emps_audit.EntityOid = employees.crmid
-				AND DATEFROMPARTS(YEAR(emps_audit.EntityModified), MONTH(emps_audit.EntityModified), 1) <= months.year_month
-				AND emps_audit.ChangedProperties LIKE '%Level%'
-			ORDER BY emps_audit.EntityModified DESC
+			SELECT	TOP 1 EmployeeLevel_Id AS level_id
+			FROM	#EmployeesAudit
+			WHERE	EntityOid = employees.crmid
+				AND DATEFROMPARTS(YEAR(EntityModified), MONTH(EntityModified), 1) <= months.year_month
+				AND ChangedProperties LIKE '%Level%'
+			ORDER BY EntityModified DESC
 		) AS emp_level_audit
+		OUTER APPLY (
+			SELECT TOP 1 *
+			FROM (	SELECT	IIF(locations.is_active = 0, NULL, ea.location_id)	AS location_id,
+							IIF(locations.is_active = 0, NULL, locations.name)	AS location_name,
+							ea.period_start										AS period_start,
+							LEAD(ea.period_end) OVER (ORDER BY period_end)		AS period_end,
+							modified											AS modified
+					FROM (	SELECT	IIF(LAG(EntityModified) OVER (ORDER BY EntityModified ASC) IS NULL,
+										@null_date,
+										DXStatisticsV2.dbo.round_to_nearest_month(EntityModified))	AS period_start,
+									DXStatisticsV2.dbo.round_to_nearest_month(EntityModified)		AS period_end,
+									EmployeeLocation_id												AS location_id,
+									EntityModified													AS modified
+							FROM	#EmployeesAudit
+							WHERE	EntityOid = employees.crmid
+								AND ChangedProperties LIKE '%Location%'
+						)	AS ea
+						CROSS APPLY (
+							SELECT	name, is_active
+							FROM	#EmployeeLocations AS l
+							WHERE	l.id = ea.location_id
+						) AS locations
+				) AS ea_outer
+			WHERE	ea_outer.period_start <= months.year_month 
+				AND (ea_outer.period_end IS NULL OR ea_outer.period_end > months.year_month)
+			ORDER BY ea_outer.modified DESC
+		) AS emp_location_audit
 		CROSS APPLY (
 			SELECT	es_inner.value * CASE es_inner.currency	WHEN @php THEN @php_to_usd
 															WHEN @eur THEN @eur_to_usd
