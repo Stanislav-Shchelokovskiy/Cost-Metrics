@@ -35,7 +35,7 @@ def upsert_cost_metrics(
     kwargs: dict,
     employees_json: str,
     employees_audit_json: str,
-    employees_positions_audit_json,
+    employees_positions_audit_json: str,
     vacations_json: str,
     positions_json: str,
     locations_json: str,
