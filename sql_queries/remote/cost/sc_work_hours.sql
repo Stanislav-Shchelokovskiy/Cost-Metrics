@@ -18,7 +18,3 @@ GROUP BY	scid,
 			DATEFROMPARTS(YEAR(date), MONTH(date), 1)
 
 CREATE CLUSTERED INDEX idx ON #SCWorkHours(emp_scid, year_month);
-
-DROP TABLE #EmployeesPositionsAudit
-DROP TABLE #EmployeesTmp
-DROP TABLE #TicketChanges
