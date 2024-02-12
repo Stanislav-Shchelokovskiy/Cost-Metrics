@@ -74,7 +74,7 @@ from sql_queries.meta import CostMetrics
             remote_paths_index.CostMetrics.sc_work_hours,
             {
                 'employees_json': 'qwe',
-                'employees_positions_audit_json': 'asd',
+                'employees_audit_json': 'qwe',
                 'start': 'start',
                 'end': 'end',
             },

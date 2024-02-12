@@ -35,8 +35,7 @@ def get_employees_audit(employees_json: str) -> tuple[str]:
         )
         audit.extend(employees.audit_select(emp_audit_json))
     
-    positions_audit = [obj for obj in audit if 'Position' in obj['changedProperties']]
-    return employees_json, Object_to_JSON.convert(audit),  Object_to_JSON.convert(positions_audit)
+    return employees_json, Object_to_JSON.convert(audit)
 
 
 def get_vacations(*passthrough, start: str, **_) -> tuple[str]:

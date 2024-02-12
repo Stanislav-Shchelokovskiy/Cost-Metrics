@@ -1,7 +1,8 @@
 SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 
+EXEC DXStatisticsV2.dbo.update_employees_positions_audit @json = N'{employees_audit_json}';
+
 DECLARE @employees 			VARCHAR(MAX) = N'{employees_json}'
-DECLARE @positions_audit 	VARCHAR(MAX) = N'{employees_positions_audit_json}'
 DECLARE @start				DATE = '{start}'
 DECLARE @end				DATE = '{end}'
 
@@ -11,7 +12,7 @@ SELECT	emp_scid									AS emp_scid,
 		DATEFROMPARTS(YEAR(date), MONTH(date), 1)	AS year_month,
 		SUM(work_hours)							    AS work_hours
 INTO	#SCWorkHours
-FROM	DXStatisticsV2.dbo.sc_work_hoursTMP(@start, @end, @employees, @positions_audit)
+FROM	DXStatisticsV2.dbo.sc_work_hoursTMP(@start, @end, @employees)
 /*	Don't group by anything else here. Otherwise make sure to filter result further by the new group field. */
 GROUP BY	emp_scid,
 			DATEFROMPARTS(YEAR(date), MONTH(date), 1)

@@ -127,7 +127,6 @@ def upsert_cost_metrics(self, *args, **kwargs):
     (
         employees,
         employees_audit,
-        employees_positions_audit,
         vacations,
         positions,
         locations,
@@ -139,7 +138,6 @@ def upsert_cost_metrics(self, *args, **kwargs):
         kwargs=config.get_period(config.Format.COSTMETRICS),
         employees_json=employees,
         employees_audit_json=employees_audit,
-        employees_positions_audit_json=employees_positions_audit,
         vacations_json=vacations,
         positions_json=positions,
         locations_json=locations,
