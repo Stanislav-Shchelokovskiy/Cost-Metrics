@@ -1,7 +1,5 @@
 SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 
--- DXStatisticsV2.dbo.update_employees_positions_audit @json = N'{employees_audit_json}';
-
 DECLARE @employees_audit_json	VARCHAR(MAX) = N'{employees_audit_json}'
 DECLARE @employees_json 		VARCHAR(MAX) = N'{employees_json}'
 DECLARE @start					DATE = '{start}'
