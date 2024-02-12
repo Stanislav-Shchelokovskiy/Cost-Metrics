@@ -29,12 +29,14 @@ def get_employees_audit(employees_json: str) -> tuple[str]:
     emps = JSON_to_object.convert(employees_json)
     audit = []
     for emp in emps:
-        emp_audit = _get_emps_response(
+        emp_audit_json = _get_emps_response(
             end_point=os.environ['EMPS_AUDIT_ENDPOINT'],
             params={'email': emp['email']},
         )
-        audit.extend(JSON_to_object.convert(emp_audit))
-    return employees_json, Object_to_JSON.convert(audit)
+        audit.extend(employees.audit_select(emp_audit_json))
+    
+    positions_audit = [obj for obj in audit if 'Position' in obj['changedProperties']]
+    return employees_json, Object_to_JSON.convert(audit),  Object_to_JSON.convert(positions_audit)
 
 
 def get_vacations(*passthrough, start: str, **_) -> tuple[str]:

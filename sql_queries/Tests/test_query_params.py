@@ -70,6 +70,15 @@ from sql_queries.meta import CostMetrics
             remote_paths_index.CostMetrics.cost_metrics,
             CostMetrics.get_attrs(),
         ),
+        (
+            remote_paths_index.CostMetrics.sc_work_hours,
+            {
+                'employees_json': 'qwe',
+                'employees_positions_audit_json': 'asd',
+                'start': 'start',
+                'end': 'end',
+            },
+        ),
     ],
 )
 def test_query_params(
