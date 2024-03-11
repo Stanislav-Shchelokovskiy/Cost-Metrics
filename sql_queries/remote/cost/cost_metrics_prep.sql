@@ -167,7 +167,12 @@ FROM	#Months AS months
 		OUTER APPLY (
 			SELECT TOP 1 *
 			FROM (	SELECT	ea.tribe_id											AS tribe_id,
-							tribe.Name											AS tribe_name,
+							ISNULL(tribe.Name,
+								ISNULL((SELECT TOP 1 Name
+										FROM	CRMAudit.dxcrm.Tribes
+										WHERE 	EntityOid = ea.tribe_id
+											AND Name != 'TO DELETE'),
+							 			ea.tribe_id))							AS tribe_name,
 							ea.period_start										AS period_start,
 							LEAD(ea.period_end) OVER (ORDER BY ea.period_end)	AS period_end,
 							modified											AS modified
