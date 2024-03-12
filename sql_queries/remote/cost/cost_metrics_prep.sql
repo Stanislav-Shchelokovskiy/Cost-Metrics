@@ -114,7 +114,8 @@ SELECT	months.year_month														AS year_month,
 		ISNULL(emp_hired_audit.hired_at, employees.hired_at)					AS hired_at,
 		employees.retired_at													AS retired_at,
 		ISNULL(emp_tribe_audit.tribe_id, employees.tribe_id)					AS tribe_id,
-		ISNULL(emp_tribe_audit.tribe_name, employees.tribe_name)				AS tribe_name,
+		IIF(emp_tribe_audit.tribe_id IS NULL,
+			employees.tribe_name, emp_tribe_audit.tribe_name)					AS tribe_name,
 		-------------------------------------------------------------------------------------------------------
 		IIF(months.year_month > @tents_introduction_date,
 			ISNULL(emp_tent_audit.tent_id, employees.tent_id), NULL)			AS tent_id,
@@ -167,12 +168,11 @@ FROM	#Months AS months
 		OUTER APPLY (
 			SELECT TOP 1 *
 			FROM (	SELECT	ea.tribe_id											AS tribe_id,
-							ISNULL(tribe.Name,
-								ISNULL((SELECT TOP 1 Name
-										FROM	CRMAudit.dxcrm.Tribes
-										WHERE 	EntityOid = ea.tribe_id
-											AND Name != 'TO DELETE'),
-							 			ea.tribe_id))							AS tribe_name,
+							ISNULL(tribe.Name, (SELECT TOP 1 Name
+												FROM	CRMAudit.dxcrm.Tribes
+												WHERE 	EntityOid = ea.tribe_id
+													AND Name != 'TO DELETE'
+												ORDER BY EntityModified DESC))	AS tribe_name,
 							ea.period_start										AS period_start,
 							LEAD(ea.period_end) OVER (ORDER BY ea.period_end)	AS period_end,
 							modified											AS modified
@@ -186,6 +186,7 @@ FROM	#Months AS months
 							WHERE	EntityOid = employees.crmid
 								AND ChangedProperties LIKE '%Tribe%'
 								AND Tribe_Id IS NOT NULL
+								AND Tribe_Id != CAST(0x0 AS UNIQUEIDENTIFIER)
 						)	AS ea
 						LEFT JOIN CRM.dbo.Tribes AS tribe ON tribe.Id = ea.tribe_id
 				) AS ea_outer

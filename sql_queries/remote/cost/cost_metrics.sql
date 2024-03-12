@@ -99,7 +99,8 @@ emp_activity_reduced AS (
 			--********************************************************************************************
 			/*	#Postulate: All replies and work hours in non primary tribe are moved (as is) as replies and work hours in the primary tribe.	*/
 			ISNULL(employees.tribe_id, emps_empirical_tribe_tent.tribe_id)				AS emp_tribe_id,
-			ISNULL(employees.tribe_name, emps_empirical_tribe_tent.tribe_name)			AS emp_tribe_name,
+			IIF(employees.tribe_id IS NULL,
+				emps_empirical_tribe_tent.tribe_name, employees.tribe_name)				AS emp_tribe_name,
 			----------------------------------------------------------------------------------------------
 			IIF(employees.year_month > @tents_introduction_date,
 				ISNULL(employees.tent_id, emps_empirical_tribe_tent.tent_id), NULL)		AS emp_tent_id,
