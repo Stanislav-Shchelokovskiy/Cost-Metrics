@@ -9,6 +9,7 @@ from toolbox.sql.crud_queries import (
     DeleteRowsOlderThanQuery,
 )
 from toolbox.sql import MetaData
+from toolbox.utils.env import recalculate_from_beginning
 from sql_queries.meta import (
     Employees,
     Teams,
@@ -55,7 +56,7 @@ def upsert_cost_metrics(
             target_table_name=CostMetrics.get_name(),
             unique_key_fields=CostMetrics.get_key_fields(lambda x: x.as_query_field()),
             values_fields=CostMetrics.get_conflicting_fields(lambda x: x.as_query_field(), preserve_order=True),
-            recreate=False,
+            recreate=recalculate_from_beginning(),
         ),
         SqliteUpsertQuery(
             table_name=CostMetrics.get_name(),
