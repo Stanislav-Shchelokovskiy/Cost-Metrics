@@ -1,9 +1,10 @@
 import os
 import toolbox.cache.view_state_cache as view_state_cache
-from fastapi import FastAPI, Cookie, status
+from fastapi import FastAPI, Cookie, status, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from toolbox.utils.converters import JSON_to_object
+from toolbox.utils.fastapi.decorators import with_authorization
 from toolbox.server_models import ViewState
 from repository import LocalRepository
 from server_models import CostMetricsParams, EmployeeParams, Range
@@ -88,12 +89,15 @@ async def get_periods_array(
 
 
 @app.post('/CostMetrics/Aggregates')
+@with_authorization
 async def get_cost_metrics_aggregates(
     group_by_period: str,
     range_start: str,
     range_end: str,
     metric: str,
     body: CostMetricsParams,
+    response: Response,
+    access_token: str | None = Header(None, alias='Authorization'),
     role: str | None = Cookie(None),
 ):
     return await LocalRepository.cost_metrics.aggregates.get_data(
@@ -111,10 +115,13 @@ async def get_display_filter(body: CostMetricsParams):
 
 
 @app.post('/CostMetrics/Raw')
+@with_authorization
 async def get_cost_metrics_raw(
     range_start: str,
     range_end: str,
     body: CostMetricsParams,
+    response: Response,
+    access_token: str | None = Header(None, alias='Authorization'),
     role: str | None = Cookie(None),
 ):
     return await LocalRepository.cost_metrics.raw.get_data(
@@ -131,9 +138,11 @@ def push_state(params: ViewState):
 
 
 @app.get('/PullState', status_code=status.HTTP_200_OK)
+@with_authorization
 def pull_state(
     state_id: str,
     response: Response,
+    access_token: str | None = Header(None, alias='Authorization'),
     role: str | None = Cookie(None),
 ):
     state = view_state_cache.pull_state(state_id)
