@@ -1,4 +1,5 @@
 import os
+import aiohttp
 import toolbox.cache.view_state_cache as view_state_cache
 from fastapi import FastAPI, Cookie, status, Header
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,6 +27,9 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
+
+def check_status(response: aiohttp.ClientResponse):
+    return response.status == status.HTTP_200_OK
 
 
 @app.get('/CostMetrics/Teams')
@@ -89,7 +93,7 @@ async def get_periods_array(
 
 
 @app.post('/CostMetrics/Aggregates')
-@with_authorization
+@with_authorization(check_status)
 async def get_cost_metrics_aggregates(
     group_by_period: str,
     range_start: str,
@@ -115,7 +119,7 @@ async def get_display_filter(body: CostMetricsParams):
 
 
 @app.post('/CostMetrics/Raw')
-@with_authorization
+@with_authorization(check_status)
 async def get_cost_metrics_raw(
     range_start: str,
     range_end: str,
@@ -138,7 +142,7 @@ def push_state(params: ViewState):
 
 
 @app.get('/PullState', status_code=status.HTTP_200_OK)
-@with_authorization
+@with_authorization(check_status)
 def pull_state(
     state_id: str,
     response: Response,

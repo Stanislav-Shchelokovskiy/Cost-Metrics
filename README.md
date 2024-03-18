@@ -22,6 +22,7 @@ Add **.env** file containing the following env vars:
 - EMPS_USERID=...
 - EMPS_APIKEY=...
 - AUTH_ENDPOINT=https://graph.microsoft.com/v1.0/me
+- AUTH_ENABLED=1
 - CORS_ORIGINS=["https://ubuntu-support.corp.devexpress.com","http://localhost:3000"]
 - ADMIN_ROLE=Admin
 - ADVANCED_ROLE=Advanced

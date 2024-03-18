@@ -17,10 +17,11 @@ wrapt = "^1.15.0"
 asyncio = "^3.4.3"
 aiofiles = "^23.1.0"
 pandas = "^2.0.1"
-celery = {extras = ["redis"], version = "^5.2.7"}
+celery = { extras = ["redis"], version = "^5.2.7" }
 aiosqlite = "^0.19.0"
 msal = "^1.27.0"
 aiohttp = "^3.9.3"
+cachetools = "^5.3.3"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^4.0.1"
