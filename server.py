@@ -1,11 +1,10 @@
 import os
-import aiohttp
-import toolbox.cache.view_state_cache as view_state_cache
+import toolbox.cache.async_cache.view_state_cache as view_state_cache
 from fastapi import FastAPI, Cookie, status, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from toolbox.utils.converters import JSON_to_object
-from toolbox.utils.fastapi.decorators import with_authorization
+from toolbox.utils.fastapi.decorators import with_authorization, AuthResponse
 from toolbox.server_models import ViewState
 from repository import LocalRepository
 from server_models import CostMetricsParams, EmployeeParams, Range
@@ -28,7 +27,8 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
-def check_status(response: aiohttp.ClientResponse):
+
+def check_status(response: AuthResponse):
     return response.status == status.HTTP_200_OK
 
 
@@ -136,22 +136,27 @@ async def get_cost_metrics_raw(
 
 
 @app.post('/PushState')
-def push_state(params: ViewState):
-    state_id = view_state_cache.push_state(params.state)
+@with_authorization(check_status)
+async def push_state(
+    body: ViewState,
+    response: Response,
+    access_token: str | None = Header(None, alias='Authorization'),
+):
+    state_id = await view_state_cache.push_state(body.state)
     return state_id
 
 
 @app.get('/PullState', status_code=status.HTTP_200_OK)
 @with_authorization(check_status)
-def pull_state(
+async def pull_state(
     state_id: str,
     response: Response,
     access_token: str | None = Header(None, alias='Authorization'),
     role: str | None = Cookie(None),
 ):
-    state = view_state_cache.pull_state(state_id)
+    state = await view_state_cache.pull_state(state_id)
     default = '{}'
-    res = authorize_state_access(
+    res = await authorize_state_access(
         role=role,
         state=state,
         default=default,
