@@ -142,8 +142,7 @@ async def push_state(
     response: Response,
     access_token: str | None = Header(None, alias='Authorization'),
 ):
-    state_id = await view_state_cache.push_state(body.state)
-    return state_id
+    return await view_state_cache.push_state(body.state)
 
 
 @app.get('/PullState', status_code=status.HTTP_200_OK)
