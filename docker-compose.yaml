@@ -23,6 +23,8 @@ x-cost_metrics:
     - EMPS_APPID
     - EMPS_USERID
     - EMPS_APIKEY
+    - AUTH_ENDPOINT
+    - AUTH_ENABLED
     - CORS_ORIGINS
     - REDIS_SERVICE=cost_metrics_redis${VERSION}
     - REDIS_PORT=6379
