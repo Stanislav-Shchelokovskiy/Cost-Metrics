@@ -33,34 +33,34 @@ def check_status(response: AuthResponse):
 
 
 @app.get('/CostMetrics/Teams')
-async def get_cost_metrics_teams():
+async def get_teams():
     return await LocalRepository.cost_metrics.teams.get_data()
 
 
 @app.get('/CostMetrics/Tribes')
-async def get_cost_metrics_tribes():
+async def get_tribes():
     return await LocalRepository.cost_metrics.tribes.get_data()
 
 
 @app.get('/CostMetrics/Tents')
-async def get_cost_metrics_tents():
+async def get_tents():
     return await LocalRepository.cost_metrics.tents.get_data()
 
 
 @app.get('/CostMetrics/Positions')
-async def get_cost_metrics_positions():
+async def get_positions():
     return await LocalRepository.cost_metrics.positions.get_data()
 
 
 @app.post('/CostMetrics/Employees')
-async def get_cost_metrics_employees(body: EmployeeParams):
+async def get_employees(body: EmployeeParams):
     return await LocalRepository.cost_metrics.employees.get_data(
         **body.get_field_values()
     )
 
 
 @app.get('/CostMetrics/Period')
-async def customers_activity_get_tickets_with_iterations_period():
+async def get_period():
     return await LocalRepository.cost_metrics.period.get_data()
 
 
@@ -94,7 +94,7 @@ async def get_periods_array(
 
 @app.post('/CostMetrics/Aggregates')
 @with_authorization(check_status)
-async def get_cost_metrics_aggregates(
+async def get_aggregates(
     group_by_period: str,
     range_start: str,
     range_end: str,
@@ -120,7 +120,7 @@ async def get_display_filter(body: CostMetricsParams):
 
 @app.post('/CostMetrics/Raw')
 @with_authorization(check_status)
-async def get_cost_metrics_raw(
+async def get_raw(
     range_start: str,
     range_end: str,
     body: CostMetricsParams,
