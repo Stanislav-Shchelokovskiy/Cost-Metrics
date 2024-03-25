@@ -9,7 +9,11 @@ from toolbox.sql.crud_queries import (
     DeleteRowsOlderThanQuery,
 )
 from toolbox.sql import MetaData
-from toolbox.utils.env import recalculate_from_beginning
+from toolbox.tasks_config import (
+    recalculate_from_beginning,
+    reset_recalculate_from_beginning,
+    reset_recalculate_for_last_n_months,
+)
 from sql_queries.meta import (
     Employees,
     Teams,
@@ -139,10 +143,6 @@ def process_staged_data(years_of_history: str):
 
 # yapf: enable
 def __post_process():
-    from toolbox.utils.env import (
-        reset_recalculate_from_beginning,
-        reset_recalculate_for_last_n_months,
-    )
     reset_recalculate_from_beginning()
     reset_recalculate_for_last_n_months()
 

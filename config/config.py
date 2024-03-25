@@ -3,7 +3,10 @@ from celery.schedules import crontab
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from toolbox.utils.converters import DateTimeToSqlString
-from toolbox.utils.env import recalculate_from_beginning, recalculate_for_last_n_months
+from toolbox.tasks_config import (
+    recalculate_from_beginning,
+    recalculate_for_last_n_months,
+)
 
 
 class Format(Enum):
