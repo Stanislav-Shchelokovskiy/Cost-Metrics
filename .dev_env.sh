@@ -12,3 +12,4 @@ export UPDATE_ON_STARTUP=1
 export SERVER_PORT=11002
 export VERSION=_rc
 export DEBUG=1
+export AUTH_ENABLED=0

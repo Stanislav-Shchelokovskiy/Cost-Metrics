@@ -1,4 +1,5 @@
-from collections.abc import Callable
+import os
+from collections.abc import Callable, Iterable
 from toolbox.sql_async import (
     AsyncRepository,
     QueryDescriptor,
@@ -13,12 +14,13 @@ from repository.metrics.local.cost_metrics import (
     TeamsQueryDescriptor,
     select_metrics,
 )
+from toolbox.sql.aggs.metrics import Metric
 from toolbox.utils.converters import Object_to_JSON
 from toolbox.sql_async.repository_queries.async_query_descriptor import PeriodQueryDescriptor
 from sql_queries.meta import CostMetrics
 
 
-class CostMetricsRepository:
+class MetricsRepository:
 
     def __init__(
         self,
@@ -33,8 +35,7 @@ class CostMetricsRepository:
         self.teams = create_repository(TeamsQueryDescriptor())
         self.period = create_repository(
             PeriodQueryDescriptor(
-                field=CostMetrics.year_month,
-                tbl=CostMetrics.get_name()
+                field=CostMetrics.year_month, tbl=CostMetrics.get_name()
             )
         )
 
@@ -50,3 +51,6 @@ class CostMetricsRepository:
                 }
             )
         )
+
+    def __call__(self) -> Iterable[Metric]:
+        return select_metrics(role=os.environ['ADMIN_ROLE'])
