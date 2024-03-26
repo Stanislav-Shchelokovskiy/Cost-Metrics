@@ -9,6 +9,7 @@ from toolbox.sql.aggs import (
     AVG,
     NONE_METRIC,
 )
+from config import is_admin, is_advanced
 
 
 class MetricGroup:
@@ -237,14 +238,6 @@ def get_metrics(role: str | None) -> Mapping[str, Metric]:
     if is_admin(role):
         return admin_role_metrics
     return basic_metrics
-
-
-def is_admin(role: str | None) -> bool:
-    return role == os.environ['ADMIN_ROLE']
-
-
-def is_advanced(role: str | None) -> bool:
-    return role == os.environ['ADVANCED_ROLE']
 
 
 def get_emp_metrics() -> Mapping[str, Metric]:

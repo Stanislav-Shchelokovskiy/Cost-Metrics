@@ -1,56 +1,33 @@
-from enum import Enum
-from celery.schedules import crontab
-from datetime import date
-from dateutil.relativedelta import relativedelta
-from toolbox.utils.converters import DateTimeToSqlString
-from toolbox.tasks_config import (
-    recalculate_from_beginning,
-    recalculate_for_last_n_months,
-)
+import os
+from collections.abc import Iterable
+from toolbox.utils.converters import JSON_to_object
 
 
-class Format(Enum):
-    WORKFLOW = 'workflow'
-    COSTMETRICS = 'costmetrics'
-    SQLITE = 'sqlite'
+def __cmp(s1: str, s2: str) -> bool:
+    return s1.casefold() == s2.casefold()
 
 
-def get_period(format: Format) -> dict[str, str]:
-    separator = '' if format == Format.WORKFLOW else '-'
-    return {
-        'start': DateTimeToSqlString.convert(get_start(), separator),
-        'end': DateTimeToSqlString.convert(get_end(), separator),
-    }
+def __cmp_role(got: str, want: str) -> bool:
+    if got:
+        return __cmp(got, want)
+    return False
 
 
-def get_end():
-    return date.today()
+def admin_role() -> str:
+    return os.environ['ADMIN_ROLE']
 
 
-def get_start():
-    if recalculate_from_beginning():
-        return get_end() - relativedelta(days=365 * 5)
-    return get_end() - offset_in_months()
+def is_admin(role: str | None) -> bool:
+    return __cmp_role(role, admin_role())
 
 
-def offset_in_months():
-    months = recalculate_for_last_n_months()
-    return relativedelta(day=1, months=months)
+def advanced_role() -> str:
+    return os.environ['ADVANCED_ROLE']
 
 
-def years_of_history(format: str):
-    return {
-        Format.SQLITE: '5 YEARS',
-    }[format]
+def is_advanced(role: str | None) -> bool:
+    return __cmp_role(role, advanced_role())
 
 
-def get_schedule():
-    """
-    Returns schedule which runs calculation every first day of each month for last N months.
-    So, RECALCULATE_FOR_LAST_MONTHS should be 1 or greater.
-    """
-    return crontab(
-        minute=0,
-        hour=1,
-        day_of_month=1,
-    )
+def cors_origins() -> Iterable[str]:
+    return JSON_to_object.convert(os.environ['CORS_ORIGINS'])

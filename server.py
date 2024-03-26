@@ -1,10 +1,10 @@
-import os
 import toolbox.cache.async_cache.view_state_cache as view_state_cache
-from fastapi import FastAPI, Cookie, status, Header
+from collections.abc import Mapping
+from fastapi import FastAPI, status, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from prometheus_client import make_asgi_app
-from toolbox.utils.converters import JSON_to_object
+from config import cors_origins
 from toolbox.utils.fastapi.decorators import with_authorization, AuthResponse
 from toolbox.server_models import ViewState
 from toolbox.sql.aggs.metrics_usage import track_metric_usage
@@ -19,19 +19,23 @@ class CustomJSONResponse(Response):
 
 app = FastAPI(default_response_class=CustomJSONResponse)
 
-origins = JSON_to_object.convert(os.environ['CORS_ORIGINS'])
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=cors_origins(),
     allow_credentials=True,
     allow_methods=['*'],
     allow_headers=['*'],
 )
 
 
-def check_status(response: AuthResponse):
-    return response.status == status.HTTP_200_OK
+async def role(response: AuthResponse) -> Mapping:
+    json: Mapping = await response.json()
+    try:
+        apps = json['value']
+        app_role_id = apps[0]['appRoleId']
+        return {'role': app_role_id}
+    except Exception:
+        return dict()
 
 
 @app.get('/CostMetrics/Teams')
@@ -71,16 +75,6 @@ async def get_group_by_periods():
     return await LocalRepository.periods.get_group_by_periods_json()
 
 
-@app.get('/CostMetrics/Metrics')
-async def get_metrics(role: str | None = Cookie(None)):
-    return await LocalRepository.metrics.get_metrics(role=role)
-
-
-@app.get('/CostMetrics/MetricDescription')
-async def get_help(metric: str, role: str | None = Cookie(None)):
-    return await LocalRepository.help.get_description(metric, role)
-
-
 @app.get('/PeriodsArray')
 async def get_periods_array(
     start: str,
@@ -99,8 +93,20 @@ async def get_display_filter(body: CostMetricsParams):
     return await LocalRepository.display_filter.generate_display_filter(body)
 
 
+@app.get('/CostMetrics/Metrics')
+@with_authorization(role)
+async def get_metrics(role: str = ''):
+    return await LocalRepository.metrics.get_metrics(role=role)
+
+
+@app.get('/CostMetrics/MetricDescription')
+@with_authorization(role)
+async def get_help(metric: str, role: str = ''):
+    return await LocalRepository.help.get_description(metric, role)
+
+
 @app.post('/CostMetrics/Aggregates')
-@with_authorization(check_status)
+@with_authorization(role)
 @track_metric_usage(LocalRepository.metrics, 'cost_metrics')
 async def get_aggregates(
     group_by_period: str,
@@ -110,7 +116,7 @@ async def get_aggregates(
     body: CostMetricsParams,
     response: Response,
     access_token: str | None = Header(None, alias='Authorization'),
-    role: str | None = Cookie(None),
+    role: str = '',
 ):
     return await LocalRepository.metrics.aggregates.get_data(
         group_by_period=group_by_period,
@@ -122,14 +128,14 @@ async def get_aggregates(
 
 
 @app.post('/CostMetrics/Raw')
-@with_authorization(check_status)
+@with_authorization(role)
 async def get_raw(
     range_start: str,
     range_end: str,
     body: CostMetricsParams,
     response: Response,
     access_token: str | None = Header(None, alias='Authorization'),
-    role: str | None = Cookie(None),
+    role: str = '',
 ):
     return await LocalRepository.metrics.raw.get_data(
         range=Range(range_start, range_end),
@@ -139,7 +145,7 @@ async def get_raw(
 
 
 @app.post('/PushState')
-@with_authorization(check_status)
+@with_authorization(role)
 async def push_state(
     body: ViewState,
     response: Response,
@@ -149,12 +155,12 @@ async def push_state(
 
 
 @app.get('/PullState', status_code=status.HTTP_200_OK)
-@with_authorization(check_status)
+@with_authorization(role)
 async def pull_state(
     state_id: str,
     response: Response,
     access_token: str | None = Header(None, alias='Authorization'),
-    role: str | None = Cookie(None),
+    role: str | None = None,
 ):
     state = await view_state_cache.pull_state(state_id)
     default = '{}'

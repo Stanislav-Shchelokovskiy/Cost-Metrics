@@ -21,11 +21,11 @@ Add **.env** file containing the following env vars:
 - EMPS_APPID=...
 - EMPS_USERID=...
 - EMPS_APIKEY=...
-- AUTH_ENDPOINT=https://graph.microsoft.com/v1.0/me
+- AUTH_ENDPOINT=https://graph.microsoft.com/v1.0/me/appRoleAssignments?$select=appRoleId&$filter=resourceId%20eq%204655AF44-BDB5-4060-9BEE-623467B27DD9
 - AUTH_ENABLED=1
 - CORS_ORIGINS=["https://ubuntu-support.corp.devexpress.com","http://localhost:3000"]
-- ADMIN_ROLE=Admin
-- ADVANCED_ROLE=Advanced
+- ADMIN_ROLE=7B4C4079-B174-425C-8FA8-344B7EF85700
+- ADVANCED_ROLE=1D7CFA35-59ED-4F6E-966E-51C0D2670DB3
 - PRODUCTION=1 #0 = false, 1 = true
 - UPDATE_ON_STARTUP=0 #0 = false, 1 = true
 - RECALCULATE_FROM_THE_BEGINNING=0

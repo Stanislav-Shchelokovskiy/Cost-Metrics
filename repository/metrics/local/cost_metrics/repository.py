@@ -18,6 +18,7 @@ from toolbox.sql.aggs.metrics import Metric
 from toolbox.utils.converters import Object_to_JSON
 from toolbox.sql_async.repository_queries.async_query_descriptor import PeriodQueryDescriptor
 from sql_queries.meta import CostMetrics
+from config import admin_role
 
 
 class MetricsRepository:
@@ -53,4 +54,4 @@ class MetricsRepository:
         )
 
     def __call__(self) -> Iterable[Metric]:
-        return select_metrics(role=os.environ['ADMIN_ROLE'])
+        return select_metrics(role=admin_role())

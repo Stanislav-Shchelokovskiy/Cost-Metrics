@@ -1,4 +1,3 @@
-import os
 from collections.abc import Callable
 
 from celery import Celery, chord, chain
@@ -16,7 +15,7 @@ app.conf.setdefault('broker_connection_retry_on_startup', True)
 
 @worker_ready.connect
 def on_startup(sender, **kwargs):
-    if not int(os.environ['UPDATE_ON_STARTUP']):
+    if not config.update_on_startup():
         return
 
     tasks = [
