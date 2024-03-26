@@ -95,13 +95,23 @@ async def get_display_filter(body: CostMetricsParams):
 
 @app.get('/CostMetrics/Metrics')
 @with_authorization(role)
-async def get_metrics(role: str = ''):
+async def get_metrics(
+    response: Response,
+    access_token: str | None = Header(None, alias='Authorization'),
+    role: str = '',
+):
+
     return await LocalRepository.metrics.get_metrics(role=role)
 
 
 @app.get('/CostMetrics/MetricDescription')
 @with_authorization(role)
-async def get_help(metric: str, role: str = ''):
+async def get_help(
+    metric: str,
+    response: Response,
+    access_token: str | None = Header(None, alias='Authorization'),
+    role: str = '',
+):
     return await LocalRepository.help.get_description(metric, role)
 
 
@@ -150,6 +160,7 @@ async def push_state(
     body: ViewState,
     response: Response,
     access_token: str | None = Header(None, alias='Authorization'),
+    role: str = '',
 ):
     return await view_state_cache.push_state(body.state)
 
