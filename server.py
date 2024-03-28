@@ -4,7 +4,7 @@ from fastapi import FastAPI, status, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from prometheus_client import make_asgi_app
-from config import cors_origins
+from toolbox.config import cors_origins
 from toolbox.utils.fastapi.decorators import with_authorization, AuthResponse
 from toolbox.server_models import ViewState
 from toolbox.sql.aggs.metrics_usage import track_metric_usage
