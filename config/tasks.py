@@ -52,7 +52,7 @@ def get_schedule():
     """
     return crontab(
         minute=0,
-        hour=1,
+        hour=5,
         day_of_month=1,
     )
 
