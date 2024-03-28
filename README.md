@@ -77,11 +77,6 @@ Stores
 - sql query's meta data which sores column names, index columns and other information about underlying tables.
 - index and tables definitions used to create local tables.
 
-All queries are separated into three categories:
-- remote - used to extracts data.
-- transform_load - used to transform extracted data: create new tebles etc.
-- local - used to extract data for the client request.
-
 ## repository
 Tasks and other components access data via repositories only which have direct access to data bases. Repositories are split into categories according to their purpose: local accesses only local db, remote accesses only remote db, wf acesses workflow's data.<br>
 All repositories contain corresponding query descriptors which are used by query executors to extract data from dbs.<br>
@@ -95,3 +90,21 @@ Contains helpers.
 # How to push an update
 There are two remote preconfigured branches: release and rc (see .github/workflows).<br>
 You create a new local branch, add changes to it, push it to remote and then merge your branch into rc or release (if you are shure you want to update release version directly). Then add VERSION=_rc to the .env file on production machine if you are going to run the release candidate (rc) version or skip it if you want to run release version.
+
+# How to force data recalculation or change update periods?
+Data is calculated periodically according to the schedule in **worker.setup_periodic_tasks** on the first day of every month (for the previous month) by default.
+
+- UPDATE_ON_STARTUP env var controls whether or not to start updating DataMart when the service starts (0 = false, 1 = true). Default is 0.
+- RECALCULATE_FOR_LAST_MONTHS env var specifies the number of months you need to run update for (0 = current, 1 = previous month, 2 = last two months etc.). So, RECALCULATE_FOR_LAST_MONTHS should be 1 or greater.
+- RECALCULATE_FROM_THE_BEGINNING env car controls whether is is necessary to recalculate data from scratch. It is effective only once as it is reset with the help of **toolbox.tasks_config.reset_recalculate_from_beginning** when recalculation is complete (see tasks->tasks->process_staged_data).
+
+At the moment, the service doesn't offer api to change these parameters. So, you need to either:
+1. Change them in the running container (support_metrics_worker) with the help of docker exec.
+2. Change these params in the .env file and restart the container.
+
+To run (apply) a task manually use [Flower API](https://flower.readthedocs.io/en/latest/api.html#post--api-task-async-apply-(.+)) like following:<br>
+POST https://ubuntu-support.corp.devexpress.com/CostMetricsDash/api/task/async-apply/update_cost_metrics
+
+This is probably the only task you will need to apply if you need to update DataMart out of schedule.
+
+Don't forget to specify auth request header(s) if the service is run [behind reverse proxy](https://flower.readthedocs.io/en/latest/reverse-proxy.html#running-behind-reverse-proxy)
