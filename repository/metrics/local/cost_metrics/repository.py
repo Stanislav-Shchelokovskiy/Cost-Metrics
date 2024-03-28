@@ -1,4 +1,3 @@
-import os
 from collections.abc import Callable, Iterable
 from toolbox.sql_async import (
     AsyncRepository,
