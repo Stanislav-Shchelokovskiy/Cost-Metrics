@@ -10,5 +10,4 @@ from config.roles import (
     admin_role,
     is_admin,
     is_advanced,
-    cors_origins,
 )

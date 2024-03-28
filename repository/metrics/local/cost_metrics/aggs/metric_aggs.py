@@ -1,4 +1,3 @@
-import os
 from collections.abc import Iterable, Callable, Mapping
 from collections import ChainMap
 from sql_queries.meta import CostMetrics
