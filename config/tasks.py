@@ -53,7 +53,7 @@ def get_schedule():
     return crontab(
         minute=0,
         hour=5,
-        day_of_month=1,
+        day_of_month=4,
     )
 
 def update_on_startup()-> int:
