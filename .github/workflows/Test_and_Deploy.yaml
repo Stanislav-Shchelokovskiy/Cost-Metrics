@@ -13,6 +13,16 @@ jobs:
         poetry-version: [1.6.1]
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
+
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: eRvLhAL104eRvLhAL104
+        ports:
+          - 1433:1433
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -27,9 +37,22 @@ jobs:
         with:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Install dependencies
-        run: poetry install
+        shell: bash
+        run: |
+          poetry install
+          sudo apt-get update
+          curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
+          curl https://packages.microsoft.com/config/debian/11/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+          ACCEPT_EULA=Y sudo apt-get install -y --no-install-recommends msodbcsql18 mssql-tools18 unixodbc-dev
       - name: Test
-        run: poetry run pytest --disable-warnings -v -m "not e2e"
+        run: poetry run pytest -xvs --disable-warnings
+        env:
+          SQL_SERVER: localhost:1433
+          SQL_SERVER_SQLCMD: localhost,1433
+          SQL_DATABASE: tempdb
+          SQL_USER: sa
+          SQL_PASSWORD: eRvLhAL104eRvLhAL104
+          PRODUCTION: 1
 
   deploy:
     needs: test

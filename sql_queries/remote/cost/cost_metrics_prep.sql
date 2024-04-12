@@ -139,9 +139,9 @@ FROM	#Months AS months
 			WHERE	e.is_service_user = 0
 		) AS employees
 		OUTER APPLY (
-			SELECT	 MIN(emp_audit.HiredAt) AS hired_at
-			FROM	#EmployeesAudit AS emp_audit 
-			WHERE	emp_audit.EntityOid = employees.crmid
+			SELECT	 MIN(HiredAt) AS hired_at
+			FROM	#EmployeesAudit
+			WHERE	EntityOid = employees.crmid
 		)	AS emp_hired_audit
 		OUTER APPLY (
 			SELECT TOP 1 *
@@ -199,7 +199,9 @@ FROM	#Months AS months
 			FROM (	SELECT	tent_id																									AS tent_id,
 							tent_name																								AS tent_name,
 							LAG(DXStatisticsV2.dbo.round_to_nearest_month(removed_at), 1, @null_date) OVER (ORDER BY removed_at) 	AS period_start,
-							DXStatisticsV2.dbo.round_to_nearest_month(removed_at)													AS period_end,
+							IIF(YEAR(removed_at) != YEAR(added_at) AND MONTH(removed_at) != MONTH(added_at),
+								DXStatisticsV2.dbo.round_to_nearest_month(removed_at), 
+								removed_at)																							AS period_end,
 							removed_at																								AS modified
 					FROM (	SELECT	*,
 									IIF(added_at != removed_at, DATEDIFF(DAY, added_at, removed_at), NULL) AS days_in_tent
@@ -347,11 +349,7 @@ DROP TABLE IF EXISTS #Iterations;
 WITH iterations AS (
 	SELECT 	e.crmid							AS emp_crmid,
 			e.scid							AS emp_scid,
-			i.tribe_id						AS tribe_id,
-			i.tent_id						AS tent_id,
 			e.name							AS emp_name,
-			i.tribe_name					AS tribe_name,
-			i.tent_name						AS tent_name,
 			e.year_month					AS year_month,
 			e.position_id					AS emp_position_id,
 			e.chapter_id					AS emp_chapter_id,
@@ -365,13 +363,7 @@ WITH iterations AS (
 iterations_reduced AS (
 	SELECT	i.emp_crmid						AS emp_crmid,
 			i.emp_scid						AS emp_scid,
-			i.tribe_id						AS tribe_id,
-			emp_main_tribe_tent.tribe_id	AS emp_tribe_id,
-			emp_main_tribe_tent.tent_id		AS emp_tent_id,
 			MIN(i.emp_name)					AS emp_name,
-			emp_main_tribe_tent.tribe_name	AS emp_tribe_name,
-			emp_main_tribe_tent.tent_name	AS emp_tent_name,
-			i.tribe_name					AS tribe_name,
 			i.year_month					AS year_month,
 			i.emp_position_id				AS emp_position_id,
 			i.emp_chapter_id				AS emp_chapter_id,
@@ -381,37 +373,11 @@ iterations_reduced AS (
 			COUNT(i.post_id)				AS iterations
 			-------------------------------------------------------
 	FROM	iterations AS i
-			OUTER APPLY (
-				/*	Calc emp primary tribe on monthly basis.
-					Emp main tribe is the tribe which emp has most posts in.	*/
-				SELECT TOP 1 tribe_id,
-							 tent_id,
-							 MIN(tribe_name) 	AS tribe_name,
-							 MIN(tent_name)		AS tent_name
-				FROM	 #IterationsRaw AS ir
-				WHERE	 ir.emp_scid	= i.emp_scid
-					 AND ir.year_month	= i.year_month
-				GROUP BY ir.emp_scid, ir.year_month, ir.tribe_id, ir.tent_id
-				HAVING	 COUNT(ir.post_id) = (	SELECT MAX(ir_outer.posts)
-													FROM (	SELECT	COUNT(ir_inner.post_id) AS posts
-															FROM	#IterationsRaw AS ir_inner
-															WHERE	ir_inner.emp_scid	= ir.emp_scid
-																AND ir_inner.year_month	= ir.year_month
-															GROUP BY emp_scid, year_month, tribe_id, tent_id) AS ir_outer)
-			) AS emp_main_tribe_tent
 	/*	#Postulate: All replies and work hours in non primary tribe are moved (as is) as replies and work hours in the primary tribe.
 		The move is per month.	*/
 	GROUP BY	i.emp_crmid, 
 				i.emp_scid,
 				i.year_month,
-				emp_main_tribe_tent.tribe_id, 
-				emp_main_tribe_tent.tribe_name, 
-				emp_main_tribe_tent.tent_id, 
-				emp_main_tribe_tent.tent_name,
-				i.tribe_id, 
-				i.tribe_name,
-				i.tent_id,
-				i.tent_name,
 				emp_position_id,
 				emp_chapter_id,
 				has_support_processing_role
@@ -424,4 +390,4 @@ FROM	iterations_reduced AS i
 		INNER JOIN #SCWorkHours AS wh ON	wh.emp_scid		= i.emp_scid 
 										AND wh.year_month	= i.year_month
 
-CREATE CLUSTERED INDEX idx ON #Iterations(emp_position_id, emp_chapter_id, has_support_processing_role, emp_crmid, year_month, emp_tribe_id, emp_tent_id);
+CREATE CLUSTERED INDEX idx ON #Iterations(emp_position_id, emp_chapter_id, has_support_processing_role, emp_crmid, year_month);

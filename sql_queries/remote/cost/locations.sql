@@ -4,10 +4,6 @@ DROP TABLE IF EXISTS #EmployeeLocations;
 
 SELECT  *
 INTO    #EmployeeLocations
-FROM    OPENJSON(@json, '$.page') WITH (
-            id			UNIQUEIDENTIFIER	'strict $.id',
-            name		NVARCHAR(250)		'strict $.name',
-            is_active	BIT					'strict $.isActive'
-        ) AS ds
+FROM    DXStatisticsV2.dbo.parse_locations(@json)
 
 CREATE CLUSTERED INDEX idx ON #EmployeeLocations(id);

@@ -25,26 +25,18 @@ WITH emp_activity_in_tribe AS (
 	SELECT	emp_crmid			AS emp_crmid,
 			emp_scid			AS emp_scid,
 			year_month			AS year_month,
-			emp_tribe_id		AS emp_tribe_id,
-			emp_tent_id			AS emp_tent_id,
-			emp_tribe_name		AS emp_tribe_name,
-			emp_tent_name		AS emp_tent_name,
 			sc_hours			AS sc_hours,
 			--------------------------------------
 			SUM(unique_tickets)	AS unique_tickets,
 			SUM(iterations)		AS iterations
 			--------------------------------------
 	FROM	#Iterations
-	GROUP BY emp_crmid, emp_scid, year_month, emp_tribe_id, emp_tribe_name, emp_tent_id, emp_tent_name, sc_hours
+	GROUP BY emp_crmid, emp_scid, year_month, sc_hours
 ),
 
 emp_activity_in_tribe_with_external_activity AS (
 	SELECT	emp_crmid,
 			year_month,
-			emp_tribe_id,
-			emp_tent_id,
-			emp_tribe_name,
-			emp_tent_name,
 			sc_hours,
 			emp_activity_in_tribe.unique_tickets + ISNULL(external_activity.unique_tickets, 0)	AS unique_tickets,
 			emp_activity_in_tribe.iterations	 + ISNULL(external_activity.iterations, 0)		AS iterations
@@ -72,10 +64,6 @@ emp_activity_in_tribe_prefilter AS (
 emp_activity_in_tribe_transformed AS (
 	SELECT	emp_crmid,
 			year_month,
-			emp_tribe_id,
-			emp_tent_id,
-			emp_tribe_name,
-			emp_tent_name,
 			IIF(ignore_sc_activity = 1, 0, sc_hours)		AS sc_hours,
 			IIF(ignore_sc_activity = 1, 0, unique_tickets)	AS unique_tickets,
 			IIF(ignore_sc_activity = 1, 0, iterations)		AS iterations
@@ -134,14 +122,22 @@ emp_activity_reduced AS (
 			-----------------------------------------------------------------------------------
 	FROM	#Employees AS employees
 			OUTER APPLY (
-				/*	Find tribe which emp worked most in.	*/
-				SELECT  TOP 1	emps_transformed.emp_tribe_id	AS tribe_id,
-								emps_transformed.emp_tribe_name AS tribe_name,
-								emps_transformed.emp_tent_id	AS tent_id,
-								emps_transformed.emp_tent_name	AS tent_name
-				FROM	emp_activity_in_tribe_transformed AS emps_transformed
-				WHERE	emps_transformed.emp_crmid = employees.crmid
-				ORDER BY sc_hours DESC
+				/*	Calc emp primary tribe on monthly basis.
+					Emp main tribe is the tribe which emp has most posts in.	*/
+				SELECT TOP 1 tribe_id,
+							 tent_id,
+							 MIN(tribe_name) 	AS tribe_name,
+							 MIN(tent_name)		AS tent_name
+				FROM	 #IterationsRaw AS ir
+				WHERE	 ir.emp_scid	= employees.scid
+					 AND ir.year_month	= employees.year_month
+				GROUP BY ir.emp_scid, ir.year_month, ir.tribe_id, ir.tent_id
+				HAVING	 COUNT(ir.post_id) = (	SELECT MAX(ir_outer.posts)
+												FROM (	SELECT	COUNT(ir_inner.post_id) AS posts
+														FROM	#IterationsRaw AS ir_inner
+														WHERE	ir_inner.emp_scid	= ir.emp_scid
+															AND ir_inner.year_month	= ir.year_month
+														GROUP BY emp_scid, year_month, tribe_id, tent_id) AS ir_outer)
 			) AS emps_empirical_tribe_tent
 			OUTER APPLY (
 				SELECT	emps_transformed.sc_hours,

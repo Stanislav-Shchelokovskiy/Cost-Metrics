@@ -5,7 +5,7 @@ DECLARE @employees_json 		VARCHAR(MAX) = N'{employees_json}'
 DECLARE @start					DATE = '{start}'
 DECLARE @end					DATE = '{end}'
 
-EXEC update_employees_sc_work_hours @start=@start, @end=@end, @employees_json=@employees_json, @employees_audit_json=@employees_audit_json
+EXEC DXStatisticsV2.dbo.update_employees_sc_work_hours @start=@start, @end=@end, @employees_json=@employees_json, @employees_audit_json=@employees_audit_json
 
 SELECT	scid										AS emp_scid,
 		DATEFROMPARTS(YEAR(date), MONTH(date), 1)	AS year_month,
