@@ -14,35 +14,47 @@ class CostMetricsQueries(RepositoryAlchemyQueries):
                 format_params=kwargs,
             ),
             SqlAlchemyQuery(
-                query_file_path=remote_paths_index.CostMetrics.employees,
+                query_file_path=remote_paths_index.CostMetrics.parse_employees,
                 format_params=kwargs,
             ),
             SqlAlchemyQuery(
-                query_file_path=remote_paths_index.CostMetrics.employees_audit,
+                query_file_path=remote_paths_index.CostMetrics.parse_employees_audit,
+                format_params=kwargs,
+            ),
+            SqlAlchemyQuery(
+                query_file_path=remote_paths_index.CostMetrics.parse_vacations,
+                format_params=kwargs,
+            ),
+            SqlAlchemyQuery(
+                query_file_path=remote_paths_index.CostMetrics.parse_positions,
+                format_params=kwargs,
+            ),
+            SqlAlchemyQuery(
+                query_file_path=remote_paths_index.CostMetrics.parse_locations,
+                format_params=kwargs,
+            ),
+            SqlAlchemyQuery(
+                query_file_path=remote_paths_index.CostMetrics.parse_levels,
+                format_params=kwargs,
+            ),
+            SqlAlchemyQuery(
+                query_file_path=remote_paths_index.CostMetrics.iterations_raw,
+                format_params=kwargs,
+            ),
+            SqlAlchemyQuery(
+                query_file_path=remote_paths_index.CostMetrics.months,
                 format_params=kwargs,
             ),
             SqlAlchemyQuery(
                 query_file_path=remote_paths_index.CostMetrics.vacations,
                 format_params=kwargs,
             ),
-            SqlAlchemyQuery(
-                query_file_path=remote_paths_index.CostMetrics.positions,
-                format_params=kwargs,
-            ),
-            SqlAlchemyQuery(
-                query_file_path=remote_paths_index.CostMetrics.locations,
-                format_params=kwargs,
-            ),
-            SqlAlchemyQuery(
-                query_file_path=remote_paths_index.CostMetrics.levels,
+             SqlAlchemyQuery(
+                query_file_path=remote_paths_index.CostMetrics.employees,
                 format_params=kwargs,
             ),
             SqlAlchemyQuery(
                 query_file_path=remote_paths_index.CostMetrics.iterations,
-                format_params=kwargs,
-            ),
-            SqlAlchemyQuery(
-                query_file_path=remote_paths_index.CostMetrics.cost_metrics_prep,
                 format_params=kwargs,
             ),
         )

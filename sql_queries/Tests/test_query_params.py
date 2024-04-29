@@ -16,52 +16,45 @@ from sql_queries.meta import CostMetrics
             },
         ),
         (
-            remote_paths_index.CostMetrics.employees,
+            remote_paths_index.CostMetrics.parse_employees,
             {
                 'employees_json': 'qwe',
             },
         ),
         (
-            remote_paths_index.CostMetrics.employees_audit,
+            remote_paths_index.CostMetrics.parse_employees_audit,
             {
                 'employees_audit_json': 'qwe',
             },
         ),
         (
-            remote_paths_index.CostMetrics.vacations,
+            remote_paths_index.CostMetrics.parse_vacations,
             {
                 'vacations_json': 'qwe',
             },
         ),
         (
-            remote_paths_index.CostMetrics.positions,
+            remote_paths_index.CostMetrics.parse_positions,
             {
                 'positions_json': 'qwe',
             },
         ),
         (
-            remote_paths_index.CostMetrics.locations,
+            remote_paths_index.CostMetrics.parse_locations,
             {
                 'locations_json': 'qwe',
             },
         ),
         (
-            remote_paths_index.CostMetrics.levels,
+            remote_paths_index.CostMetrics.parse_levels,
             {
                 'levels_json': 'qwe',
             },
         ),
         (
-            remote_paths_index.CostMetrics.iterations,
+            remote_paths_index.CostMetrics.iterations_raw,
             {
                 'employees_json': 'qwe',
-                'start': 'start',
-                'end': 'end',
-            },
-        ),
-        (
-            remote_paths_index.CostMetrics.cost_metrics_prep,
-            {
                 'start': 'start',
                 'end': 'end',
             },

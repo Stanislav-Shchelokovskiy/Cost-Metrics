@@ -8,15 +8,20 @@ _wf_path = _root_path + '/wf'
 
 class CostMetrics:
     sc_work_hours = _cost_path + '/sc_work_hours.sql'
-    iterations = _cost_path + '/iterations.sql'
-    employees = _cost_path + '/employees.sql'
-    employees_audit = _cost_path + '/employees_audit.sql'
-    vacations = _cost_path + '/vacations.sql'
-    positions = _cost_path + '/positions.sql'
-    locations = _cost_path + '/locations.sql'
-    levels = _cost_path + '/levels.sql'
-    cost_metrics_prep = _cost_path + '/cost_metrics_prep.sql'
-    cost_metrics = _cost_path + '/cost_metrics.sql'
+    iterations_raw = _cost_path + '/iterations_raw.sql'
+    parse_employees = _cost_path + '/employees.sql'
+    parse_employees_audit = _cost_path + '/employees_audit.sql'
+    parse_vacations = _cost_path + '/vacations.sql'
+    parse_positions = _cost_path + '/positions.sql'
+    parse_locations = _cost_path + '/locations.sql'
+    parse_levels = _cost_path + '/levels.sql'
+
+    __metrics = _cost_path + '/metrics/'
+    months = __metrics + 'months.sql'
+    vacations = __metrics + 'vacations.sql'
+    employees = __metrics + 'employees.sql'
+    iterations = __metrics + 'iterations.sql'
+    cost_metrics = __metrics + 'cost_metrics.sql'
 
 
 class WF:
