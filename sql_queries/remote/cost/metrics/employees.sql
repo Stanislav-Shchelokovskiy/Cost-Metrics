@@ -129,32 +129,50 @@ FROM	#Months AS months
 			ORDER BY ea_outer.modified DESC
 		) AS emp_tribe_audit
 		OUTER APPLY (
-			SELECT TOP 1 *
-			FROM (	SELECT	tent_id																									AS tent_id,
-							tent_name																								AS tent_name,
-							LAG(DXStatisticsV2.dbo.round_to_nearest_month(removed_at), 1, @null_date) OVER (ORDER BY removed_at) 	AS period_start,
-							IIF(YEAR(removed_at) != YEAR(added_at) AND MONTH(removed_at) != MONTH(added_at),
-								DXStatisticsV2.dbo.round_to_nearest_month(removed_at), 
-								removed_at)																							AS period_end,
-							removed_at																								AS modified
-					FROM (	SELECT	*,
-									IIF(added_at != removed_at, DATEDIFF(DAY, added_at, removed_at), NULL) AS days_in_tent
-							FROM (	SELECT	Tent_Id											AS tent_id,
-											t.Name											AS tent_name,
-											MIN(EntityModified) OVER (PARTITION BY Tent_Id) AS added_at,
-											MAX(EntityModified) OVER (PARTITION BY Tent_Id) AS removed_at,
-											AuditAction
-									FROM	CRMAudit.dxcrm.Tent_Employee AS te
-											LEFT JOIN CRM.dbo.Tents AS t ON t.Id = te.Tent_Id
-									WHERE	Employee_Id = employees.crmid
-								) AS ea_inner
-						) AS ea
-					WHERE	AuditAction = 2 /* DELETED */
-						AND	(days_in_tent IS NULL OR days_in_tent > 1)
-			) AS ea_outer
-			WHERE	ea_outer.period_start <= months.year_month 
-				AND (ea_outer.period_end IS NULL OR ea_outer.period_end > months.year_month)
-			ORDER BY ea_outer.modified DESC
+				SELECT TOP 1 *
+				FROM (	SELECT	tent_id													AS tent_id,
+								tent_name												AS tent_name,
+								DXStatisticsV2.dbo.round_to_nearest_month(added_at)		AS period_start,
+								IIF(	YEAR(removed_at) != YEAR(added_at)
+									AND MONTH(removed_at) != MONTH(added_at),
+									DXStatisticsV2.dbo.round_to_nearest_month(removed_at), 
+									removed_at)											AS period_end,
+								days_in_tent											AS days_in_tent,
+								removed_at												AS modified
+						FROM (	SELECT	tent_id,
+										tent_name,
+										added_at,
+										removed_at,
+										audit_action,
+										IIF(added_at != removed_at, DATEDIFF(DAY, added_at, removed_at), NULL)	AS days_in_tent
+								FROM (	SELECT	tent_id,
+												tent_name,
+												audit_action,
+												MIN(entity_modified) OVER (PARTITION BY tent_id, tent_group) AS added_at,
+												MAX(entity_modified) OVER (PARTITION BY tent_id, tent_group) AS removed_at
+										FROM (	SELECT	tent_id,
+														tent_name,
+														entity_modified,
+														audit_action,
+														SUM(IIF(prev_tent_id != tent_id, 1, 0)) OVER (ORDER BY entity_modified) AS tent_group
+												FROM (	SELECT	Tent_Id													AS tent_id,
+																LAG(Tent_Id, 1, NULL) OVER (ORDER BY EntityModified)	AS prev_tent_id,
+																t.Name													AS tent_name,
+																EntityModified											AS entity_modified,
+																AuditAction												AS audit_action
+														FROM	CRMAudit.dxcrm.Tent_Employee AS te
+																LEFT JOIN CRM.dbo.Tents AS t ON t.Id = te.Tent_Id
+														WHERE	Employee_Id = employees.crmid
+												) AS ea1
+										) AS ea_2
+								) AS ea_3
+						) AS ea_inner
+						WHERE	days_in_tent IS NULL
+							OR (audit_action = 2 /* DELETED */ AND days_in_tent > 1)
+				) AS ea_outer
+				WHERE	ea_outer.period_start <= months.year_month 
+					AND (ea_outer.days_in_tent IS NULL OR ea_outer.period_end > months.year_month)
+				ORDER BY ea_outer.modified DESC
 		) AS emp_tent_audit
 		OUTER APPLY (
 			SELECT TOP 1 *

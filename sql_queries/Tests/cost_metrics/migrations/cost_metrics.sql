@@ -60,11 +60,11 @@ CREATE TABLE dxcrm.Tent_Employee (
 	AuditAction		TINYINT
 )
 INSERT INTO dxcrm.Tent_Employee
-VALUES	(@emp1, @tent1, '2023-05-04 11:54:44.340', 2),
-		(@emp1, @tent2, '2023-05-05 11:54:44.340', 3), --should be ignored
-		(@emp1, @tent2, '2023-05-06 11:53:44.340', 2), --should be ignored
-		(@emp1, @tent3, '2023-05-06 11:54:44.340', 3),
-		(@emp1, @tent3, '2023-05-13 11:54:44.340', 2)
+VALUES	(@emp1, @tent1, '2023-06-04 11:54:44.340', 0),
+        (@emp1, @tent1, '2023-07-04 11:54:44.340', 2),
+		(@emp1, @tent2, '2023-07-05 11:54:44.340', 0),
+		(@emp1, @tent2, '2023-07-06 11:53:44.340', 2),
+		(@emp1, @tent3, '2023-08-06 11:54:44.340', 3)
 
 --#######################
 --##### Tribes Audit ####

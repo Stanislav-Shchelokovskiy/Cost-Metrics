@@ -26,9 +26,9 @@ cost_metrics = {
             None,
             None,
             '00000000-0000-0000-0000-000000000003',
-            '00000000-0000-0000-0000-000000000002',
             '00000000-0000-0000-0000-000000000001',
-            None,
+            '00000000-0000-0000-0000-000000000001',
+            '00000000-0000-0000-0000-000000000003',
         ],
     CostMetrics.tribe_id.name:
         [
@@ -60,7 +60,7 @@ cost_metrics = {
             'tribe3', 'tribe3', 'tribe3', 'tribe3'
         ],
     CostMetrics.tent_name.name:
-        [None, None, None, None, None, None, 'tent3', 'tent2', 'tent1', None],
+        [None, None, None, None, None, None, 'tent3', 'tent1', 'tent1', 'tent3'],
     CostMetrics.name.name: ['emp1'] * 10,
     CostMetrics.position_name.name:
         [
