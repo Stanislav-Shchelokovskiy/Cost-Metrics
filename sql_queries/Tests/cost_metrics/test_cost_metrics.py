@@ -25,6 +25,10 @@ from toolbox.sql.repository_queries import RepositoryAlchemyQueries, SqlAlchemyQ
             cases.levels,
         ),
         (
+            '/employees/chapters',
+            cases.chapters,
+        ),
+        (
             '/employees/tents',
             cases.tents,
         ),
