@@ -37,8 +37,6 @@ params = {
     'levels_json': '',
 }
 
-cols = '*'
-
 tbl = '#Employees'
 
 queries = [

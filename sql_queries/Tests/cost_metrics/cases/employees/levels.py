@@ -2,7 +2,6 @@ from sql_queries.Tests.cost_metrics.cases.employees.common import (
     _emps,
     params,
     tbl,
-    cols,
     queries,
 )
 
@@ -23,7 +22,6 @@ want = {
             '2022-11-01',
             '2022-12-01',
         ],
-    _emps.scid: ['00000000-0000-0000-0000-000000000001'] * 4,
     _emps.name: ['emp1'] * 4,
     _emps.level_name:
         [
