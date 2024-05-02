@@ -7,7 +7,7 @@ DECLARE @working_hours_per_month TINYINT = 168
 	gross			= with taxes
 	gross_withAOE	= gross with administrative/operating expenses	*/
 
-DECLARE @now			DATE = GETUTCDATE()
+DECLARE @now DATE = GETUTCDATE()
 
 DECLARE @before_oct_2022	TINYINT = 0
 DECLARE @after_oct_2022		TINYINT = 1
@@ -249,11 +249,11 @@ FROM	#Months AS months
 						(	SELECT	TOP 1 level_id
 							FROM	DXStatisticsV2.dbo.EmployeesSalaries
 							WHERE	probable_level_num IS NOT NULL 
-									AND probable_level_num =	ISNULL((SELECT (SELECT TOP 1 level_num FROM DXStatisticsV2.dbo.EmployeesSalaries WHERE level_id = ISNULL(employees.level_id, emp_position_audit.position_id))
-																		-  FLOOR(DATEDIFF(MONTH, months.year_month, @now) /
-																				 CEILING((DATEDIFF(MONTH, ISNULL(ISNULL(emp_hired_audit.hired_at, employees.hired_at), months.year_month), @now) + 1) * 1.0 /
-																						 (SELECT TOP 1 level_num FROM DXStatisticsV2.dbo.EmployeesSalaries WHERE level_id = ISNULL(employees.level_id, emp_position_audit.position_id))))), 1)
-									AND	period = IIF(ISNULL(emp_location_audit.location_id, employees.location_id) = @philippines, @not_applicable, IIF(months.year_month < @new_life_start, @before_oct_2022, @after_oct_2022)))
+								AND probable_level_num =	ISNULL((SELECT (SELECT TOP 1 level_num FROM DXStatisticsV2.dbo.EmployeesSalaries WHERE level_id = ISNULL(employees.level_id, emp_position_audit.position_id))
+																	-  FLOOR(DATEDIFF(MONTH, months.year_month, @now) /
+																				CEILING((DATEDIFF(MONTH, ISNULL(ISNULL(emp_hired_audit.hired_at, employees.hired_at), months.year_month), @now) + 1) * 1.0 /
+																						(SELECT TOP 1 level_num FROM DXStatisticsV2.dbo.EmployeesSalaries WHERE level_id = ISNULL(employees.level_id, emp_position_audit.position_id))))), 1)
+								AND	period = IIF(ISNULL(emp_location_audit.location_id, employees.location_id) = @philippines, @not_applicable, IIF(months.year_month < @new_life_start, @before_oct_2022, @after_oct_2022)))
 						)
 				AND (es_inner.location_id IS NULL OR es_inner.location_id = ISNULL(emp_location_audit.location_id, employees.location_id))
 		) AS salaries
