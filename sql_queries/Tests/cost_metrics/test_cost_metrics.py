@@ -36,6 +36,10 @@ from toolbox.sql.repository_queries import RepositoryAlchemyQueries, SqlAlchemyQ
             '/employees/tents',
             cases.tents,
         ),
+        (
+            '/employees/positions',
+            cases.positions,
+        ),
     ],
 )
 @pytest.mark.integration
