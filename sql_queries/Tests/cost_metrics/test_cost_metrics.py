@@ -40,6 +40,10 @@ from toolbox.sql.repository_queries import RepositoryAlchemyQueries, SqlAlchemyQ
             '/employees/positions',
             cases.positions,
         ),
+        (
+            '/employees/locations',
+            cases.locations,
+        ),
     ],
 )
 @pytest.mark.integration

@@ -7,3 +7,4 @@ import sql_queries.Tests.cost_metrics.cases.employees.chapters as chapters
 import sql_queries.Tests.cost_metrics.cases.employees.tribes as tribes
 import sql_queries.Tests.cost_metrics.cases.employees.tents as tents
 import sql_queries.Tests.cost_metrics.cases.employees.positions as positions
+import sql_queries.Tests.cost_metrics.cases.employees.locations as locations
