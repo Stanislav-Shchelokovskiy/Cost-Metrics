@@ -167,15 +167,11 @@ VALUES	(5, 5, @middle_support, @armenia, 1200, @usd, @not_applicable, 5)
 --#########################################
 --####### EmployeesOperatingExpenses ######
 --#########################################
-DECLARE @null_date	DATE = '1990-01-01'
 CREATE TABLE EmployeesOperatingExpenses (
 	location_id			UNIQUEIDENTIFIER,
 	actual_since		DATE,
 	value_usd			FLOAT
 )
-CREATE CLUSTERED INDEX idx ON EmployeesOperatingExpenses(location_id, actual_since)
-INSERT INTO EmployeesOperatingExpenses
-VALUES	(@armenia, @null_date, 2200)
 --#########################################
 --######## EmployeesTaxCoefficients #######
 --#########################################
@@ -186,9 +182,6 @@ CREATE TABLE EmployeesTaxCoefficients (
 	self_employed	TINYINT,
 	value			FLOAT
 )
-CREATE CLUSTERED INDEX idx ON EmployeesTaxCoefficients(location_id, actual_since, self_employed, salary)
-INSERT INTO EmployeesTaxCoefficients
-VALUES	(@armenia, '2021-12-01', 0, 0, 1.31)
 --#####################################
 --####### EmployeesSelfEmployed #######
 --#####################################

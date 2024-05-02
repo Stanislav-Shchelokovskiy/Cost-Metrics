@@ -136,11 +136,11 @@ CREATE TABLE EmployeesAudit (
 )
 INSERT INTO	EmployeesAudit	(	EntityOid,	EntityModified,				ChangedProperties,	Chapter_Id,	Tribe_Id,	EmployeePosition_Id,	EmployeeLevel_Id,	EmployeeLocation_id,	HiredAt,				RetiredAt	)
 VALUES						(	@emp1,		'2022-09-05T08:50:17.43',	'Level',			@chapter1,	@tribe1,	@support_developer,		@trainee_support,	@armenia,				'2022-06-16T00:00:00',	NULL		),
-							(	@emp1,		'2022-10-05T08:50:17.43',	'Level',			@chapter1,	@tribe1,	@support_developer,		@middle_support,	@armenia,				'2022-06-16T00:00:00',	NULL		),
 							(	@emp1,		'2022-10-14T08:50:17.43',	'Level',			@chapter1,	@tribe1,	@support_developer,		@middle_dev,		@armenia,				'2022-06-16T00:00:00',	NULL		),
-							(	@emp1,		'2022-11-05T08:50:17.43',	'Level',			@chapter1,	@tribe1,	@support_developer,		@middle_support,	@armenia,				'2022-06-16T00:00:00',	NULL		),
-							(	@emp1,		'2022-12-07T08:50:17.43',	'Level',			@chapter1,	@tribe1,	@support_developer,		@middle_dev,		@armenia,				'2022-06-16T00:00:00',	NULL		),
-							(	@emp1,		'2022-12-27T08:50:17.43',	'Level',			@chapter1,	@tribe1,	@support_developer,		@senior_support,	@armenia,				'2022-06-16T00:00:00',	NULL		)
+							(	@emp1,		'2022-10-15T08:50:17.43',	'Level',			@chapter1,	@tribe1,	@support_developer,		@middle_support,	@armenia,				'2022-06-16T00:00:00',	NULL		),
+							(	@emp1,		'2022-11-15T08:50:17.43',	'Level',			@chapter1,	@tribe1,	@support_developer,		@middle_dev,		@armenia,				'2022-06-16T00:00:00',	NULL		),
+							(	@emp1,		'2022-11-16T08:50:17.43',	'Level',			@chapter1,	@tribe1,	@support_developer,		@middle_support,	@armenia,				'2022-06-16T00:00:00',	NULL		),
+							(	@emp1,		'2022-12-16T08:50:17.43',	'Level',			@chapter1,	@tribe1,	@support_developer,		@senior_support,	@armenia,				'2022-06-16T00:00:00',	NULL		)
 --#################################
 --####### EmployeesSalaries #######
 --#################################
@@ -165,14 +165,11 @@ VALUES	(1, 1,		@trainee_support,		@armenia,		900,	@usd, @not_applicable,	3	),
 --#########################################
 --####### EmployeesOperatingExpenses ######
 --#########################################
-DECLARE @null_date	DATE = '1990-01-01'
 CREATE TABLE EmployeesOperatingExpenses (
 	location_id			UNIQUEIDENTIFIER,
 	actual_since		DATE,
 	value_usd			FLOAT
 )
-INSERT INTO EmployeesOperatingExpenses
-VALUES	(@armenia, @null_date,	2200)
 --#########################################
 --######## EmployeesTaxCoefficients #######
 --#########################################
@@ -183,9 +180,6 @@ CREATE TABLE EmployeesTaxCoefficients (
 	self_employed	TINYINT,
 	value			FLOAT
 )
-CREATE CLUSTERED INDEX idx ON EmployeesTaxCoefficients(location_id, actual_since, self_employed, salary)
-INSERT INTO EmployeesTaxCoefficients
-VALUES	(@armenia, '2021-12-01', 0, 0, 1.31)
 --#####################################
 --####### EmployeesSelfEmployed #######
 --#####################################

@@ -62,8 +62,7 @@ SELECT	months.year_month														AS year_month,
 		ISNULL(emp_chapter_audit.chapter_id, employees.chapter_id)				AS chapter_id,
 		employees.has_support_processing_role									AS has_support_processing_role,
 		emp_location_audit.location_id											AS audit_location_id,
-		emp_location_audit.location_name										AS audit_location_name,
-		employees.location_id													AS actual_location_id
+		emp_location_audit.location_name										AS audit_location_name
 INTO	#Employees
 FROM	#Months AS months
 		OUTER APPLY (
@@ -255,7 +254,8 @@ FROM	#Months AS months
 																				 CEILING((DATEDIFF(MONTH, ISNULL(ISNULL(emp_hired_audit.hired_at, employees.hired_at), months.year_month), @now) + 1) * 1.0 /
 																						 (SELECT TOP 1 level_num FROM DXStatisticsV2.dbo.EmployeesSalaries WHERE level_id = ISNULL(employees.level_id, emp_position_audit.position_id))))), 1)
 									AND	period = IIF(ISNULL(emp_location_audit.location_id, employees.location_id) = @philippines, @not_applicable, IIF(months.year_month < @new_life_start, @before_oct_2022, @after_oct_2022)))
-						) AND (es_inner.location_id IS NULL OR es_inner.location_id = ISNULL(emp_location_audit.location_id, employees.location_id))
+						)
+				AND (es_inner.location_id IS NULL OR es_inner.location_id = ISNULL(emp_location_audit.location_id, employees.location_id))
 		) AS salaries
 		OUTER APPLY (
 			SELECT	TOP 1 eoe.value_usd
