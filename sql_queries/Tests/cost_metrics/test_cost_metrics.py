@@ -56,7 +56,7 @@ def test_prerequisites(
     case: cases.TestCase,
 ):
     with db(
-        up=f'{params.migrations}{up}.sql',
+        up=(params.up, f'{params.migrations}{up}.sql'),
         down=params.down,
     ):
         r = SqlServerRepository(
@@ -80,7 +80,7 @@ def test_prerequisites(
 @pytest.mark.integration
 def test_cost_metrics():
     with db(
-        up=params.cost_metrics,
+        up=(params.up, params.cost_metrics),
         down=params.down,
     ):
         got = RemoteRepository.cost_metrics.get_data(

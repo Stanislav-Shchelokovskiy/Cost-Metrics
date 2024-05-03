@@ -27,20 +27,20 @@ want = {
     _emps.name: ['emp1'] * 6,
     _emps.audit_location_id:
         [
-            '69D186BB-CF91-4A5B-BF75-D3F1036C33E3',
-            '00000000-0000-0000-0000-000000000002',
             None,
-            '69D186BB-CF91-4A5B-BF75-D3F1036C33E3',
-            '69D186BB-CF91-4A5B-BF75-D3F1036C33E3',
+            '00000000-0000-0000-0000-000000000003',
+            None,
+            '00000000-0000-0000-0000-000000000002',
+            '00000000-0000-0000-0000-000000000002',
             '00000000-0000-0000-0000-000000000001',
         ],
     _emps.audit_location_name:
         [
-            'philippines',
+            None,
             'other',
             None,
-            'philippines',
-            'philippines',
+            'estonia',
+            'estonia',
             'armenia',
         ],
 }

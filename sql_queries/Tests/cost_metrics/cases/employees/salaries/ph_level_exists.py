@@ -40,6 +40,6 @@ want = {
     _emps.name: ['emp1'] * 6,
     _emps.level_value: [4.0, 5.0, 5.0, 4.0, 5.0, 6.0],
     _emps.hourly_pay_net: [5.143, 6.214, 6.214, 5.143, 6.214, 6.964],
-    _emps.hourly_pay_gross: [5.143, 6.214, 6.214, 5.143, 6.214, 6.964],
-    _emps.hourly_pay_gross_withAOE: [5.143, 6.214, 6.214, 5.143, 6.214, 6.964],
+    _emps.hourly_pay_gross: [5.451, 6.587, 6.587, 5.451, 6.587, 7.382],
+    _emps.hourly_pay_gross_withAOE: [17.356, 18.492, 18.492, 17.356, 18.492, 19.287],
 }

@@ -1,10 +1,11 @@
 import os
 import subprocess
 from contextlib import contextmanager
+from collections.abc import Iterable
 
 
 @contextmanager
-def db(up: str, down: str):
+def db(up: str | Iterable[str], down: str):
     try:
         sqlcmd = [
             '/opt/mssql-tools18/bin/sqlcmd',
@@ -17,7 +18,10 @@ def db(up: str, down: str):
             '-C',
             '-i',
         ]
-        subprocess.run([*sqlcmd, up, '-I'])
+        if isinstance(up, str):
+            up = [up]
+        for u in up:
+            subprocess.run([*sqlcmd, u, '-I'])
         yield
     finally:
         subprocess.run([*sqlcmd, down])
