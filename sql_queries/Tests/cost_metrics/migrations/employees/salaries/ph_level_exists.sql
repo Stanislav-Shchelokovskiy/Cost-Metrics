@@ -19,7 +19,7 @@ DECLARE @philippines UNIQUEIDENTIFIER = '69D186BB-CF91-4A5B-BF75-D3F1036C33E3'
 --##### EMPLOYEES #######
 --#######################
 DECLARE @now 		DATE = GETUTCDATE()
-DECLARE @hired_at 	DATETIME = DATEADD(MONTH, -12,  @now)
+DECLARE @hired_at 	DATETIME = DATEADD(MONTH, -7,  @now)
 
 DECLARE @tribe1		UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000001'
 DECLARE @tribe1Name VARCHAR(20) 	 = 'tribe1'
@@ -32,6 +32,9 @@ VALUES					(	@emp1,	@emp1,	'emp1',	@tribe1,	@tribe1Name,	NULL,		NULL,		@support_
 --### EMPLOYEES AUDIT ###
 --#######################
 INSERT INTO	EmployeesAudit	(	EntityOid,	EntityModified,				ChangedProperties,	Chapter_Id,	Tribe_Id,	EmployeePosition_Id,	EmployeeLevel_Id,	EmployeeLocation_id,	HiredAt,	RetiredAt	)
-VALUES						(	@emp1,		DATEADD(MONTH, -3, @now),	'Level',			@chapter1,	@tribe1,	@support_developer_ph,	@junior4,			@philippines,			@hired_at,	NULL		),
+VALUES						(	@emp1,		DATEADD(MONTH, -6, @now),	'Level',			@chapter1,	@tribe1,	@support_developer_ph,	@junior1,			@philippines,			@hired_at,	NULL		),
+							(	@emp1,		DATEADD(MONTH, -5, @now),	'Level',			@chapter1,	@tribe1,	@support_developer_ph,	@junior2,			@philippines,			@hired_at,	NULL		),
+							(	@emp1,		DATEADD(MONTH, -4, @now),	'Level',			@chapter1,	@tribe1,	@support_developer_ph,	@junior3,			@philippines,			@hired_at,	NULL		),
+							(	@emp1,		DATEADD(MONTH, -3, @now),	'Level',			@chapter1,	@tribe1,	@support_developer_ph,	@junior4,			@philippines,			@hired_at,	NULL		),
 							(	@emp1,		DATEADD(MONTH, -2, @now),	'Level',			@chapter1,	@tribe1,	@support_developer_ph,	@middle1,			@philippines,			@hired_at,	NULL		),
 							(	@emp1,		DATEADD(MONTH, -1, @now),	'Level',			@chapter1,	@tribe1,	@support_developer_ph,	@middle2,			@philippines,			@hired_at,	NULL		)

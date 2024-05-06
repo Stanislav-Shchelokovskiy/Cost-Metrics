@@ -48,6 +48,10 @@ from toolbox.sql.repository_queries import RepositoryAlchemyQueries, SqlAlchemyQ
             '/employees/salaries/ph_level_missing',
             cases.ph_level_missing,
         ),
+        (
+            '/employees/salaries/ph_level_exists',
+            cases.ph_level_exists,
+        ),
     ],
 )
 @pytest.mark.integration
