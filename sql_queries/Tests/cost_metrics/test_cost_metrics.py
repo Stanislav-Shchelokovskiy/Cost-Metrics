@@ -68,6 +68,26 @@ from toolbox.sql.repository_queries import RepositoryAlchemyQueries, SqlAlchemyQ
             '/employees/salaries/self_employed',
             cases.self_employed,
         ),
+        (
+            '/employees/where/pos_audit_non_null',
+            cases.pos_audit_non_null,
+        ),
+        (
+            '/employees/where/pos_not_null',
+            cases.pos_not_null,
+        ),
+        (
+            '/employees/where/hired_at_audit_not_null',
+            cases.hired_at_audit_not_null,
+        ),
+        (
+            '/employees/where/hired_at_not_null',
+            cases.hired_at_not_null,
+        ),
+        (
+            '/employees/where/salaries',
+            cases.salaries,
+        ),
     ],
 )
 @pytest.mark.integration

@@ -16,3 +16,10 @@ from sql_queries.Tests.cost_metrics.cases.employees.salaries import (
     only_pos_audit_exists,
     self_employed,
 )
+from sql_queries.Tests.cost_metrics.cases.employees.where import (
+    pos_audit_non_null,
+    pos_not_null,
+    hired_at_audit_not_null,
+    hired_at_not_null,
+    salaries,
+)
