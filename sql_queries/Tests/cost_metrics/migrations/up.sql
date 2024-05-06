@@ -245,15 +245,15 @@ VALUES		(1, 1, @junior1, @philippines, 30500, @php, @not_applicable, 3),
             (3, 3,    	@middle_support,  	@other,   	1300, @usd, @after_oct_2022,  	5),
             (3, 3,    	@middle_support,  	NULL,     	1400, @usd, @before_oct_2022, 	5),
 
-            (4, 4,    	@middle_dev,      	@estonia, 	1450, @eur, @after_oct_2022,  	5),
-            (4, 4,    	@middle_dev,      	@armenia, 	1500, @usd, @after_oct_2022,  	5),
-            (4, 4,    	@middle_dev,      	@other,   	1600, @usd, @after_oct_2022,  	5),
-            (4, 4,    	@middle_dev,      	NULL,     	1700, @usd, @before_oct_2022, 	5),
+            (3, 3,    	@middle_dev,      	@estonia, 	1450, @eur, @after_oct_2022,  	5),
+            (3, 3,    	@middle_dev,      	@armenia, 	1500, @usd, @after_oct_2022,  	5),
+            (3, 3,    	@middle_dev,      	@other,   	1600, @usd, @after_oct_2022,  	5),
+            (3, 3,    	@middle_dev,      	NULL,     	1700, @usd, @before_oct_2022, 	5),
 
-            (5, 5,	 	@senior_support,  	@estonia, 	1750, @eur, @after_oct_2022, 	5.5),
-            (5, 5,   	@senior_support,  	@armenia, 	1800, @usd, @after_oct_2022,  	5.5),
-            (5, 5,   	@senior_support,  	@other,   	1900, @usd, @after_oct_2022,  	5.5),
-            (5, 5,   	@senior_support,  	NULL,     	2000, @usd, @before_oct_2022, 	5.5)
+            (4, 4,	 	@senior_support,  	@estonia, 	1750, @eur, @after_oct_2022, 	5.5),
+            (4, 4,   	@senior_support,  	@armenia, 	1800, @usd, @after_oct_2022,  	5.5),
+            (4, 4,   	@senior_support,  	@other,   	1900, @usd, @after_oct_2022,  	5.5),
+            (4, 4,   	@senior_support,  	NULL,     	2000, @usd, @before_oct_2022, 	5.5)
 
 CREATE CLUSTERED INDEX idx ON EmployeesSalaries(level_id, location_id)
 CREATE NONCLUSTERED INDEX idx_missing_level ON EmployeesSalaries(period, probable_level_num) INCLUDE(level_id) WHERE EmployeesSalaries.probable_level_num IS NOT NULL

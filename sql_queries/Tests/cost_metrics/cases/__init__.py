@@ -12,4 +12,5 @@ from sql_queries.Tests.cost_metrics.cases.employees.salaries import (
     ph_level_missing,
     ph_level_exists,
     non_ph_level_missing,
+    only_pos_audit_exists,
 )
