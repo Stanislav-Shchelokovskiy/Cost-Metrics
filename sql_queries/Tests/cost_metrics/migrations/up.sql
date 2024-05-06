@@ -167,11 +167,13 @@ DECLARE @middle1 UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000055'
 DECLARE @middle2 UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000066'
 
 DECLARE @trainee_support	UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000003'
+DECLARE @junior_support		UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000007'
 DECLARE @middle_support		UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000004'
 DECLARE @middle_dev			UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000005'
 DECLARE @senior_support		UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000006'
 INSERT INTO Levels(id, name)
 VALUES	(@trainee_support,	'trainee_support'	),
+		(@junior_support,	'junior_support'	),
 		(@middle_support,	'middle_support'	),
 		(@middle_dev,		'middle_dev'		),
 		(@senior_support,	'senior_support'	)
@@ -228,25 +230,30 @@ VALUES		(1, 1, @junior1, @philippines, 30500, @php, @not_applicable, 3),
             (5, 5, @middle1, @philippines, 58000, @php, @not_applicable, 5),
             (6, 6, @middle2, @philippines, 65000, @php, @not_applicable, 6),
 
-            (1, 1,    @trainee_support, @estonia, 850,  @eur, @after_oct_2022,  3),
-            (1, 1,    @trainee_support, @armenia, 900,  @usd, @after_oct_2022,  3),
-            (1, NULL, @trainee_support, @other,   1000, @usd, @after_oct_2022,  3),
-            (1, 1,    @trainee_support, NULL,     1100, @usd, @before_oct_2022, 3),
+            (1, 1,   	@trainee_support, 	@estonia, 	850,  @eur, @after_oct_2022,  	3),
+            (1, 1,   	@trainee_support, 	@armenia, 	900,  @usd, @after_oct_2022,  	3),
+            (1, NULL,	@trainee_support, 	@other,   	1000, @usd, @after_oct_2022,  	3),
+            (1, 1,   	@trainee_support, 	NULL,     	1100, @usd, @before_oct_2022, 	3),
 
-            (5, 5,    @middle_support,  @estonia, 1150, @eur, @after_oct_2022,  5),
-            (5, 5,    @middle_support,  @armenia, 1200, @usd, @after_oct_2022,  5),
-            (5, 5,    @middle_support,  @other,   1300, @usd, @after_oct_2022,  5),
-            (5, 5,    @middle_support,  NULL,     1400, @usd, @before_oct_2022, 5),
+			(2,	2,		@junior_support,	@estonia,  	925,  @eur, @after_oct_2022,  	4),
+			(2,	2,		@junior_support,	@armenia,  	975,  @usd, @after_oct_2022,  	4),
+			(2,	NULL,	@junior_support,	@other,	  	1025, @usd, @after_oct_2022,  	4),
+			(2,	2,		@junior_support,	NULL,	  	1075, @usd, @before_oct_2022, 	4),
 
-            (5, 5,    @middle_dev,      @estonia, 1450, @eur, @after_oct_2022,  5),
-            (5, 5,    @middle_dev,      @armenia, 1500, @usd, @after_oct_2022,  5),
-            (5, 5,    @middle_dev,      @other,   1600, @usd, @after_oct_2022,  5),
-            (5, 5,    @middle_dev,      NULL,     1700, @usd, @before_oct_2022, 5),
+            (3, 3,    	@middle_support,  	@estonia, 	1150, @eur, @after_oct_2022,  	5),
+            (3, 3,    	@middle_support,  	@armenia, 	1200, @usd, @after_oct_2022,  	5),
+            (3, 3,    	@middle_support,  	@other,   	1300, @usd, @after_oct_2022,  	5),
+            (3, 3,    	@middle_support,  	NULL,     	1400, @usd, @before_oct_2022, 	5),
 
-            (6, 6,	  @senior_support,  @estonia, 1750,	@eur, @after_oct_2022,	5.5),
-            (6, 6,    @senior_support,  @armenia, 1800, @usd, @after_oct_2022,  5.5),
-            (6, 6,    @senior_support,  @other,   1900, @usd, @after_oct_2022,  5.5),
-            (6, 6,    @senior_support,  NULL,     2000, @usd, @before_oct_2022, 5.5)
+            (4, 4,    	@middle_dev,      	@estonia, 	1450, @eur, @after_oct_2022,  	5),
+            (4, 4,    	@middle_dev,      	@armenia, 	1500, @usd, @after_oct_2022,  	5),
+            (4, 4,    	@middle_dev,      	@other,   	1600, @usd, @after_oct_2022,  	5),
+            (4, 4,    	@middle_dev,      	NULL,     	1700, @usd, @before_oct_2022, 	5),
+
+            (5, 5,	 	@senior_support,  	@estonia, 	1750, @eur, @after_oct_2022, 	5.5),
+            (5, 5,   	@senior_support,  	@armenia, 	1800, @usd, @after_oct_2022,  	5.5),
+            (5, 5,   	@senior_support,  	@other,   	1900, @usd, @after_oct_2022,  	5.5),
+            (5, 5,   	@senior_support,  	NULL,     	2000, @usd, @before_oct_2022, 	5.5)
 
 CREATE CLUSTERED INDEX idx ON EmployeesSalaries(level_id, location_id)
 CREATE NONCLUSTERED INDEX idx_missing_level ON EmployeesSalaries(period, probable_level_num) INCLUDE(level_id) WHERE EmployeesSalaries.probable_level_num IS NOT NULL
