@@ -45,8 +45,8 @@ from toolbox.sql.repository_queries import RepositoryAlchemyQueries, SqlAlchemyQ
             cases.locations,
         ),
         (
-            '/employees/salaries/ph_level_exists',
-            cases.ph_level_exists,
+            '/employees/salaries/ph_level_missing',
+            cases.ph_level_missing,
         ),
     ],
 )
