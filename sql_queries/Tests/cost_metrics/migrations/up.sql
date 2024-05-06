@@ -199,8 +199,6 @@ DROP TABLE IF EXISTS EmployeesSelfEmployed
 CREATE TABLE EmployeesSelfEmployed (
 	crmid	UNIQUEIDENTIFIER
 )
-INSERT INTO EmployeesSelfEmployed
-VALUES	('00000000-0000-0000-0000-000000000004')
 --#################################
 --####### EmployeesSalaries #######
 --#################################
@@ -279,18 +277,18 @@ CREATE CLUSTERED INDEX idx ON EmployeesOperatingExpenses(location_id, actual_sin
 CREATE TABLE EmployeesTaxCoefficients (
 	location_id		UNIQUEIDENTIFIER,
 	actual_since	DATE,
-	salary			FLOAT,
 	self_employed	TINYINT,
 	value			FLOAT
 )
 DECLARE @new_life_start		DATE = '2022-10-01'
 DECLARE @relocation_date	DATE = '2022-03-01'
-INSERT INTO EmployeesTaxCoefficients(location_id,   actual_since,   salary, self_employed, value    )
-VALUES	                            (@other,		@null_date,		0,		0,	            1.078	),
-		                            (@philippines,	@null_date,		0,		0,	            1.06	),
-		                            (@armenia,		'2021-12-01',	0,		0,	            1.31	)
+INSERT INTO EmployeesTaxCoefficients(location_id,   actual_since,   self_employed,  value   )
+VALUES	                            (@other,		@null_date,		0,	            1.078	),
+		                            (@philippines,	@null_date,		0,	            1.06	),
+		                            (@armenia,		'2021-12-01',	0,	            1.31	),
+									(@armenia,		'2021-12-01',	1,	            1		)
 
-CREATE CLUSTERED INDEX idx ON EmployeesTaxCoefficients(location_id, actual_since, self_employed, salary)
+CREATE CLUSTERED INDEX idx ON EmployeesTaxCoefficients(location_id, actual_since, self_employed)
 --#######################
 --##### SCWorkHours #####
 --#######################
