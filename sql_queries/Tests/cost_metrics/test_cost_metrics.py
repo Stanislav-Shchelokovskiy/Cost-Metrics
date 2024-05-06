@@ -60,6 +60,10 @@ from toolbox.sql.repository_queries import RepositoryAlchemyQueries, SqlAlchemyQ
             '/employees/salaries/only_pos_audit_exists',
             cases.only_pos_audit_exists,
         ),
+        (
+            '/employees/salaries/only_actual_level_exists',
+            cases.only_actual_level_exists,
+        ),
     ],
 )
 @pytest.mark.integration

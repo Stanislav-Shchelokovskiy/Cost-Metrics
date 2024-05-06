@@ -9,6 +9,7 @@ import sql_queries.Tests.cost_metrics.cases.employees.tents as tents
 import sql_queries.Tests.cost_metrics.cases.employees.positions as positions
 import sql_queries.Tests.cost_metrics.cases.employees.locations as locations
 from sql_queries.Tests.cost_metrics.cases.employees.salaries import (
+    only_actual_level_exists,
     ph_level_missing,
     ph_level_exists,
     non_ph_level_missing,
