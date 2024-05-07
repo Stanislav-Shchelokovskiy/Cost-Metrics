@@ -23,3 +23,5 @@ from sql_queries.Tests.cost_metrics.cases.employees.where import (
     hired_at_not_null,
     salaries,
 )
+
+import sql_queries.Tests.cost_metrics.cases.iterations as iterations

@@ -13,7 +13,7 @@ from toolbox.sql.repository_queries import RepositoryAlchemyQueries, SqlAlchemyQ
     'up, case',
     [
         (
-            'months',
+            'stub',
             cases.months,
         ),
         (
@@ -87,6 +87,10 @@ from toolbox.sql.repository_queries import RepositoryAlchemyQueries, SqlAlchemyQ
         (
             '/employees/where/salaries',
             cases.salaries,
+        ),
+        (
+            'stub',
+            cases.iterations,
         ),
     ],
 )
