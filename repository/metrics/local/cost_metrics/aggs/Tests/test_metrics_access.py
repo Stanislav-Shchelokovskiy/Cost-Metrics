@@ -22,21 +22,18 @@ ADMIN = 'admin'
 
 
 @decorator
-def with_env(
+def with_patch(
     callable: Callable[..., None],
     instance,
     args: Iterable,
     kwargs: dict,
 ):
     with pytest.MonkeyPatch.context() as monkeypatch:
-        import repository.metrics.local.cost_metrics.aggs.metric_aggs as aggs
-        # yapf: disable
         monkeypatch.setenv('ADMIN_ROLE', ADMIN)
         monkeypatch.setenv('ADVANCED_ROLE', ADVANCED)
         monkeypatch.setattr(aggs, 'basic_metrics', basic_metrics)
         monkeypatch.setattr(aggs, 'advanced_role_metrics', advanced_role_metrics)
         monkeypatch.setattr(aggs, 'admin_role_metrics', admin_role_metrics)
-        # yapf: enable
         return callable(**kwargs)
 
 
@@ -54,7 +51,7 @@ def with_env(
         (basic_metric.name, ADMIN, basic_metric),
     ],
 )
-@with_env
+@with_patch
 def test_get_metric(metric_name, role, result):
     assert aggs.get_metric(metric_name, role) == result
 
@@ -73,7 +70,7 @@ def test_get_metric(metric_name, role, result):
         (basic_metric.name, ADMIN, True),
     ],
 )
-@with_env
+@with_patch
 def test_is_authorized_metric(metric_name, role, result):
     assert aggs.is_authorized_metric(metric_name, role) == result
 
@@ -86,7 +83,7 @@ def test_is_authorized_metric(metric_name, role, result):
         (ADMIN, admin_role_metrics),
     ],
 )
-@with_env
+@with_patch
 def test_get_metrics(role, result):
     assert aggs.get_metrics(role) == result
 
@@ -120,6 +117,6 @@ def test_get_metrics(role, result):
         ),
     ],
 )
-@with_env
+@with_patch
 def test_select_metrics(role, projector, filter, result):
     assert aggs.select_metrics(role, projector, filter) == result
