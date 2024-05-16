@@ -6,6 +6,4 @@
 **celerybeat-schedule
 **data
 **Tests/test_db
-**Tests/params
-**Tests/responses
 **tmp.py
