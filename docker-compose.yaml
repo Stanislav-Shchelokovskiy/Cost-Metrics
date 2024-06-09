@@ -2,7 +2,7 @@ version: '3.4'
 
 x-cost_metrics:
   &cost_metrics
-  image: devexpress/support:cost_metrics
+  image: shchelokovskiy/metrics:cost_metrics
   restart: always
   environment:
     - SQL_SERVER
