@@ -1,3 +1,6 @@
+### See [Engineering Metrics WIKI](https://github.com/Stanislav-Shchelokovskiy/MetricsUI/blob/release/wiki/WIKI.md) for a full review of the overall platform functionality.
+
+
 # How to run the app
 Add **.env** file containing the following env vars:
 - SQL_SERVER=...
