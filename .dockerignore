@@ -1,0 +1,16 @@
+**/__pycache__
+**/Tests
+**/.pytest_cache
+**/.gitignore
+**celerybeat-schedule
+**/.venv
+**/*.md
+**/*.dvc
+/data
+**/.dev_env.sh
+**/.dockerignore
+**/.env
+**/.dvcignore
+**/.gitmodules
+**/.github
+**/Makefile

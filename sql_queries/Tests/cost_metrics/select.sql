@@ -1,0 +1,2 @@
+SELECT  {select}
+FROM    {from}

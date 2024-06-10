@@ -1,0 +1,114 @@
+version: '3.4'
+
+x-cost_metrics:
+  &cost_metrics
+  image: shchelokovskiy/metrics:cost_metrics
+  restart: always
+  environment:
+    - SQL_SERVER
+    - SQL_DATABASE
+    - SQL_USER
+    - SQL_PASSWORD
+    - WF_LOGIN_HEADER
+    - WF_LOGIN_PASSWORD
+    - WF_LOGIN
+    - WF_PASSWORD
+    - WF_ENDPOINT
+    - EMPS_ENDPOINT
+    - EMPS_AUDIT_ENDPOINT
+    - EMPS_VACATIONS_ENDPOINT
+    - EMPS_POSITIONS_ENDPOINT
+    - EMPS_LOCATIONS_ENDPOINT
+    - EMPS_LEVELS_ENDPOINT
+    - EMPS_APPID
+    - EMPS_USERID
+    - EMPS_APIKEY
+    - AUTH_ENDPOINT
+    - AUTH_ENABLED
+    - CORS_ORIGINS
+    - REDIS_SERVICE=cost_metrics_redis${VERSION}
+    - REDIS_PORT=6379
+    - REDIS_DB
+    - ADMIN_ROLE
+    - ADVANCED_ROLE
+    - CELERY_BROKER_URL=redis://cost_metrics_redis${VERSION}:6379/0
+    - CELERY_RESULT_BACKEND=redis://cost_metrics_redis${VERSION}:6379/0
+    - SQLITE_DATABASE=${DB_HOME}/db
+    - LD_LIBRARY_PATH=/usr/lib #https://stackoverflow.com/questions/49920444/upgrading-sqlite3-version-used-in-python3-on-linux
+    - PRODUCTION
+    - UPDATE_ON_STARTUP
+    - RECALCULATE_FROM_THE_BEGINNING
+    - RECALCULATE_FOR_LAST_MONTHS
+
+services:
+  cost_metrics_dashboard:
+    <<: *cost_metrics
+    hostname: cost_metrics_dashboard${VERSION}
+    container_name: cost_metrics_dashboard${VERSION}
+    command: celery --app=worker flower --url_prefix=CostMetricsDash --port=5555
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-f",
+          "http://localhost:5555/CostMetricsDash/healthcheck"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    expose:
+      - "5555"
+    depends_on:
+      cost_metrics_redis:
+        condition: service_healthy
+
+  cost_metrics_worker:
+    <<: *cost_metrics
+    hostname: cost_metrics_worker${VERSION}
+    container_name: cost_metrics_worker${VERSION}
+    command: celery --app=worker worker --beat --loglevel=INFO --concurrency=7
+    volumes:
+      - cost_metrics${VERSION}-volume:${DB_HOME}
+    depends_on:
+      cost_metrics_redis:
+        condition: service_healthy
+      cost_metrics_dashboard:
+        condition: service_healthy
+
+  cost_metrics_server:
+    <<: *cost_metrics
+    hostname: cost_metrics_server${VERSION}
+    container_name: cost_metrics_server${VERSION}
+    command: uvicorn server:app --host 0.0.0.0 --port 80 --log-level critical
+    expose:
+      - "80"
+    volumes:
+      - cost_metrics${VERSION}-volume:${DB_HOME}
+
+  cost_metrics_redis:
+    image: redis/redis-stack-server:latest
+    hostname: cost_metrics_redis${VERSION}
+    container_name: cost_metrics_redis${VERSION}
+    restart: always
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    volumes:
+      - cost_metrics${VERSION}-volume:/data
+    environment:
+      - REDIS_ARGS=--save 600 10
+
+volumes:
+  cost_metrics-volume:
+  cost_metrics_rc-volume:
+
+
+networks:
+  default:
+    name: support_analytics
+    external: true
